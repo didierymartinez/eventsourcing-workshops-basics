@@ -1,4 +1,4 @@
-# 🏷️ Definición de eventos
+# 03 - Modelado de eventos
 
 En Event Sourcing, los eventos son la fuente de la verdad. Representan hechos inmutables que ya ocurrieron en tu negocio.
 
@@ -31,20 +31,11 @@ El dominio de una **Orden de Compra** tiene más situaciones. Intenta definir ot
 Usar `record` (en lugar de una `class` tradicional) es una de las mejores prácticas en .NET para Event Sourcing por tres razones:
 
 1. **Inmutabilidad**: Un evento es un hecho que **ya ocurrió en el pasado**. El pasado no se puede editar. Los `record` facilitan la definición de objetos que no pueden cambiar una vez creados, evitando errores accidentales en tu lógica.
-2. **Igualdad por Valor (Testing)**: A diferencia de las clases, dos registros son considerados **iguales si sus datos son iguales**. Esto es clave para las **Prueas Unitarias**: puedes comparar directamente el evento generado por tu sistema con uno esperado (`Assert.Equal(esperado, generado)`) sin tener que comparar propiedad por propiedad.
+2. **Igualdad por Valor (Testing)**: A diferencia de las clases, dos registros son considerados **iguales si sus datos son iguales**. Esto es clave para las **Pruebas Unitarias**: puedes comparar directamente el evento generado por tu sistema con uno esperado (`Assert.Equal(esperado, generado)`) sin tener que comparar propiedad por propiedad.
 3. **Semántica de Dominio**: En Event Sourcing, un evento es una "foto" de un momento. Si tienes dos fotos idénticas, representan el mismo hecho, sin importar si están en distintos lugares de la memoria.
 
 ---
 
-> [!TIP]
-> **Dato técnico**: Las clases comparan por **referencia** (identidad en memoria), mientras que los records comparan por **valor** (los datos que contienen). Para un evento, lo que importa es el dato, no dónde está guardado en la memoria.
+[⬅️ Volver a la sección anterior](./2-configuracion.md)
 
-
-> [!IMPORTANT]
-> Los eventos siempre deben nombrarse en **pasado** (`Creada`, `Agregado`, `Enviado`) porque representan algo que ya sucedió.
-
----
-
-[⬅️ Volver a la sección anterior](./configuracion-inicial.md)
-
-[➡️ Siguiente sección: Persistencia de eventos con Marten](./persistencia-eventos-marten.md)
+[➡️ Siguiente sección: Construir el Agregado Puro](./4-agregado-puro.md)

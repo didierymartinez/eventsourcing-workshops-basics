@@ -1,4 +1,4 @@
-# ⚙️ Configuración inicial y requisitos previos
+# 02 - Configuración inicial y requisitos previos
 
 Antes de comenzar con el workshop, asegúrate de cumplir con los siguientes requisitos y de preparar tu entorno.
 
@@ -52,6 +52,6 @@ Ahora que la base de datos está lista, crearemos el proyecto donde trabajaremos
 
 ---
 
-[⬅️ Volver al índice](../README.md)
+[⬅️ Volver a la sección anterior](./1-fundamentos.md)
 
-[➡️ Siguiente sección: Definición de eventos](./definicion-eventos.md)
+[➡️ Siguiente sección: Modelado de eventos](./3-modelado-eventos.md)

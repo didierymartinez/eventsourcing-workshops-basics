@@ -16,12 +16,12 @@ Aprenderás a modelar eventos, almacenarlos y consultarlos usando Event Sourcing
 
 ## 📚 Secciones del workshop
 
-1. [⚙️ Configuración inicial y requisitos previos](./secciones/configuracion-inicial.md)
-2. [🏷️ Definición de eventos](./secciones/definicion-eventos.md)
-3. [💾 Persistir los eventos en la base de datos](./secciones/persistencia-eventos-marten.md)
-4. [🧩 Construir el agregado](./secciones/construir-agregado.md)
-5. [🔎 Consultar eventos y reconstruir el agregado](./secciones/consultar-eventos-y-reconstruir-agregado.md)
-6. [📊 Proyecciones y consultas derivadas](./secciones/proyecciones.md)
+1. [01 - 🧠 Fundamentos de Event Sourcing](./secciones/1-fundamentos.md)
+2. [02 - ⚙️ Configuración inicial y requisitos previos](./secciones/2-configuracion.md)
+3. [03 - 🏷️ Modelado de eventos](./secciones/3-modelado-eventos.md)
+4. [04 - 🧩 Construir el Agregado (Puro C#)](./secciones/4-agregado-puro.md)
+5. [05 - 💾 Persistencia de eventos con Marten](./secciones/5-persistencia-marten.md)
+6. [06 - 📊 Consultas y Proyecciones](./secciones/6-consultas-proyecciones.md)
 
 ---
 
