@@ -10,7 +10,7 @@ Imagina que el dueño del negocio te pide saber cuánto dinero ha vendido hoy. S
 ---
 
 ## 1. Definiendo los hechos
-En C#, la mejor forma de representar algo que ya pasó es mediante un **Record**. 
+Independientemente del lenguaje de programación, lo que buscamos es que algo que **ya pasó** no se pueda alterar. En C#, la herramienta ideal para representar este concepto de inmutabilidad es el **Record**, ya que es muy breve de escribir y protege los datos por naturaleza.
 
 Escribe esto en tu `Program.cs`:
 
@@ -22,9 +22,9 @@ public record ProductoAgregado(string Nombre, int Cantidad, decimal Precio);
 
 ### ¿Por qué `record` en vez de `class`?
 
-Usar `record` es fundamental en este enfoque por tres razones clave:
+Usar `record` es fundamental por tres razones que refuerzan este principio:
 
-1.  **Inmutabilidad**: Un hecho es algo que **ya ocurrió**. El pasado no se puede cambiar. Los `record` están diseñados para no ser modificados una vez creados, protegiendo la integridad de tu historia.
+1.  **Inmutabilidad**: Como mencionamos, un hecho es pasado. El pasado no se edita. Los `record` aseguran que nadie pueda cambiar accidentalmente los datos de un evento una vez que ha sido registrado.
 2.  **Igualdad por Valor**: Dos registros son iguales si sus datos son iguales. Esto facilita enormemente las pruebas: puedes comparar si el sistema generó el hecho correcto simplemente comparando los objetos, sin revisar propiedad por propiedad.
 3.  **Semántica**: Al leer `record`, el programador entiende de inmediato que este objeto es un transporte de datos inmutable, no una entidad con comportamiento complejo.
 
