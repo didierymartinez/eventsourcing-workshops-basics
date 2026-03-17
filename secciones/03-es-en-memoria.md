@@ -8,9 +8,6 @@ En C#, la mejor forma de representar algo que ya pasó es mediante un **Record**
 Escribe esto en tu `Program.cs`:
 
 ```csharp
-using System;
-using System.Collections.Generic;
-
 // Definimos los hechos que pueden ocurrir en nuestra Orden de Compra
 public record OrdenCreada(Guid Id, string NumeroFactura);
 public record ProductoAgregado(string Nombre, int Cantidad, decimal Precio);
@@ -19,10 +16,12 @@ public record ProductoAgregado(string Nombre, int Cantidad, decimal Precio);
 ---
 
 ## 2. Nuestro diario de anotaciones
-Para guardar estos hechos, usaremos la estructura más simple que nos ofrece C#: una **Lista**.
+Para que la historia tenga sentido, necesitamos guardar estos hechos **en el orden exacto en que ocurrieron**. Un hecho que sucede después de otro puede cambiar el resultado final.
+
+Por eso, usaremos la estructura más simple que nos permite mantener ese orden cronológico: una **Lista**.
 
 ```csharp
-// Un lugar temporal para anotar todo lo que pase
+// Un lugar temporal para anotar todo lo que pase (en orden)
 var historial = new List<object>();
 
 // Comienzan a ocurrir hechos en nuestro negocio
