@@ -1,32 +1,34 @@
-## Ejercicio: Modelando eventos en Program.cs
+# 🏷️ Definición de eventos
 
-En este ejercicio trabajarás en el archivo `Program.cs` para modelar un flujo básico de eventos usando C# y Marten.
+En Event Sourcing, los eventos son la fuente de la verdad. Representan hechos inmutables que ya ocurrieron en tu negocio.
 
-### ¿Qué debes hacer?
+## Ejercicio: Modelando tus primeros eventos
 
-1. **Define los eventos** que representan acciones importantes en el dominio de una orden de compra. Por ejemplo:
-   - `OrdenCreada`: cuando se crea una orden.
-   - `ProductoAgregado`: cuando se agrega un producto a la orden.
+En este primer paso, definirás cómo se ven los eventos de una **Orden de Compra** en código C#.
 
-2. **Implementa estos tipos usando `record`** para los eventos. Los `record` en C# son ideales para modelar datos inmutables y facilitan la comparación y manipulación de datos.
+### 1. ¿Qué debes hacer?
 
-### Diferencia entre `class` y `record`
-
-- **`class`**: Es el tipo de referencia tradicional en C#. Sus instancias son mutables por defecto y la igualdad se basa en la referencia (a menos que se sobreescriba).
-- **`record`**: Introducido en C# 9, es ideal para modelos inmutables. La igualdad se basa en el valor de sus propiedades, lo que es útil para eventos y estados en DDD/Event Sourcing.
-
-### Ejemplo orientativo
+Abre el archivo `Program.cs` de tu proyecto `TallerMarten.OrdenCompra` y borra todo su contenido. Luego, escribe las siguientes definiciones de eventos:
 
 ```csharp
-public record OrdenCreada(string IdOrden, string Numero);
-public record ProductoAgregado(string IdProducto, string Nombre, decimal Precio);
+using System;
+
+// Definición de eventos como registros (records) inmutables
+public record OrdenCreada(Guid Id, string NumeroFactura);
+public record ProductoAgregado(string Nombre, int Cantidad, decimal Precio);
 ```
 
-### ¿Por qué modelar así?
+### 2. ¿Por qué usamos `record`?
 
-- Los **eventos** (`OrdenCreada`, `ProductoAgregado`) representan hechos que ocurrieron en el sistema y deben ser inmutables.
+En C#, un `record` es ideal para eventos porque:
+- **Inmutabilidad**: Una vez creado, un evento no debe cambiar (el pasado no se puede editar).
+- **Simplicidad**: Permiten definir estructuras de datos en una sola línea.
+- **Igualdad por valor**: Dos eventos son iguales si sus datos son iguales.
 
-> Intenta implementar estos tipos en tu `Program.cs` y reflexiona sobre cómo los eventos pueden modificar el estado del sistema.
+---
+
+> [!IMPORTANT]
+> Los eventos siempre deben nombrarse en **pasado** (`Creada`, `Agregado`, `Enviado`) porque representan algo que ya sucedió.
 
 ---
 
