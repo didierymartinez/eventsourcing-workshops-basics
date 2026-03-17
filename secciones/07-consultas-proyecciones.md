@@ -1,12 +1,19 @@
 # 07 - Consultas y vistas inteligentes
 
-Ya guardamos hechos de forma profesional. Ahora el reto es: ¿cómo volvemos a leerlos sin tener que hacer todo el trabajo manual de la sección 03?
+Llegamos a la última etapa. Ya guardamos la historia, pero ahora necesitamos leerla de forma eficiente.
 
-## 1. Reconstrucción automática del estado
-¿Recuerdas el bucle `foreach` que escribiste para calcular el total? Marten ya sabe hacer eso por ti. Solo tienes que pedirle el "Agregado" (el objeto final).
+## 🎯 El Objetivo
+Si una orden tiene miles de hechos, reconstruir el total sumándolos todos cada vez que el cliente refresca la página es ineficiente y lento.
+
+¿Cómo podemos tener una "foto" instantánea del total sin perder el historial de los hechos?
+
+---
+
+## 1. Reconstrucción automática
+Antes de pasar a la solución avanzada, veamos cómo la herramienta automatiza lo que hicimos en la sección 03.
 
 ```csharp
-// Marten lee la historia y te devuelve la "foto" actual de la orden
+// Le pedimos a la herramienta que reconstruya el estado final por nosotros
 var orden = await session.Events.AggregateStreamAsync<OrdenCompra>(idOrden);
 
 Console.WriteLine($"Orden recuperada: {orden.Numero}");
@@ -14,10 +21,8 @@ Console.WriteLine($"Orden recuperada: {orden.Numero}");
 
 ---
 
-## 2. El problema del rendimiento
-Si nuestro negocio tiene 10 años de historia y millones de hechos, reconstruir el estado cada vez que alguien quiere ver un reporte sería muy lento. 
-
-**¿La solución?** Ir creando "vistas" o "reportes" en tiempo real a medida que los hechos ocurren.
+## 2. El poder de las vistas en tiempo real
+Para cumplir nuestro objetivo de eficiencia, crearemos un modelo que se actualice **automáticamente** cada vez que un hecho ocurre.
 
 ```csharp
 public class OrdenResumen
@@ -31,7 +36,7 @@ public class OrdenResumenProjection : Marten.Events.Projections.EventProjection
     // Cuando el hecho "OrdenCreada" sucede, iniciamos un resumen
     public OrdenResumen Create(OrdenCreada ev) => new OrdenResumen { Id = ev.Id, Total = 0 };
 
-    // Cuando el hecho "ProductoAgregado" sucede, actualizamos el resumen
+    // Cuando el hecho "ProductoAgregado" sucede, actualizamos el resumen instantáneamente
     public void Apply(ProductoAgregado ev, OrdenResumen resumen)
     {
         resumen.Total += ev.Precio;
@@ -42,18 +47,17 @@ public class OrdenResumenProjection : Marten.Events.Projections.EventProjection
 ---
 
 ### El Descubrimiento Final
-A estas "vistas inteligentes" que escuchan hechos y transforman la historia en tablas de consulta fáciles de leer, se les llama **Proyecciones**. 
+A estas tablas optimizadas para lectura, que se mantienen sincronizadas con la historia sin intervención manual, las llamamos **Proyecciones**. 
 
-Con esto, has cerrado el círculo:
-1. Identificaste **Hechos** (Eventos).
-2. Construiste la **Historia** (Event Sourcing).
-3. Aseguraste la permanencia en un **Baúl** (Event Store).
-4. Optimizaste la lectura con **Vistas** (Proyecciones).
+Ahora tienes un sistema que:
+1. No olvida nada (Historia).
+2. Es permanente (Almacenamiento).
+3. Es increíblemente rápido al leer (Proyecciones).
 
 ---
 
 ## 🏁 ¡Felicidades!
-Has descubierto los fundamentos de una arquitectura orientada a eventos. Ahora tienes las herramientas para construir sistemas que no olvidan nada.
+Has completado el viaje. Has pasado de anotar en listas manuales a entender cómo funcionan los sistemas de eventos más avanzados de la industria.
 
 ---
 

@@ -1,11 +1,16 @@
 # 05 - Un baúl que no se borra
 
-Para que nuestros hechos "sobrevivan" al cierre de la aplicación, necesitamos un lugar donde guardarlos en el disco duro. 
+Ya experimentamos el dolor de perder nuestros datos al reiniciar la aplicación. Es hora de buscar una solución permanente.
+
+## 🎯 El Objetivo
+Necesitamos un lugar que sea capaz de guardar nuestra lista de hechos (nuestro Event Store) de tal manera que, si el servidor explota o la aplicación se reinicia, podamos volver a leer el historial exactamente donde lo dejamos.
+
+¿Cómo podemos externalizar ese almacenamiento fuera de la memoria de nuestro programa?
+
+---
 
 ## 1. La solución al problema
-En lugar de una lista en RAM, usaremos una base de datos. Pero no una cualquiera; usaremos una que sepa manejar grandes volúmenes de información y que sea segura.
-
-Para no tener que instalar programas pesados en tu computadora, usaremos un **Contenedor**. Es como una caja cerrada que contiene todo lo necesario para que nuestra base de datos funcione.
+Para que nuestros hechos "sobrevivan", usaremos un **Contenedor**. Es como una caja fuerte digital que vive fuera de tu aplicación y guarda la información en el disco duro.
 
 ---
 
@@ -18,9 +23,8 @@ docker run --name almacen-hechos -e POSTGRES_PASSWORD=Marten123 -e POSTGRES_DB=t
 ```
 
 ### ¿Qué acabas de hacer?
-- Has creado una "caja" llamada `almacen-hechos`.
-- Le has puesto una contraseña segura.
-- Has creado un espacio llamado `taller-hechos` para guardar nuestra información.
+- Has creado una "caja" persistente llamada `almacen-hechos`.
+- Le has creado un espacio llamado `taller-hechos` para guardar nuestra información.
 
 ---
 
@@ -36,9 +40,9 @@ docker exec -it almacen-hechos psql -U postgres -l
 ---
 
 ### El Descubrimiento
-Este contenedor que acabas de lanzar está corriendo un motor de base de datos llamado **PostgreSQL**, y la herramienta que usamos para gestionarlo fácilmente se llama **Docker**. 
+Este almacén resistente que acabas de lanzar está corriendo un motor de base de datos llamado **PostgreSQL**, y la caja contenedora se gestiona con una herramienta llamada **Docker**. 
 
-Ahora tenemos el lugar físico para guardar los hechos, pero... ¿cómo hacemos para que nuestra aplicación .NET hable con este baúl automáticamente?
+Ahora tenemos el lugar físico, pero necesitamos el "pegamento" para conectar nuestro código C# con este baúl de forma automática.
 
 ---
 

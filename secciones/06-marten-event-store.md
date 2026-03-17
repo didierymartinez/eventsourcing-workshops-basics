@@ -1,11 +1,17 @@
 # 06 - Automatizando el historial
 
-Ya tenemos los hechos y ya tenemos el baúl (el contenedor). Pero en la sección 03 vimos que guardar en una lista y hacer bucles `foreach` manualmente es mucho trabajo y puede fallar.
+Tenemos los hechos y tenemos el baúl (PostgreSQL). Pero todavía nos falta algo: no queremos escribir código manual para traducir nuestros records a tablas de base de datos.
+
+## 🎯 El Objetivo
+Queremos una herramienta que tome nuestros hechos tal cual están en C# y los guarde en el baúl sin que tengamos que preocuparnos por abrir conexiones, escribir SQL o serializar datos. 
+
+Buscamos "conectar y listo" para que podamos enfocarnos en el negocio.
+
+---
 
 ## 1. Buscando eficiencia
-¿Y si existiera algo que tome nuestros hechos y los guarde directamente en el baúl sin que tengamos que preocuparnos por cómo se guardan?
 
-Para eso, vamos a pedir ayuda a una librería externa.
+En lugar de construir nuestro propio motor de persistencia, vamos a usar una herramienta diseñada específicamente para esto.
 
 ### Instalación
 En la terminal, dentro de la carpeta de tu proyecto, ejecuta:
@@ -16,7 +22,7 @@ dotnet add package Marten
 ---
 
 ## 2. Conectando el proyecto al baúl
-En tu `Program.cs`, vamos a configurar cómo nuestra app debe hablar con el contenedor que creamos.
+En tu `Program.cs`, vamos a configurar cómo nuestra app debe hablar con el almacén.
 
 ```csharp
 using Marten;
@@ -31,7 +37,6 @@ var store = DocumentStore.For(opt =>
 ---
 
 ## 3. Guardando hechos de forma profesional
-La librería que acabamos de instalar nos permite agrupar hechos relacionados. Por ejemplo, todos los hechos de la misma Orden de Compra.
 
 ```csharp
 var idOrden = Guid.NewGuid();
@@ -52,9 +57,9 @@ Console.WriteLine("¡Hechos guardados de forma segura y permanente!");
 ---
 
 ### El Descubrimiento
-Acabas de simplificar todo tu trabajo manual. La librería que está haciendo todo este "trabajo sucio" de serializar, conectar y guardar los hechos se llama **Marten**. 
+Acabas de automatizar todo lo que antes era manual. La herramienta que está haciendo este trabajo inteligente de convertir tus records en historia persistente se llama **Marten**. 
 
-Marten es la que convierte a PostgreSQL en un **Event Store** profesional para tus aplicaciones .NET.
+Marten es quien permite que tu PostgreSQL actúe como un **Event Store** de alto nivel.
 
 ---
 

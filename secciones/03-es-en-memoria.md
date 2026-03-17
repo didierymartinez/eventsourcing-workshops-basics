@@ -1,9 +1,16 @@
 # 03 - Guardando hechos en el código
 
-Vamos a empezar a anotar lo que sucede en nuestro negocio usando solo C#.
+Ahora que tenemos nuestro lienzo en blanco, vamos a empezar a anotar lo que sucede. 
+
+## 🎯 El Objetivo
+Imagina que el dueño del negocio te pide saber cuánto dinero ha vendido hoy. Sin embargo, **no tienes permiso de crear una tabla llamada "Ventas"**. Solo puedes anotar en un diario cada cosa que pase (compras, cancelaciones, cambios).
+
+¿Cómo harías para darle el total al final del día usando solo esas notas?
+
+---
 
 ## 1. Definiendo los hechos
-En C#, la mejor forma de representar algo que ya pasó es mediante un **Record**. Es inmutable (una vez creado, no cambia) y muy breve de escribir.
+En C#, la mejor forma de representar algo que ya pasó es mediante un **Record**. 
 
 Escribe esto en tu `Program.cs`:
 
@@ -12,6 +19,14 @@ Escribe esto en tu `Program.cs`:
 public record OrdenCreada(Guid Id, string NumeroFactura);
 public record ProductoAgregado(string Nombre, int Cantidad, decimal Precio);
 ```
+
+### ¿Por qué `record` en vez de `class`?
+
+Usar `record` es fundamental en este enfoque por tres razones clave:
+
+1.  **Inmutabilidad**: Un hecho es algo que **ya ocurrió**. El pasado no se puede cambiar. Los `record` están diseñados para no ser modificados una vez creados, protegiendo la integridad de tu historia.
+2.  **Igualdad por Valor**: Dos registros son iguales si sus datos son iguales. Esto facilita enormemente las pruebas: puedes comparar si el sistema generó el hecho correcto simplemente comparando los objetos, sin revisar propiedad por propiedad.
+3.  **Semántica**: Al leer `record`, el programador entiende de inmediato que este objeto es un transporte de datos inmutable, no una entidad con comportamiento complejo.
 
 ---
 
@@ -36,8 +51,8 @@ Console.WriteLine($"Se han registrado {historial.Count} hechos en el historial."
 
 ---
 
-## 3. Reconstruyendo la realidad
-Como no tenemos una tabla que diga el "Total", vamos a leer nuestra lista de arriba hacia abajo para calcularlo.
+## 3. Reconstruyendo la realidad (El Desafío)
+Para cumplir nuestro objetivo de dar el total, vamos a leer nuestra lista de arriba hacia abajo.
 
 ```csharp
 decimal total = 0;
@@ -58,7 +73,7 @@ Console.WriteLine($"El total de la orden calculada es: ${total}");
 ### El Descubrimiento
 Acabas de implementar los dos pilares de este enfoque:
 1. Usar hechos inmutables para guardar la verdad.
-2. Reconstruir el estado leyendo el historial.
+2. Reconstruir el estado leyendo el historial en orden.
 
 A esa "Lista" donde guardamos todos los hechos para consultarlos después, se le conoce conceptualmente como un **Event Store**.
 
