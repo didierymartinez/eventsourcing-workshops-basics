@@ -14,14 +14,15 @@ Aprenderás a modelar eventos, almacenarlos y consultarlos usando Event Sourcing
 - **Agregado**: Entidad principal del dominio que agrupa y protege la consistencia de un conjunto de objetos relacionados y sus reglas de negocio. En Event Sourcing, el agregado se reconstruye aplicando la secuencia de eventos de su stream (por ejemplo, una orden de compra con sus productos).
 - **Marten**: Librería para .NET que facilita la persistencia de eventos y documentos en PostgreSQL.
 
-## 📚 Secciones del workshop
+## 📚 Secciones del workshop (Hoja de Ruta)
 
-1. [01 - 🧠 Fundamentos de Event Sourcing](./secciones/1-fundamentos.md)
-2. [02 - ⚙️ Configuración inicial y requisitos previos](./secciones/2-configuracion.md)
-3. [03 - 🏷️ Modelado de eventos](./secciones/3-modelado-eventos.md)
-4. [04 - 🧩 Construir el Agregado (Puro C#)](./secciones/4-agregado-puro.md)
-5. [05 - 💾 Persistencia de eventos con Marten](./secciones/5-persistencia-marten.md)
-6. [06 - 📊 Consultas y Proyecciones](./secciones/6-consultas-proyecciones.md)
+1. [01 - 🧠 ¿Por qué Event Sourcing? (Conceptos)](./secciones/01-intro-conceptos.md)
+2. [02 - 🚀 Tu primer proyecto .NET](./secciones/02-primer-proyecto.md)
+3. [03 - 📝 Event Sourcing en Memoria](./secciones/03-es-en-memoria.md)
+4. [04 - ⚠️ El gran problema: La Volatilidad](./secciones/04-el-problema.md)
+5. [05 - 🗄️ Preparando la Persistencia (Docker)](./secciones/05-preparando-persistencia.md)
+6. [06 - 💾 Marten: Tu Event Store profesional](./secciones/06-marten-event-store.md)
+7. [07 - 📊 Consultas y Proyecciones](./secciones/07-consultas-proyecciones.md)
 
 ---
 
