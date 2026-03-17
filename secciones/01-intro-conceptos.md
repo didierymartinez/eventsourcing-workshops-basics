@@ -37,8 +37,8 @@ Para nuestra Orden de Compra, las anotaciones serían:
 ---
 
 ### El Descubrimiento
-Este enfoque de guardar la secuencia completa de hechos en lugar de solo el estado actual es lo que en el mundo del software conocemos formalmente como **Event Sourcing**.
+Este enfoque, donde el estado de un sistema no es un dato estático, sino el resultado de procesar una **secuencia cronológica de hechos**, se conoce formalmente como **Event Sourcing**. 
 
----
+Lo más potente es que esta secuencia nos permite reflejar **cómo se veía el sistema en cualquier momento del pasado**, simplemente deteniendo la lectura de los hechos en el punto que nos interese. Es, literalmente, una máquina del tiempo para tus datos.
 
 [➡️ Siguiente sección: Preparando nuestro lienzo](./02-primer-proyecto.md)

@@ -73,9 +73,9 @@ Console.WriteLine($"El total de la orden calculada es: ${total}");
 ### El Descubrimiento
 Acabas de implementar los dos pilares de este enfoque:
 1. Usar hechos inmutables para guardar la verdad.
-2. Reconstruir el estado leyendo el historial en orden.
+2. Reconstruir el estado leyendo la secuencia completa.
 
-A esa "Lista" donde guardamos todos los hechos para consultarlos después, se le conoce conceptualmente como un **Event Store**.
+Al tener la historia guardada como una **secuencia de eventos**, tenemos el poder de reflejar el estado del sistema en **cualquier momento**. A la estructura donde guardamos estas secuencias para consultarlas después, se le conoce conceptualmente como un **Event Store**.
 
 ---
 
