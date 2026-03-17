@@ -18,7 +18,15 @@ public record OrdenCreada(Guid Id, string NumeroFactura);
 public record ProductoAgregado(string Nombre, int Cantidad, decimal Precio);
 ```
 
-### 2. ¿Por qué usamos `record`?
+### 2. Reto: ¡Ve un paso más allá!
+
+El dominio de una **Orden de Compra** tiene más situaciones. Intenta definir otros `records` que representen estos cambios de estado:
+- ¿Cómo llamarías al evento cuando se elimina un producto? (ej: `ProductoEliminado`)
+- ¿Y cuando la orden se cancela o se marca como enviada?
+
+> Escribe al menos dos eventos más por tu cuenta en `Program.cs`.
+
+### 3. ¿Por qué usamos `record`?
 
 En C#, un `record` es ideal para eventos porque:
 - **Inmutabilidad**: Una vez creado, un evento no debe cambiar (el pasado no se puede editar).
