@@ -1,63 +1,63 @@
-# 06 - Marten: Tu Event Store profesional
+# 06 - Automatizando el historial
 
-Ya tenemos eventos y ya tenemos una base de datos. Ahora necesitamos una herramienta que sepa cómo guardar esos eventos de forma eficiente en PostgreSQL. 
+Ya tenemos los hechos y ya tenemos el baúl (el contenedor). Pero en la sección 03 vimos que guardar en una lista y hacer bucles `foreach` manualmente es mucho trabajo y puede fallar.
 
-Esa herramienta es **Marten**.
+## 1. Buscando eficiencia
+¿Y si existiera algo que tome nuestros hechos y los guarde directamente en el baúl sin que tengamos que preocuparnos por cómo se guardan?
 
-## 1. El reemplazo de la Lista
-¿Recuerdas nuestra `List<object>` de la sección 03? Marten va a tomar ese lugar, pero guardando los datos en discos reales.
+Para eso, vamos a pedir ayuda a una librería externa.
 
 ### Instalación
-En la carpeta de tu proyecto, instala el paquete:
+En la terminal, dentro de la carpeta de tu proyecto, ejecuta:
 ```bash
 dotnet add package Marten
 ```
 
 ---
 
-## 2. Configuración inicial
-En tu `Program.cs`, configura el `DocumentStore` (es el objeto que sabe hablar con Postgres).
+## 2. Conectando el proyecto al baúl
+En tu `Program.cs`, vamos a configurar cómo nuestra app debe hablar con el contenedor que creamos.
 
 ```csharp
 using Marten;
 
+// Configuramos la conexión automática
 var store = DocumentStore.For(opt =>
 {
-    opt.Connection("Host=localhost;Port=5432;Database=taller-marten;Username=postgres;Password=Marten123");
+    opt.Connection("Host=localhost;Port=5432;Database=taller-hechos;Username=postgres;Password=Marten123");
 });
 ```
 
 ---
 
-## 3. Guardando tu primer Stream
-En Event Sourcing, los eventos se agrupan en **Streams** (líneas de tiempo). Cada Orden de Compra tendrá su propio Stream.
+## 3. Guardando hechos de forma profesional
+La librería que acabamos de instalar nos permite agrupar hechos relacionados. Por ejemplo, todos los hechos de la misma Orden de Compra.
 
 ```csharp
 var idOrden = Guid.NewGuid();
 
 await using var session = store.LightweightSession();
 
-// Abrimos el stream y guardamos los eventos iniciales
-session.Events.StartStream<OrdenCompra>(idOrden, 
-    new OrdenCreada(idOrden, "FAC-001"),
-    new ProductoAgregado("Teclado Mecánico", 1, 85m)
+// Enviamos los hechos al baúl
+session.Events.StartStream(idOrden, 
+    new OrdenCreada(idOrden, "FAC-999"),
+    new ProductoAgregado("Monitor Curvo 34", 1, 450m)
 );
 
 await session.SaveChangesAsync();
 
-Console.WriteLine("¡Felicidades! Tus eventos ahora son permanentes.");
+Console.WriteLine("¡Hechos guardados de forma segura y permanente!");
 ```
 
 ---
 
-## ¿Qué acaba de pasar?
-Si reinicias tu app ahora, **tus eventos seguirán ahí**. Marten se encargó de:
-1. Serializar tus records a JSON.
-2. Crear las tablas en Postgres automáticamente.
-3. Asegurar que los datos se guarden físicamente.
+### El Descubrimiento
+Acabas de simplificar todo tu trabajo manual. La librería que está haciendo todo este "trabajo sucio" de serializar, conectar y guardar los hechos se llama **Marten**. 
+
+Marten es la que convierte a PostgreSQL en un **Event Store** profesional para tus aplicaciones .NET.
 
 ---
 
 [⬅️ Volver a la sección anterior](./05-preparando-persistencia.md)
 
-[➡️ Siguiente sección: El poder de las Proyecciones](./07-consultas-proyecciones.md)
+[➡️ Siguiente sección: Consultas y vistas inteligentes](./07-consultas-proyecciones.md)

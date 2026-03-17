@@ -1,56 +1,43 @@
-# 02 - Tu primer proyecto .NET
+# 02 - Preparando nuestro lienzo
 
-Ahora que entendemos la teoría, vamos a preparar las manos. En esta etapa **solo necesitamos .NET**. No instalaremos bases de datos ni herramientas complejas todavía.
-
-## 📝 Requisitos previos
-
-- **.NET 9.0 SDK**: [Descargar aquí](https://dotnet.microsoft.com/download)
-- **IDE**: Visual Studio, VS Code o Rider
-
----
+Para empezar a trabajar con hechos e historia, primero necesitamos un lugar muy sencillo donde experimentar. **Solo necesitamos .NET**. No instalaremos herramientas externas todavía.
 
 ## 🚀 Paso 1: Crear el proyecto
 
-Abriremos una terminal en la carpeta donde quieras trabajar y ejecutaremos:
+Abriremos una terminal en la carpeta de trabajo y ejecutaremos:
 
-1. **Crear el proyecto de consola**:
+1. **Crear el proyecto**:
    ```bash
-   dotnet new console -n TallerMarten.OrdenCompra
+   dotnet new console -n Taller.OrdenCompra
    ```
 
 2. **Acceder a la carpeta**:
    ```bash
-   cd TallerMarten.OrdenCompra
+   cd Taller.OrdenCompra
    ```
 
 3. **Abrir tu IDE**:
-   Abre esta carpeta en tu editor favorito.
+   Abre esta carpeta en tu editor favorito (VS Code, Visual Studio, o Rider).
 
 ---
 
 ## Paso 2: Entendiendo nuestro lienzo
 
-Antes de borrar nada, observa qué ha creado .NET por ti:
+Observa qué ha creado .NET por ti:
 
-- **`TallerMarten.OrdenCompra.csproj`**: Es el corazón del proyecto. Aquí se definen la versión de .NET y las librerías que usaremos más adelante.
-- **`Program.cs`**: Este es nuestro **lienzo en blanco**. No necesitamos múltiples archivos ni carpetas complejas todavía. 
+- **`Taller.OrdenCompra.csproj`**: El archivo que define la configuración básica de tu proyecto.
+- **`Program.cs`**: Este es nuestro **lienzo en blanco**. No nos perderemos en carpetas complejas ni arquitecturas sofisticadas. 
 
-### ¿Por qué trabajaremos aquí?
-A medida que el workshop avance, verás cómo este archivo evoluciona. Es la forma más sencilla de **identificar las piezas** del rompecabezas de Event Sourcing:
-1. Definiremos los **Eventos**.
-2. Crearemos el **Agregado**.
-3. Implementaremos la **Persistencia**.
-
-Al tenerlo todo en un solo lugar al principio, podrás ver claramente cómo se conectan los conceptos antes de moverlos a una arquitectura más profesional.
+A medida que avancemos, veremos cómo este archivo evoluciona. Es la forma más sencilla de identificar cómo cada pieza que construyamos encaja con la anterior.
 
 ---
 
 ## Paso 3: Limpieza
 
-Abre el archivo `Program.cs` y borra todo su contenido. Deja el archivo vacío y listo para recibir tus primeros eventos.
+Abre el archivo `Program.cs` y borra todo su contenido. Queremos un lienzo totalmente vacío para empezar a anotar nuestros primeros hechos.
 
 ---
 
 [⬅️ Volver a la sección anterior](./01-intro-conceptos.md)
 
-[➡️ Siguiente sección: Event Sourcing en Memoria](./03-es-en-memoria.md)
+[➡️ Siguiente sección: Guardando hechos en el código](./03-es-en-memoria.md)

@@ -1,42 +1,44 @@
-# 01 - ¿Por qué Event Sourcing? (Conceptos)
+# 01 - El rastro de lo que sucede
 
-Antes de tocar una sola línea de código, debemos entender el cambio de mentalidad. La mayoría de nosotros estamos acostumbrados al modelo **CRUD** (Create, Read, Update, Delete).
+Antes de empezar a programar, pensemos en cómo guardamos la realidad en el software. La mayoría de los sistemas actuales se enfocan en el **"Ahoritismo"**.
 
-## 1. El modelo CRUD (Estado Actual)
+## 1. El modelo del "Ahora" (Estado Actual)
 
-Imagina que estás gestionando una **Orden de Compra**. En un sistema CRUD, tu base de datos guarda el "ahora":
+Imagina que estás gestionando una **Orden de Compra**. Normalmente, tu base de datos guarda una foto del presente:
 
 | ID | Numero | Estado | Total |
 |----|--------|--------|-------|
 | 1  | FAC-001| Pagada | $125  |
 
-Si el cliente cancela la orden, simplemente hacemos un `UPDATE` y cambiamos "Pagada" por "Cancelada".
-**El problema:** Hemos perdido la información de que alguna vez estuvo pagada. No sabemos *cuándo* ocurrió ni *quién* lo hizo. Solo sabemos el presente.
+Si el cliente cancela la orden, simplemente sobrescribimos el valor: cambiamos "Pagada" por "Cancelada".
+**El problema:** Al sobrescribir, hemos borrado la historia. No sabemos *cuándo* estuvo pagada, ni qué pasó entre que se creó y se canceló. Solo sabemos el presente.
 
 ---
 
-## 2. El modelo Event Sourcing (La Historia)
+## 2. El modelo de la "Historia" (Hechos pasados)
 
-En **Event Sourcing**, no guardamos el estado actual. Guardamos la **historia completa** de lo que ha sucedido. Cada cambio es un "Evento" (un hecho inmutable del pasado).
+¿Y si en lugar de sobrescribir, simplemente anotamos cada cosa que pasa? Como si fuera el diario de vida de la orden.
 
-### Analogía: El Libro Mayor (Ledger)
-Piensa en un contador. Un contador nunca borra una cifra de su libro. Si cometió un error o hubo un cambio, añade una nueva línea de ajuste.
+Para nuestra Orden de Compra, las anotaciones serían:
+1. Se creó la orden `FAC-001`.
+2. Se agregó una `Laptop` por `$1200`.
+3. Se agregó un `Mouse` por `$25`.
+4. Se recibió el pago.
 
-Para nuestra Orden de Compra, la historia sería:
-1. `Orden Creada` (ID: 1, Numero: FAC-001)
-2. `Producto Agregado` (Nombre: Laptop, Precio: $1200)
-3. `Producto Agregado` (Nombre: Mouse, Precio: $25)
-4. `Pago Recibido` (Metodo: Tarjeta)
-
-**¿Cuál es el total?** No está guardado en una columna, pero lo podemos calcular sumando los eventos: `$1225`.
+**¿Cuál es el total actual?** No lo tenemos guardado en ninguna celda, pero si leemos todas las notas de arriba hacia abajo, podemos calcularlo: `$1225`.
 
 ---
 
-## 3. Beneficios inmediatos
-- **Auditoría perfecta:** Tienes el rastro de todo lo que pasó.
-- **Viaje en el tiempo:** Puedes saber cómo se veía el sistema el martes pasado a las 3:00 PM simplemente procesando los eventos hasta esa fecha.
-- **Nuevas preguntas:** Si mañana el jefe pregunta "¿Cuántos clientes agregaron un producto y luego lo quitaron?", con CRUD no podrías responder. Con Event Sourcing, sí.
+## 3. ¿Por qué es potente este enfoque?
+- **No pierdes nada:** Tienes el rastro de todo lo que ocurrió.
+- **Auditoría natural:** Si el total no cuadra, puedes revisar línea por línea qué se anotó mal.
+- **Nuevas respuestas:** Si mañana el negocio pregunta "¿Cuántas veces la gente cambia de opinión antes de pagar?", con el modelo de historia puedes responder. Con el modelo del "ahora", esa información ya se borró.
 
 ---
 
-[➡️ Siguiente sección: Creando tu primer proyecto](./02-primer-proyecto.md)
+### El Descubrimiento
+Este enfoque de guardar la secuencia completa de hechos en lugar de solo el estado actual es lo que en el mundo del software conocemos formalmente como **Event Sourcing**.
+
+---
+
+[➡️ Siguiente sección: Preparando nuestro lienzo](./02-primer-proyecto.md)

@@ -1,44 +1,47 @@
-# 05 - Preparando la Persistencia (Docker)
+# 05 - Un baúl que no se borra
 
-Para que nuestros eventos "sobrevivan" al reinicio de la aplicación, necesitamos una base de datos. Usaremos **PostgreSQL** porque es robusto, de código abierto y tiene extensiones geniales para trabajar con JSON.
+Para que nuestros hechos "sobrevivan" al cierre de la aplicación, necesitamos un lugar donde guardarlos en el disco duro. 
 
-## 1. ¿Por qué Docker?
-En lugar de instalar PostgreSQL directamente en tu sistema (lo cual puede ser complicado y ensuciar tu configuración), usaremos **Docker**. 
+## 1. La solución al problema
+En lugar de una lista en RAM, usaremos una base de datos. Pero no una cualquiera; usaremos una que sepa manejar grandes volúmenes de información y que sea segura.
 
-Docker nos permite crear un "contenedor" con PostgreSQL listo para usar en segundos.
-
-### Requisitos
-- **Docker Desktop**: [Descargar aquí](https://www.docker.com/products/docker-desktop/)
+Para no tener que instalar programas pesados en tu computadora, usaremos un **Contenedor**. Es como una caja cerrada que contiene todo lo necesario para que nuestra base de datos funcione.
 
 ---
 
-## 2. Paso a paso: Creando tu base de datos
+## 2. Preparando el baúl persistente
 
-Ejecuta el siguiente comando en tu terminal para crear el contenedor y la base de datos automáticamente:
+Ejecuta el siguiente comando en tu terminal para crear este almacén:
 
 ```bash
-docker run --name postgres-marten -e POSTGRES_PASSWORD=Marten123 -e POSTGRES_DB=taller-marten -p 5432:5432 -d postgres
+docker run --name almacen-hechos -e POSTGRES_PASSWORD=Marten123 -e POSTGRES_DB=taller-hechos -p 5432:5432 -d postgres
 ```
 
-### ¿Qué hace este comando?
-- `--name postgres-marten`: Le da un nombre a nuestro contenedor.
-- `-e POSTGRES_PASSWORD=Marten123`: Configura la contraseña del administrador.
-- `-e POSTGRES_DB=taller-marten`: Crea una base de datos llamada `taller-marten` al iniciar.
-- `-p 5432:5432`: Abre el "puerto" para que nuestra app .NET pueda hablar con la base de datos.
+### ¿Qué acabas de hacer?
+- Has creado una "caja" llamada `almacen-hechos`.
+- Le has puesto una contraseña segura.
+- Has creado un espacio llamado `taller-hechos` para guardar nuestra información.
 
 ---
 
-## 3. Verificar disponibilidad
-Es importante confirmar que la base de datos está lista. Ejecuta:
+## 3. Verificar que el baúl está abierto
+Para confirmar que todo está listo para recibir nuestros hechos, ejecuta:
 
 ```bash
-docker exec -it postgres-marten psql -U postgres -l
+docker exec -it almacen-hechos psql -U postgres -l
 ```
 
-> Busca **taller-marten** en la lista. Si aparece, ya tienes tu baúl de eventos listo.
+> Si ves **taller-hechos** en la lista, el baúl está listo.
+
+---
+
+### El Descubrimiento
+Este contenedor que acabas de lanzar está corriendo un motor de base de datos llamado **PostgreSQL**, y la herramienta que usamos para gestionarlo fácilmente se llama **Docker**. 
+
+Ahora tenemos el lugar físico para guardar los hechos, pero... ¿cómo hacemos para que nuestra aplicación .NET hable con este baúl automáticamente?
 
 ---
 
 [⬅️ Volver a la sección anterior](./04-el-problema.md)
 
-[➡️ Siguiente sección: Marten: Tu Event Store profesional](./06-marten-event-store.md)
+[➡️ Siguiente sección: Automatizando el historial](./06-marten-event-store.md)

@@ -6,23 +6,23 @@ Bienvenido al workshop práctico para aprender a usar [Marten](https://martendb.
 
 Aprenderás a modelar eventos, almacenarlos y consultarlos usando Event Sourcing con Marten y PostgreSQL en .NET, siguiendo un enfoque paso a paso y práctico.
 
-## 🧠 Conceptos clave
+## 🧠 ¿Qué aprenderás?
 
-- **Event Sourcing**: Patrón donde el estado de la aplicación se construye a partir de una secuencia de eventos.
-- **Stream**: Secuencia de eventos relacionados a un mismo agregado (por ejemplo, una orden de compra).
-- **Record**: Tipo inmutable en C# ideal para modelar eventos.
-- **Agregado**: Entidad principal del dominio que agrupa y protege la consistencia de un conjunto de objetos relacionados y sus reglas de negocio. En Event Sourcing, el agregado se reconstruye aplicando la secuencia de eventos de su stream (por ejemplo, una orden de compra con sus productos).
-- **Marten**: Librería para .NET que facilita la persistencia de eventos y documentos en PostgreSQL.
+Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
+- Cómo gestionar la **historia** de tu negocio en lugar de solo el estado actual.
+- Cómo transformar hechos pasados en información útil para el presente.
+- Cómo asegurar que el rastro de lo que sucede nunca se borre.
+- Cómo automatizar y profesionalizar todo este proceso con herramientas de última generación.
 
 ## 📚 Secciones del workshop (Hoja de Ruta)
 
-1. [01 - 🧠 ¿Por qué Event Sourcing? (Conceptos)](./secciones/01-intro-conceptos.md)
-2. [02 - 🚀 Tu primer proyecto .NET](./secciones/02-primer-proyecto.md)
-3. [03 - 📝 Event Sourcing en Memoria](./secciones/03-es-en-memoria.md)
+1. [01 - 🧠 El rastro de lo que sucede](./secciones/01-intro-conceptos.md)
+2. [02 - 🚀 Preparando nuestro lienzo](./secciones/02-primer-proyecto.md)
+3. [03 - 📝 Guardando hechos en el código](./secciones/03-es-en-memoria.md)
 4. [04 - ⚠️ El gran problema: La Volatilidad](./secciones/04-el-problema.md)
-5. [05 - 🗄️ Preparando la Persistencia (Docker)](./secciones/05-preparando-persistencia.md)
-6. [06 - 💾 Marten: Tu Event Store profesional](./secciones/06-marten-event-store.md)
-7. [07 - 📊 Consultas y Proyecciones](./secciones/07-consultas-proyecciones.md)
+5. [05 - 🗄️ Un baúl que no se borra](./secciones/05-preparando-persistencia.md)
+6. [06 - 💾 Automatizando el historial](./secciones/06-marten-event-store.md)
+7. [07 - 📊 Consultas y vistas inteligentes](./secciones/07-consultas-proyecciones.md)
 
 ---
 

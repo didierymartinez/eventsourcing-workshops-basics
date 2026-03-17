@@ -1,9 +1,9 @@
-# 03 - Event Sourcing en Memoria
+# 03 - Guardando hechos en el código
 
-Ahora vamos a implementar nuestra primera versión de Event Sourcing. Lo haremos de la forma más sencilla posible: usando una **Lista** de C#.
+Vamos a empezar a anotar lo que sucede en nuestro negocio usando solo C#.
 
-## 1. Definiendo los Eventos
-En C#, la mejor forma de representar eventos es mediante **Records**. Son inmutables (no cambian) y muy breves.
+## 1. Definiendo los hechos
+En C#, la mejor forma de representar algo que ya pasó es mediante un **Record**. Es inmutable (una vez creado, no cambia) y muy breve de escribir.
 
 Escribe esto en tu `Program.cs`:
 
@@ -11,54 +11,57 @@ Escribe esto en tu `Program.cs`:
 using System;
 using System.Collections.Generic;
 
-// Definimos los hechos que pueden ocurrir
+// Definimos los hechos que pueden ocurrir en nuestra Orden de Compra
 public record OrdenCreada(Guid Id, string NumeroFactura);
 public record ProductoAgregado(string Nombre, int Cantidad, decimal Precio);
 ```
 
 ---
 
-## 2. Guardando la historia
-En lugar de una tabla de base de datos, usaremos una lista para guardar todo lo que pase.
+## 2. Nuestro diario de anotaciones
+Para guardar estos hechos, usaremos la estructura más simple que nos ofrece C#: una **Lista**.
 
 ```csharp
-// Nuestro "Event Store" temporal
+// Un lugar temporal para anotar todo lo que pase
 var historial = new List<object>();
 
-// Ocurren cosas en el negocio
+// Comienzan a ocurrir hechos en nuestro negocio
 var idOrden = Guid.NewGuid();
-historial.Add(new OrdenCreada(idOrden, "FAC-2024-01"));
-historial.Add(new ProductoAgregado("Laptop", 1, 1200m));
-historial.Add(new ProductoAgregado("Mouse", 2, 25m));
 
-Console.WriteLine($"Hemos guardado {historial.Count} eventos en memoria.");
+historial.Add(new OrdenCreada(idOrden, "FAC-2024-001"));
+historial.Add(new ProductoAgregado("Laptop Pro", 1, 1500m));
+historial.Add(new ProductoAgregado("Mouse Inalambrico", 1, 45m));
+
+Console.WriteLine($"Se han registrado {historial.Count} hechos en el historial.");
 ```
 
 ---
 
-## 3. Reconstruyendo el presente
-Como no tenemos una tabla con el "Total", debemos calcularlo recorriendo el historial.
+## 3. Reconstruyendo la realidad
+Como no tenemos una tabla que diga el "Total", vamos a leer nuestra lista de arriba hacia abajo para calcularlo.
 
 ```csharp
 decimal total = 0;
 
-foreach (var evento in historial)
+foreach (var hecho in historial)
 {
-    if (evento is ProductoAgregado p)
+    if (hecho is ProductoAgregado p)
     {
         total += (p.Precio * p.Cantidad);
     }
 }
 
-Console.WriteLine($"El total de la orden es: ${total}");
+Console.WriteLine($"El total de la orden calculada es: ${total}");
 ```
 
 ---
 
-## ¿Qué hemos aprendido?
-1. Los eventos son **Records** (inmutables).
-2. El estado no se guarda, se **calcula**.
-3. La lista es nuestro "Event Store".
+### El Descubrimiento
+Acabas de implementar los dos pilares de este enfoque:
+1. Usar hechos inmutables para guardar la verdad.
+2. Reconstruir el estado leyendo el historial.
+
+A esa "Lista" donde guardamos todos los hechos para consultarlos después, se le conoce conceptualmente como un **Event Store**.
 
 ---
 
