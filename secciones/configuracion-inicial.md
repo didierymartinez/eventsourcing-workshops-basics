@@ -42,13 +42,12 @@ Ahora que la base de datos está lista, crearemos el proyecto donde trabajaremos
 1. **Crear el proyecto de consola**:
    Ejecuta en la terminal:
    ```bash
-   dotnet new console -n NombreDelProyecto
+   dotnet new console -n MartenWorkshop.PurchaseOrder
    ```
-   *(Reemplaza `NombreDelProyecto` por el nombre que prefieras)*.
 
 2. **Acceder a la carpeta**:
    ```bash
-   cd NombreDelProyecto
+   cd MartenWorkshop.PurchaseOrder
    ```
 
 ---
