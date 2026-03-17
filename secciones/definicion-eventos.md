@@ -26,14 +26,19 @@ El dominio de una **Orden de Compra** tiene más situaciones. Intenta definir ot
 
 > Escribe al menos dos eventos más por tu cuenta en `Program.cs`.
 
-### 3. ¿Por qué usamos `record`?
+### 3. ¿Por qué usamos `record` en vez de `class`?
 
-En C#, un `record` es ideal para eventos porque:
-- **Inmutabilidad**: Una vez creado, un evento no debe cambiar (el pasado no se puede editar).
-- **Simplicidad**: Permiten definir estructuras de datos en una sola línea.
-- **Igualdad por valor**: Dos eventos son iguales si sus datos son iguales.
+Usar `record` (en lugar de una `class` tradicional) es una de las mejores prácticas en .NET para Event Sourcing por tres razones:
+
+1. **Inmutabilidad**: Un evento es un hecho que **ya ocurrió en el pasado**. El pasado no se puede editar. Los `record` facilitan la definición de objetos que no pueden cambiar una vez creados, evitando errores accidentales en tu lógica.
+2. **Igualdad por Valor (Testing)**: A diferencia de las clases, dos registros son considerados **iguales si sus datos son iguales**. Esto es clave para las **Prueas Unitarias**: puedes comparar directamente el evento generado por tu sistema con uno esperado (`Assert.Equal(esperado, generado)`) sin tener que comparar propiedad por propiedad.
+3. **Semántica de Dominio**: En Event Sourcing, un evento es una "foto" de un momento. Si tienes dos fotos idénticas, representan el mismo hecho, sin importar si están en distintos lugares de la memoria.
 
 ---
+
+> [!TIP]
+> **Dato técnico**: Las clases comparan por **referencia** (identidad en memoria), mientras que los records comparan por **valor** (los datos que contienen). Para un evento, lo que importa es el dato, no dónde está guardado en la memoria.
+
 
 > [!IMPORTANT]
 > Los eventos siempre deben nombrarse en **pasado** (`Creada`, `Agregado`, `Enviado`) porque representan algo que ya sucedió.
