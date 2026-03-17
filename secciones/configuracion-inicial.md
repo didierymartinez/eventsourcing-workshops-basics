@@ -18,11 +18,11 @@ Para este workshop utilizaremos PostgreSQL corriendo en Docker. Esto asegura que
 Ejecuta el siguiente comando en tu terminal para crear el contenedor y la base de datos automáticamente:
 
 ```bash
-docker run --name postgres-marten -e POSTGRES_PASSWORD=Marten123 -e POSTGRES_DB=marten-demo -p 5432:5432 -d postgres
+docker run --name postgres-marten -e POSTGRES_PASSWORD=Marten123 -e POSTGRES_DB=taller-marten -p 5432:5432 -d postgres
 ```
 
 > [!TIP]
-> El parámetro `-e POSTGRES_DB=marten-demo` crea la base de datos automáticamente al iniciar el contenedor.
+> El parámetro `-e POSTGRES_DB=taller-marten` crea la base de datos automáticamente al iniciar el contenedor.
 
 ### 1.2 Verificar disponibilidad
 Es importante confirmar que la base de datos está lista. Ejecuta:
@@ -31,7 +31,7 @@ Es importante confirmar que la base de datos está lista. Ejecuta:
 docker exec -it postgres-marten psql -U postgres -l
 ```
 
-> Busca **marten-demo** en la lista. Si aparece, ¡estás listo para continuar!
+> Busca **taller-marten** en la lista. Si aparece, ¡estás listo para continuar!
 
 ---
 
@@ -42,12 +42,12 @@ Ahora que la base de datos está lista, crearemos el proyecto donde trabajaremos
 1. **Crear el proyecto de consola**:
    Ejecuta en la terminal:
    ```bash
-   dotnet new console -n MartenWorkshop.PurchaseOrder
+   dotnet new console -n TallerMarten.OrdenCompra
    ```
 
 2. **Acceder a la carpeta**:
    ```bash
-   cd MartenWorkshop.PurchaseOrder
+   cd TallerMarten.OrdenCompra
    ```
 
 ---

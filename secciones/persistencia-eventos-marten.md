@@ -39,7 +39,7 @@ En tu archivo `Program.cs`, deberás crear una instancia de `DocumentStore` con 
 using Marten;
 
 var store = DocumentStore.For(opt =>
-    opt.Connection("User ID=postgres;Password=Marten123;Host=localhost;Port=5432;Database=marten-demo;Pooling=true;MaxPoolSize=20")
+    opt.Connection("User ID=postgres;Password=Marten123;Host=localhost;Port=5432;Database=taller-marten;Pooling=true;MaxPoolSize=20")
 );
 ```
 
