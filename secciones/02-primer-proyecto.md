@@ -28,9 +28,26 @@ Abriremos una terminal en la carpeta donde quieras trabajar y ejecutaremos:
 
 ---
 
-## Paso 2: Limpieza
+## Paso 2: Entendiendo nuestro lienzo
 
-Abre el archivo `Program.cs` y borra todo su contenido. Queremos un lienzo en blanco para empezar a construir nuestra lógica de eventos.
+Antes de borrar nada, observa qué ha creado .NET por ti:
+
+- **`TallerMarten.OrdenCompra.csproj`**: Es el corazón del proyecto. Aquí se definen la versión de .NET y las librerías que usaremos más adelante.
+- **`Program.cs`**: Este es nuestro **lienzo en blanco**. No necesitamos múltiples archivos ni carpetas complejas todavía. 
+
+### ¿Por qué trabajaremos aquí?
+A medida que el workshop avance, verás cómo este archivo evoluciona. Es la forma más sencilla de **identificar las piezas** del rompecabezas de Event Sourcing:
+1. Definiremos los **Eventos**.
+2. Crearemos el **Agregado**.
+3. Implementaremos la **Persistencia**.
+
+Al tenerlo todo en un solo lugar al principio, podrás ver claramente cómo se conectan los conceptos antes de moverlos a una arquitectura más profesional.
+
+---
+
+## Paso 3: Limpieza
+
+Abre el archivo `Program.cs` y borra todo su contenido. Deja el archivo vacío y listo para recibir tus primeros eventos.
 
 ---
 
