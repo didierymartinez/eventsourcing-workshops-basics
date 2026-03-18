@@ -1,6 +1,6 @@
 # 03 - Guardando hechos en el código
 
-Ahora que tenemos nuestro lienzo en blanco, vamos a empezar a anotar lo que sucede. 
+Vamos a empezar a anotar lo que sucede en nuestro negocio usando solo C#.
 
 ## 🎯 El Objetivo
 Imagina que el dueño del negocio te pide saber cuánto dinero ha vendido hoy. Sin embargo, **no tienes permiso de crear una tabla llamada "Ventas"**. Solo puedes anotar en un diario cada cosa que pase (compras, cancelaciones, cambios).
@@ -9,50 +9,52 @@ Imagina que el dueño del negocio te pide saber cuánto dinero ha vendido hoy. S
 
 ---
 
-## 1. Definiendo los hechos
-Independientemente del lenguaje de programación, lo que buscamos es que algo que **ya pasó** no se pueda alterar. En C#, la herramienta ideal para representar este concepto de inmutabilidad es el **Record**, ya que es muy breve de escribir y protege los datos por naturaleza.
+## 1. Identificando al protagonista (La Entidad)
+Cuando procesamos información, siempre lo hacemos sobre algo específico. En nuestro caso, es una **Orden de Compra**. 
 
-Escribe esto en tu `Program.cs`:
+Para que el sistema sepa de qué orden estamos hablando, necesitamos un identificador único. 
 
 ```csharp
-// Definimos los hechos que pueden ocurrir en nuestra Orden de Compra
+// Identificador único para nuestra entidad
+var idOrden = Guid.NewGuid();
+```
+
+En el mundo del software, a este objeto con identidad propia lo llamamos **Entidad**. Podemos tener la Entidad A y la Entidad B, cada una con su propia historia.
+
+---
+
+## 2. Definiendo los hechos (Records)
+Independientemente del lenguaje de programación, lo que buscamos es que algo que **ya pasó** no se pueda alterar. En C#, la herramienta ideal para representar este concepto de inmutabilidad es el **Record**.
+
+```csharp
+// Definimos los hechos vinculados a nuestra entidad
 public record OrdenCreada(Guid Id, string NumeroFactura);
 public record ProductoAgregado(string Nombre, int Cantidad, decimal Precio);
 ```
 
-### ¿Por qué `record` en vez de `class`?
-
-Usar `record` es fundamental por tres razones que refuerzan este principio:
-
-1.  **Inmutabilidad**: Como mencionamos, un hecho es pasado. El pasado no se edita. Los `record` aseguran que nadie pueda cambiar accidentalmente los datos de un evento una vez que ha sido registrado.
-2.  **Igualdad por Valor**: Dos registros son iguales si sus datos son iguales. Esto facilita enormemente las pruebas: puedes comparar si el sistema generó el hecho correcto simplemente comparando los objetos, sin revisar propiedad por propiedad.
-3.  **Semántica**: Al leer `record`, el programador entiende de inmediato que este objeto es un transporte de datos inmutable, no una entidad con comportamiento complejo.
+> [!NOTE]
+> Nota que cada hecho incluye el ID de la entidad. Un hecho siempre pertenece a una sola entidad a la vez.
 
 ---
 
-## 2. Nuestro diario de anotaciones
-Para que la historia tenga sentido, necesitamos guardar estos hechos **en el orden exacto en que ocurrieron**. Un hecho que sucede después de otro puede cambiar el resultado final.
-
-Por eso, usaremos la estructura más simple que nos permite mantener ese orden cronológico: una **Lista**.
+## 3. El flujo de la historia (El Stream)
+Para que la historia tenga sentido, guardamos estos hechos en el orden exacto en que ocurrieron. 
 
 ```csharp
-// Un lugar temporal para anotar todo lo que pase (en orden)
+// Nuestra secuencia cronológica de hechos
 var historial = new List<object>();
-
-// Comienzan a ocurrir hechos en nuestro negocio
-var idOrden = Guid.NewGuid();
 
 historial.Add(new OrdenCreada(idOrden, "FAC-2024-001"));
 historial.Add(new ProductoAgregado("Laptop Pro", 1, 1500m));
 historial.Add(new ProductoAgregado("Mouse Inalambrico", 1, 45m));
-
-Console.WriteLine($"Se han registrado {historial.Count} hechos en el historial.");
 ```
+
+A esta secuencia ininterrumpida de hechos que pertenecen a una misma entidad la llamamos **Stream** (Flujo). Una entidad equivale a un Stream.
 
 ---
 
-## 3. Reconstruyendo la realidad (El Desafío)
-Para cumplir nuestro objetivo de dar el total, vamos a leer nuestra lista de arriba hacia abajo.
+## 4. Reconstruyendo la realidad (El Agregado)
+Para saber el estado actual (en este caso, el total), simplemente "reproducimos" el Stream de arriba hacia abajo.
 
 ```csharp
 decimal total = 0;
@@ -65,17 +67,18 @@ foreach (var hecho in historial)
     }
 }
 
-Console.WriteLine($"El total de la orden calculada es: ${total}");
+Console.WriteLine($"Total calculado: ${total}");
 ```
 
----
-
 ### El Descubrimiento
-Acabas de implementar los dos pilares de este enfoque:
-1. Usar hechos inmutables para guardar la verdad.
-2. Reconstruir el estado leyendo la secuencia completa.
+Acabas de construir un **Agregado**. 
 
-Al tener la historia guardada como una **secuencia de eventos**, tenemos el poder de reflejar el estado del sistema en **cualquier momento**. A la estructura donde guardamos estas secuencias para consultarlas después, se le conoce conceptualmente como un **Event Store**.
+Un **Agregado** no es solo el dato guardado; es la unión de:
+1. La **Entidad** (el ID que nos identifica).
+2. El **Stream** (la lista de hechos que son nuestra fuente de verdad).
+3. La **Lógica** (el código que recorre los hechos para calcular el estado).
+
+Al lugar donde guardamos permanentemente estos Streams para que nunca se pierdan, se le conoce conceptualmente como **Event Store**.
 
 ---
 
