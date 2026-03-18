@@ -27,6 +27,7 @@ En el código, estos hitos del pasado se representan mejor usando **Records**. �
 ```csharp
 public record PersonaNacida(Guid PersonaId, string Nombre, DateTime FechaNacimiento);
 public record CumpleañosCelebrado(Guid PersonaId);
+public record HijoNacido(Guid PersonaId, string NombreHijo);
 ```
 
 ### El orden preciso de su vida
@@ -38,6 +39,7 @@ var biografia = new List<object>();
 
 biografia.Add(new PersonaNacida(idPersona, "Juan", new DateTime(1990, 5, 10)));
 biografia.Add(new CumpleañosCelebrado(idPersona)); // 1 año
+biografia.Add(new HijoNacido(idPersona, "Pedro")); // ¡Juan ahora es padre!
 biografia.Add(new CumpleañosCelebrado(idPersona)); // 2 años
 ```
 
@@ -70,6 +72,7 @@ public class Persona
     public Guid Id { get; private set; }
     public string Nombre { get; private set; }
     public int Edad { get; private set; } 
+    public List<string> Hijos { get; private set; } = new();
 
     // El Agregado se reconstruye leyendo su pasado
     public Persona(IEnumerable<object> eventos)
@@ -85,12 +88,13 @@ public class Persona
     {
         if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; }
         if (ev is CumpleañosCelebrado) { Edad++; }
+        if (ev is HijoNacido h) { Hijos.Add(h.NombreHijo); }
     }
 }
 
 // ¡Uso profesional!
 var juan = new Persona(biografia);
-Console.WriteLine($"{juan.Nombre} tiene {juan.Edad} años.");
+Console.WriteLine($"{juan.Nombre} tiene {juan.Edad} años y {juan.Hijos.Count} hijos.");
 ```
 
 En este modelo, la clase `Persona` es la encargada de cuidar que la historia de Juan sea siempre coherente. Es quien "posee" la verdad de su biografía.
@@ -101,14 +105,14 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 Para no confundirnos entre el código y la arquitectura, vamos a separar el **Rol** de la **Frontera**:
 
--   **La Raíz (Aggregate Root - "El Punto de Acceso")**: Es la clase **`Persona`**. En la arquitectura, la Raíz es la "puerta de entrada". Cuando en tu código creas una instancia como `var juan = new Persona()`, ese objeto específico es quien asume el rol de **CEO**: es el único punto de contacto autorizado para realizar cambios.
--   **El Agregado (Aggregate - "La Frontera de Consistencia")**: Es el concepto total. Es el perímetro invisible que envuelve a Juan, su pasado y sus reglas. Piensa en él como la **Empresa**. El Agregado NO es una clase; es la garantía de que nada de lo que le pase a Juan (el objeto Raíz) rompa las leyes de su propia vida (la frontera).
+-   **La Raíz (Aggregate Root - "El Punto de Acceso")**: Es la clase **`Persona`**. En la arquitectura, la Raíz es la "puerta de entrada". Cuando en tu código creas una instancia como `var juan = new Persona()`, ese objeto específico es quien asume el rol de **CEO**: es el único punto de contacto autorizado para realizar cambios. Incluso si quieres añadir un hijo, hablas con Juan (`Persona`), no con la lista de hijos directamente.
+-   **El Agregado (Aggregate - "La Frontera de Consistencia")**: Es el concepto total. Es el perímetro invisible que envuelve a Juan, su pasado, sus hijos y sus reglas. El Agregado NO es una clase; es la garantía de que nada de lo que le pase a Juan (la Raíz) o a sus relaciones (sus hijos) rompa las reglas de su vida.
 
 > [!IMPORTANT]
 > **La Raíz (`Persona`)** es el objeto que "da la cara". 
-> **El Agregado** es el sistema completo que ese objeto protege. 
+> **El Agregado** es el sistema completo (incluyendo sus hijos y su historia) que ese objeto protege. 
 > 
-> Tú le pides cosas a la **Raíz**, y ella se asegura de que se cumplan las reglas de todo el **Agregado**. Es una unidad indivisible: o se acepta todo el cambio en la vida de Juan, o no se acepta nada.
+> Tú le pides cosas a la **Raíz**, y ella se asegura de que se cumplan las reglas de todo el **Agregado**. Es una unidad indivisible: no puedes modificar un "Hijo" sin que la Raíz lo valide y lo registre en la biografía completa.
 
 ---
 
