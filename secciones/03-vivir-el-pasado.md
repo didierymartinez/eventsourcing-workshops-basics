@@ -99,13 +99,13 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 ### 🧠 ¿Cuál es la diferencia entre Raíz y Agregado?
 
-Aunque a veces los usamos como sinónimos, hay una jerarquía importante:
+Imagina un gran **Navío en alta mar**. Para que el barco llegue a puerto de forma segura, no puedes hablar con cada madera del casco o cada grano de pólvora por separado; necesitas a alguien que responda por todo el conjunto y mantenga el rumbo.
 
-- **Aggregate Root (La Raíz)**: Es la clase `Persona`. El objeto físico con el que hablas en tu código (el "Capitán").
-- **Agregado (Aggregate)**: Es el concepto completo. Es **Juan + Su Diario + Su Lógica**. Es la frontera invisible que asegura que toda su vida sea coherente.
+-   **La Raíz (Aggregate Root - "El Capitán")**: Es la clase `Persona`. El Capitán es el único con el que el mundo exterior habla. Él tiene la **Identidad** (el ID), firma la bitácora y toma las decisiones finales basados en lo que ha vivido. Si quieres cambiar el rumbo, hablas con el Capitán, no con el mástil.
+-   **El Agregado (Aggregate - "El Navío")**: Es el concepto completo. No es solo el Capitán, sino el Capitán **+** Su Tripulación **+** Sus Provisiones **+** Su Bitácora (Eventos) **+** Las Reglas de Navegación. El Agregado es la **Frontera de Consistencia**; asegura que si el barco gira a la derecha, toda la estructura gire con él y nadie se caiga al agua.
 
 > [!IMPORTANT]
-> La **Raíz** es la puerta de entrada. El **Agregado** es todo lo que vive detrás de esa puerta cuidando que no se rompa ninguna regla de la historia de Juan.
+> En nuestro código, tú no manipulas la "Edad" o el "Nombre" desde afuera de forma aislada. Tú interactúas con la **Raíz (Juan)**, y él se encarga de que todo su historial (**El Agregado**) sea coherente y verídico. Si Juan dice que nació en 1990, el Agregado garantiza que no puedas celebrar su cumpleaños número 5 en 1992.
 
 ---
 
