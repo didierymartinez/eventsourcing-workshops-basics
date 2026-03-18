@@ -106,7 +106,8 @@ Esta es la parte donde muchos se confunden, así que vamos a separar el **Interl
 
 > [!IMPORTANT]
 > **Juan (el objeto)** es la Raíz. **La Biografía de Juan (el conjunto de datos y reglas)** es el Agregado. 
-> Interactúas con la Raíz para asegurar la integridad de todo el Agregado. Es una unidad indivisible: o se acepta todo el cambio en su vida, o no se acepta nada.
+> 
+> Exacto: la **Biografía** es el Agregado. No es solo un archivo o una lista; es la frontera de todo lo que le ha pasado a Juan y las leyes que rigen su vida. Tú interactúas con la Raíz para asegurar la integridad de ese Agregado. Es una unidad indivisible: o se acepta todo el cambio en su vida, o no se acepta nada.
 
 ---
 
