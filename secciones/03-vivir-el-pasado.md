@@ -105,9 +105,9 @@ Esta es la parte donde muchos se confunden, así que vamos a separar el **Interl
 -   **El Agregado (Aggregate - "La Unidad de Coherencia")**: No es un objeto de código, es una **frontera invisible**. Es el "Juan" completo: su cuerpo, sus recuerdos, su pasado y sus reglas. Piensa en él como la **Empresa**. La Raíz (Juan/CEO) vive dentro de esta frontera y su trabajo es asegurar que nada de lo que pase rompa las leyes de la "empresa" (por ejemplo, que no pueda cumplir años si no ha nacido).
 
 > [!IMPORTANT]
-> **Juan (el objeto)** es la Raíz. **La Biografía de Juan (el conjunto de datos y reglas)** es el Agregado. 
+> **La clase `Persona`** es nuestra Raíz (Root). Aunque en el código solo veas esta clase, ella representa a todo el **Agregado**. 
 > 
-> Exacto: la **Biografía** es el Agregado. No es solo un archivo o una lista; es la frontera de todo lo que le ha pasado a Juan y las leyes que rigen su vida. Tú interactúas con la Raíz para asegurar la integridad de ese Agregado. Es una unidad indivisible: o se acepta todo el cambio en su vida, o no se acepta nada.
+> El **Agregado** es esa frontera invisible que protege la historia de Juan. Al usar la clase `Persona`, te aseguras de que nadie pueda entrar a modificar su pasado sin pasar por las reglas que hemos escrito. Es una unidad indivisible: o se acepta todo el cambio en su vida, o no se acepta nada.
 
 ---
 
