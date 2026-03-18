@@ -75,22 +75,22 @@ Console.WriteLine($"Total calculado: ${total}");
 ```
 
 ### El Descubrimiento
-Acabas de construir un **Agregado**, que es el concepto que lo une todo. Para que no haya confusión, definamos las piezas usando la analogía de una **Persona**:
+Acabas de construir un **Agregado**, que es el concepto que lo une todo. Para que no haya duda, mapeemos estos términos de la arquitectura a tu código C#:
 
-1.  **El Identificador (ID / Pasaporte)**: 
-    Es el número único que nos permite saber de quién estamos hablando. Sin ID, no podemos buscar la historia en el Event Store.
+1.  **El Identificador (El `Guid`)**: 
+    Es el `idOrden`. Es la llave que nos permite buscar los hechos correctos en la base de datos. Sin ID, no hay identidad.
 
-2.  **La Entidad (El Sujeto)**: 
-    Es el concepto del objeto (ej. "Persona" o "Orden de Compra"). Es el "quién" que posee ese ID.
+2.  **La Entidad (La `class` o Instancia)**: 
+    Es la clase que representa al sujeto (ej. `public class OrdenCompra`). Una instancia de esta clase es "la Entidad". Es el "quién" que posee el ID.
 
-3.  **El Stream (La Biografía)**: 
-    Es la lista de hechos que le han pasado a esa Entidad específica. Es su pasado escrito en el tiempo.
+3.  **El Stream (La `List<object>`)**: 
+    Es la biografía. La secuencia de hechos que le han pasado a esa instancia específica. Es su pasado escrito en el tiempo.
 
-4.  **El Agregado (La Unidad de Decisión)**: 
-    Es el **Agente Vivo**. Eres **tú** (Entidad) + **tu ID** + **tu historia** (Stream) + **tu contexto** (familia, dirección, reglas).
-    > El **Agregado** es la frontera de consistencia. Es la entidad "cargada" con toda su historia y lista para responder a una petición. Es quien dice: *"Dado que en mi biografía dice que ya estoy casado, no puedo registrar el hecho 'Casarse' otra vez"*.
+4.  **El Agregado (La Instancia "Cargada")**: 
+    Es el **Agente Vivo**. Es la instancia de tu clase (Entidad) que ya ha procesado su lista de hechos (Stream) y ahora conoce su estado actual.
+    > El **Agregado** es la frontera de decisión. Es quien usa su lógica interna para decir: *"Como mi saldo actual es $100, puedo aceptar el comando 'Comprar' por $50"*. 
 
-**En resumen**: La **Entidad** nos da la identidad, el **Stream** nos da el pasado, y el **Agregado** es el objeto que cobra vida para validar reglas y decidir el futuro.
+**En resumen**: La **Entidad** es el molde y la identidad, el **Stream** es el historial, y el **Agregado** es el objeto final que usamos en nuestro código para ejecutar la lógica de negocio de forma segura.
 
 Al lugar donde guardamos permanentemente estos Streams se le conoce como **Event Store**.
 
