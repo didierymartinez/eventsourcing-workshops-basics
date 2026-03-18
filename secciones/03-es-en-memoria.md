@@ -75,19 +75,22 @@ Console.WriteLine($"Total calculado: ${total}");
 ```
 
 ### El Descubrimiento
-Acabas de construir un **Agregado**, que es el concepto que lo une todo. Resolvamos el misterio de la relación entre las piezas usando la analogía de una **Persona**:
+Acabas de construir un **Agregado**, que es el concepto que lo une todo. Para que no haya confusión, definamos las piezas usando la analogía de una **Persona**:
 
-1.  **La Entidad (Tu Identidad / "El Qué")**: 
-    Es tu identidad única (como tu Pasaporte). Es el nombre de la clase o el ID que dice "esta es la Orden de Compra #123". La entidad es importante porque sin ella no hay un sujeto al cual asociarle hechos.
+1.  **El Identificador (ID / Pasaporte)**: 
+    Es el número único que nos permite saber de quién estamos hablando. Sin ID, no podemos buscar la historia en el Event Store.
 
-2.  **El Stream (Tu Biografía / "El Cuándo")**: 
-    Es la lista de hechos que te han pasado. Sin el stream, la entidad es una cáscara vacía sin pasado.
+2.  **La Entidad (El Sujeto)**: 
+    Es el concepto del objeto (ej. "Persona" o "Orden de Compra"). Es el "quién" que posee ese ID.
 
-3.  **El Agregado (Tú hoy / "El Todo")**: 
-    Es el **contenedor lógico**. Eres **tú** (Entidad) + **tu historia** (Stream) + **tus reglas y relaciones** (Familia, Dirección, Cerebro).
-    > El **Agregado** es más que la entidad; es la frontera que protege tus reglas de negocio. Cuando alguien te pide algo (Comando), el Agregado usa la **Entidad** para identificarse, lee el **Stream** para saber cómo está hoy, y aplica su **Lógica** para decidir si el comando se acepta u otro hecho debe ser registrado.
+3.  **El Stream (La Biografía)**: 
+    Es la lista de hechos que le han pasado a esa Entidad específica. Es su pasado escrito en el tiempo.
 
-**Conclusión**: La **Entidad** es el "quién", pero el **Agregado** es el "sistema completo" encargado de que todo tenga coherencia.
+4.  **El Agregado (La Unidad de Decisión)**: 
+    Es el **Agente Vivo**. Eres **tú** (Entidad) + **tu ID** + **tu historia** (Stream) + **tu contexto** (familia, dirección, reglas).
+    > El **Agregado** es la frontera de consistencia. Es la entidad "cargada" con toda su historia y lista para responder a una petición. Es quien dice: *"Dado que en mi biografía dice que ya estoy casado, no puedo registrar el hecho 'Casarse' otra vez"*.
+
+**En resumen**: La **Entidad** nos da la identidad, el **Stream** nos da el pasado, y el **Agregado** es el objeto que cobra vida para validar reglas y decidir el futuro.
 
 Al lugar donde guardamos permanentemente estos Streams se le conoce como **Event Store**.
 
