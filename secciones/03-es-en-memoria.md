@@ -50,15 +50,15 @@ historial.Add(new ProductoAgregado("Mouse Inalambrico", 1, 45m));
 ```
 
 ### ¿Qué es un Stream realmente?
-A esta secuencia ininterrumpida de hechos la llamamos **Stream** (Flujo). Una entidad equivale a un Stream.
+A esta secuencia ininterrumpida de hechos la llamamos **Stream** (Flujo). 
 
-Piénsalo así: **Un Stream es la historia de vida de la entidad**. 
-> Es como tú: naces, creces, estudias la primaria, luego la secundaria, te gradúas de la universidad, te casas... Esa sucesión de hechos, en ese orden exacto, es lo que define quién eres hoy. Si cambiaras el orden (si te casaras antes de nacer), la historia no tendría sentido.
+Piénsalo así: **Un Stream es la biografía de la entidad**. 
+> Es el registro de todo lo que te ha pasado: naces, creces, estudias, te casas... Esa sucesión de hechos, en ese orden exacto, es lo que permite conocer tu pasado. Pero la biografía por sí sola es solo papel; falta el protagonista.
 
 ---
 
 ## 4. Reconstruyendo la realidad (El Agregado)
-Para saber el estado actual (en este caso, el total), simplemente "reproducimos" el Stream de arriba hacia abajo.
+Para saber el estado actual (por ejemplo, tu saldo bancario), "reproducimos" el Stream de arriba hacia abajo.
 
 ```csharp
 decimal total = 0;
@@ -75,14 +75,21 @@ Console.WriteLine($"Total calculado: ${total}");
 ```
 
 ### El Descubrimiento
-Acabas de construir un **Agregado**. 
+Acabas de construir un **Agregado**, que es el concepto que lo une todo. Resolvamos el misterio de la relación entre las piezas usando la analogía de una **Persona**:
 
-Un **Agregado** no es solo el dato guardado; es la unión de:
-1. La **Entidad** (el ID que nos identifica).
-2. El **Stream** (la lista de hechos que son nuestra fuente de verdad).
-3. La **Lógica** (el código que recorre los hechos para calcular el estado).
+1.  **La Entidad (Tu Identidad / "El Qué")**: 
+    Es tu identidad única (como tu Pasaporte). Es el nombre de la clase o el ID que dice "esta es la Orden de Compra #123". La entidad es importante porque sin ella no hay un sujeto al cual asociarle hechos.
 
-Al lugar donde guardamos permanentemente estos Streams para que nunca se pierdan, se le conoce conceptualmente como **Event Store**.
+2.  **El Stream (Tu Biografía / "El Cuándo")**: 
+    Es la lista de hechos que te han pasado. Sin el stream, la entidad es una cáscara vacía sin pasado.
+
+3.  **El Agregado (Tú hoy / "El Todo")**: 
+    Es el **contenedor lógico**. Eres **tú** (Entidad) + **tu historia** (Stream) + **tus reglas y relaciones** (Familia, Dirección, Cerebro).
+    > El **Agregado** es más que la entidad; es la frontera que protege tus reglas de negocio. Cuando alguien te pide algo (Comando), el Agregado usa la **Entidad** para identificarse, lee el **Stream** para saber cómo está hoy, y aplica su **Lógica** para decidir si el comando se acepta u otro hecho debe ser registrado.
+
+**Conclusión**: La **Entidad** es el "quién", pero el **Agregado** es el "sistema completo" encargado de que todo tenga coherencia.
+
+Al lugar donde guardamos permanentemente estos Streams se le conoce como **Event Store**.
 
 ---
 
