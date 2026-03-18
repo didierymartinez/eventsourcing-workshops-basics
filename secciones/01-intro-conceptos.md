@@ -1,44 +1,36 @@
-# 01 - El rastro de lo que sucede
+# 01 - 🧠 El rastro de lo que sucede
 
-Antes de empezar a programar, pensemos en cómo guardamos la realidad en el software. La mayoría de los sistemas actuales se enfocan en el **"Ahoritismo"**.
+Bienvenido. En este workshop no vamos a construir una base de datos tradicional. Vamos a construir una **Biografía**.
 
-## 1. El modelo del "Ahora" (Estado Actual)
+## 🎯 El Objetivo
+Imagina que quieres conocer la vida de una persona. Tienes dos opciones:
+1. Ver su **foto actual** (donde ves si está feliz, qué ropa lleva y su edad).
+2. Leer su **diario personal** (desde que nació hasta hoy).
 
-Imagina que estás gestionando una **Orden de Compra**. Normalmente, tu base de datos guarda una foto del presente:
+Si el dueño de la empresa te pregunta: *"¿Cómo llegó esta persona a ser quien es hoy?"*, la foto no te sirve. Necesitas el diario.
 
-| ID | Numero | Estado | Total |
-|----|--------|--------|-------|
-| 1  | FAC-001| Pagada | $125  |
-
-Si el cliente cancela la orden, simplemente sobrescribimos el valor: cambiamos "Pagada" por "Cancelada".
-**El problema:** Al sobrescribir, hemos borrado la historia. No sabemos *cuándo* estuvo pagada, ni qué pasó entre que se creó y se canceló. Solo sabemos el presente.
+En el software tradicional, solemos guardar "fotos" (el estado actual en una tabla). En este workshop, aprenderemos a guardar el **"diario"**.
 
 ---
 
-## 2. El modelo de la "Historia" (Hechos pasados)
+## 1. El problema de la "Foto" (Estado Actual)
+Cuando usamos una base de datos normal, si una persona se muda de ciudad, sobrescribimos su dirección. 
+*   **Antes**: Calle A.
+*   **Después**: Calle B.
 
-¿Y si en lugar de sobrescribir, simplemente anotamos cada cosa que pasa? Como si fuera el diario de vida de la orden.
+**¿Qué perdimos?** Perdimos el hecho de que alguna vez vivió en la Calle A. Perdimos su historia.
 
-Para nuestra Orden de Compra, las anotaciones serían:
-1. Se creó la orden `FAC-001`.
-2. Se agregó una `Laptop` por `$1200`.
-3. Se agregó un `Mouse` por `$25`.
-4. Se recibió el pago.
+## 2. La solución: El "Diario" (Hechos)
+En lugar de guardar solo dónde vive alguien, vamos a guardar los hechos que lo llevaron ahí:
+- *Persona nacida.*
+- *Persona se mudó a Calle A.*
+- *Persona se mudó a Calle B.*
 
-**¿Cuál es el total actual?** No lo tenemos guardado en ninguna celda, pero si leemos todas las notas de arriba hacia abajo, podemos calcularlo: `$1225`.
-
----
-
-## 3. ¿Por qué es potente este enfoque?
-- **No pierdes nada:** Tienes el rastro de todo lo que ocurrió.
-- **Auditoría natural:** Si el total no cuadra, puedes revisar línea por línea qué se anotó mal.
-- **Nuevas respuestas:** Si mañana el negocio pregunta "¿Cuántas veces la gente cambia de opinión antes de pagar?", con el modelo de historia puedes responder. Con el modelo del "ahora", esa información ya se borró.
-
----
+Si tenemos la lista de hechos, siempre podemos saber dónde vive hoy, pero además ganamos el **pasado**.
 
 ### El Descubrimiento
-Este enfoque, donde el estado de un sistema no es un dato estático, sino el resultado de procesar una **secuencia cronológica de hechos**, se conoce formalmente como **Event Sourcing**. 
+A esta forma de diseñar sistemas donde la "Fuente de la Verdad" no es una foto del presente, sino la secuencia de todos los hechos del pasado, se le conoce como **Event Sourcing**.
 
-Lo más potente es que esta secuencia nos permite reflejar **cómo se veía el sistema en cualquier momento del pasado**, simplemente deteniendo la lectura de los hechos en el punto que nos interese. Es, literalmente, una máquina del tiempo para tus datos.
+---
 
 [➡️ Siguiente sección: Preparando nuestro lienzo](./02-primer-proyecto.md)

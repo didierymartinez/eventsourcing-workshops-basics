@@ -1,102 +1,95 @@
-# 03 - Guardando hechos en el código
+# 03 - Guardando la historia en el código
 
-Vamos a empezar a anotar lo que sucede en nuestro negocio usando solo C#.
+Ahora que tenemos nuestro lienzo en blanco, vamos a empezar a anotar la historia de una vida usando C#.
 
 ## 🎯 El Objetivo
-Imagina que el dueño del negocio te pide saber cuánto dinero ha vendido hoy. Sin embargo, **no tienes permiso de crear una tabla llamada "Ventas"**. Solo puedes anotar en un diario cada cosa que pase (compras, cancelaciones, cambios).
+Imagina que quieres saber exactamente qué edad tenía Juan en el año 2005. 
+**No puedes guardar una variable fija llamada `Edad = 34`**, porque esa variable solo te dice el "ahora". Si la sobrescribes cada año, destruyes el pasado.
 
-¿Cómo harías para darle el total al final del día usando solo esas notas?
+¿Cómo podrías calcular su edad en cualquier punto del tiempo sin guardar el número final?
 
 ---
 
-## 1. Identificando al protagonista (La Entidad)
-Cuando procesamos información, siempre lo hacemos sobre algo específico. En nuestro caso, es una **Orden de Compra**. 
-
-Para que el sistema sepa de qué orden estamos hablando, necesitamos un identificador único. 
+## 1. El Protagonista e Identidad
+En Event Sourcing, todo gira en torno a una identidad única.
 
 ```csharp
-// Identificador único para nuestra entidad
-var idOrden = Guid.NewGuid();
+// El ancla de nuestra historia
+var idPersona = Guid.NewGuid();
 ```
 
-En el mundo del software, a este objeto con identidad propia lo llamamos **Entidad**. Podemos tener la Entidad A y la Entidad B, cada una con su propia historia.
+Esto representa la **Identidad**. Es como tu huella digital o tu número de pasaporte: no cambia nunca, sin importar cuántos hechos ocurran en tu vida.
 
 ---
 
-## 2. Definiendo los hechos (Records)
-Independientemente del lenguaje de programación, lo que buscamos es que algo que **ya pasó** no se pueda alterar. En C#, la herramienta ideal para representar este concepto de inmutabilidad es el **Record**.
+## 2. Definiendo los Hitos (Hechos)
+
+Antes de escribir código, debemos decidir qué momentos de la vida de Juan afectan su "estado" (como su edad o su ubicación). En el mundo profesional, se usa una técnica llamada **Event Storming** para identificar qué eventos son realmente importantes para el negocio.
+
+### ¿Record o Clase?
+Para representar estos hechos, en C# usamos **Records** en lugar de clases tradicionales. ¿Por qué?
+
+1.  **Inmutabilidad**: Un hecho del pasado (como nacer) no puede cambiarse. Un `record` es inmutable por defecto.
+2.  **Igualdad por valor**: Dos hechos son iguales si sus datos son iguales, no si son la misma instancia en memoria.
 
 ```csharp
-// Definimos los hechos vinculados a nuestra entidad
-public record OrdenCreada(Guid Id, string NumeroFactura);
-public record ProductoAgregado(string Nombre, int Cantidad, decimal Precio);
+// La vida empieza con un hecho fundacional
+public record PersonaNacida(Guid Id, string Nombre, DateTime FechaNacimiento);
+
+// Y continúa con hitos que cambian su estado
+public record CumpleañosCelebrado(Guid Id, DateTime Fecha);
 ```
 
-> [!NOTE]
-> Nota que cada hecho incluye el ID de la entidad. Un hecho siempre pertenece a una sola entidad a la vez.
+> [!TIP]
+> Solo anotamos los eventos que **importan**. Que Juan desayunó hoy quizás no sea relevante para nuestro sistema, pero que cumplió años sí, porque afecta su edad.
 
 ---
 
-## 3. El flujo de la historia (El Stream)
-Para que la historia tenga sentido, guardamos estos hechos en el orden exacto en que ocurrieron. 
+## 3. La Biografía (El Stream)
+
+¿Cómo guardamos estos hitos para no perder el orden? Usamos una **Lista**.
 
 ```csharp
-// Nuestra secuencia cronológica de hechos
-var historial = new List<object>();
+// Nuestra biografía es una secuencia cronológica
+var biografia = new List<object>();
 
-historial.Add(new OrdenCreada(idOrden, "FAC-2024-001"));
-historial.Add(new ProductoAgregado("Laptop Pro", 1, 1500m));
-historial.Add(new ProductoAgregado("Mouse Inalambrico", 1, 45m));
+biografia.Add(new PersonaNacida(idPersona, "Juan", new DateTime(1990, 5, 10)));
+biografia.Add(new CumpleañosCelebrado(idPersona, new DateTime(1991, 5, 10)));
+biografia.Add(new CumpleañosCelebrado(idPersona, new DateTime(1992, 5, 10)));
 ```
 
-### ¿Qué es un Stream realmente?
-A esta secuencia ininterrumpida de hechos la llamamos **Stream** (Flujo). 
-
-Piénsalo así: **Un Stream es la biografía de la entidad**. 
-> Es el registro de todo lo que te ha pasado: naces, creces, estudias, te casas... Esa sucesión de hechos, en ese orden exacto, es lo que permite conocer tu pasado. Pero la biografía por sí sola es solo papel; falta el protagonista.
+**¿Por qué una lista?** Porque un diario solo tiene sentido si se lee en orden. A esta secuencia ininterrumpida de hechos la llamamos **Stream** (Flujo). El Stream es la "Fuente de la Verdad": si quieres saber quién es Juan, lees su Stream.
 
 ---
 
-## 4. Reconstruyendo la realidad (El Agregado)
-Para saber el estado actual (por ejemplo, tu saldo bancario), "reproducimos" el Stream de arriba hacia abajo.
+## 4. Resolviendo el desafío (El Agregado)
+
+Volvamos al objetivo: ¿Cómo sabemos su edad actual? 
+No la leemos de una propiedad; la **reconstruimos** procesando su biografía.
 
 ```csharp
-decimal total = 0;
+int edadCalculada = 0;
 
-foreach (var hecho in historial)
+foreach (var hito in biografia)
 {
-    if (hecho is ProductoAgregado p)
+    if (hito is CumpleañosCelebrado)
     {
-        total += (p.Precio * p.Cantidad);
+        edadCalculada++;
     }
 }
 
-Console.WriteLine($"Total calculado: ${total}");
+Console.WriteLine($"Juan tiene {edadCalculada} años.");
 ```
 
-### El Descubrimiento
-Acabas de construir un **Agregado**, que es el concepto que lo une todo. Para que no haya duda, mapeemos la teoría a lo que realmente está pasando en tu código C#:
+### El Descubrimiento: Aggregate Root y Aggregate
 
-1.  **El Identificador (El `idOrden`)**: 
-    Es la pieza más importante. Es el ancla que nos dice de quién es la historia que estamos leyendo. Sin este ID, los hechos estarían "sueltos" y no tendrían dueño.
+Acabas de crear un sistema que protege la historia. En la teoría de DDD, esto se divide así:
 
-2.  **La Entidad (El Concepto de Identidad)**: 
-    En Event Sourcing, la **Entidad** es más conceptual que física. No es necesariamente una clase que instancies, sino la **identidad** que vive detrás del ID. Cuando dices "esta es la Orden #123", la Entidad es ese concepto de "Orden" que tiene ese ID único.
+1.  **Aggregate Root (La Raíz)**: Es el "Jefe". En nuestro caso, es la clase o el concepto de **Persona** que posee el ID. Es a quien le enviamos las órdenes.
+2.  **Aggregate (El Agregado)**: Es el conjunto completo. Es **Juan (Root) + Su Biografía (Stream) + La lógica de conteo**. 
 
-3.  **El Stream (La Biografía / `List<object>`)**: 
-    Es la secuencia de hechos. Es el historial de vida de esa identidad conceptual. 
-
-4.  **El Agregado (El "Agente" en el código)**: 
-    Es la unidad lógica que **sí creas en tu código**. Es el objeto que toma el ID (Entidad conceptual) y carga su historial (Stream) para poder tomar decisiones.
-    > El **Agregado** es quien usa su lógica para decir: *"Si mi historia dice que esta orden ya fue pagada, no puedo agregarle más productos"*. 
-
-**En resumen**, el rompecabezas de este capítulo tiene 4 piezas:
-1.  **El ID**: El ancla que une todo.
-2.  **La Entidad**: El "Quién" conceptual.
-3.  **El Stream**: La biografía (qué pasó y en qué orden).
-4.  **El Agregado**: El agente vivo en tu código que carga el pasado para decidir el futuro.
-
-Esta es la base técnica. Pero como viste al ejecutar el programa, esta historia vive solo en la memoria RAM. En el siguiente capítulo, veremos por qué esto es un riesgo enorme.
+> [!IMPORTANT]
+> El **Agregado** es la frontera que garantiza que los datos sean coherentes. Por ejemplo, la lógica del Agregado no debería permitir que Juan celebre un cumpleaños ANTES de haber nacido. Esa regla de negocio la protege el Agregado.
 
 ---
 

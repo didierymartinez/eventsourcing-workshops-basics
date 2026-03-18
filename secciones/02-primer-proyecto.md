@@ -8,12 +8,12 @@ Abriremos una terminal en la carpeta de trabajo y ejecutaremos:
 
 1. **Crear el proyecto**:
    ```bash
-   dotnet new console -n Taller.OrdenCompra
+   dotnet new console -n Taller.HistoriaVida
    ```
 
 2. **Acceder a la carpeta**:
    ```bash
-   cd Taller.OrdenCompra
+   cd Taller.HistoriaVida
    ```
 
 3. **Abrir tu IDE**:
@@ -25,7 +25,8 @@ Abriremos una terminal en la carpeta de trabajo y ejecutaremos:
 
 Observa qué ha creado .NET por ti:
 
-- **`Taller.OrdenCompra.csproj`**: El archivo que define la configuración básica de tu proyecto.
+- **`Taller.HistoriaVida.sln`**: El archivo de solución que agrupa y organiza tus proyectos.
+- **`Taller.HistoriaVida.csproj`**: El archivo que define la configuración básica de tu proyecto.
 - **`Program.cs`**: Este es nuestro **lienzo en blanco**. No nos perderemos en carpetas complejas ni arquitecturas sofisticadas. 
 
 A medida que avancemos, veremos cómo este archivo evoluciona. Es la forma más sencilla de identificar cómo cada pieza que construyamos encaja con la anterior.
