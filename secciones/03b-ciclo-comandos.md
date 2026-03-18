@@ -1,95 +1,71 @@
-# 03b - El ciclo de vida de un cambio
+# 03b - Tomando decisiones (Comandos)
 
-Ya sabemos cómo reconstruir a Juan leyendo su biografía. Pero, ¿qué pasa cuando Juan quiere hacer algo nuevo? ¿Cómo pasamos de una "intención" a un "hecho registrado"?
+Juan ya tiene una biografía y sabe quién es. Pero la vida sigue, y Juan quiere tomar decisiones.
 
 ## 🎯 El Objetivo
-Juan se quiere mudar de ciudad. Sin embargo, tenemos una regla de negocio: **Juan no puede mudarse si no ha nacido todavía.**
+Juan quiere cambiar su nombre. Pero tenemos una regla: **Una vez que naces con un nombre, no puedes cambiarlo en este sistema.**
 
-Tu reto es implementar el ciclo completo de un comando para asegurar que esta regla se cumpla.
+¿Cómo usamos lo que ya sabemos para proteger esta regla?
 
 ---
 
-## 1. La intención (El Comando)
-A diferencia de los hechos (que están en pasado), los **Comandos** representan una intención de futuro. Suelen llamarse en imperativo: `Mudarse`.
+## 1. La Intención (El Comando)
+Un **Hecho** dice lo que pasó (`PersonaNacida`). Un **Comando** dice lo que *queremos* que pase.
 
 ```csharp
-public record Mudarse(Guid PersonaId, string NuevaCiudad);
+public record CambiarNombre(Guid PersonaId, string NuevoNombre);
 ```
 
 ---
 
-## 2. El Ciclo de Vida: Las 5 Estaciones
-Para procesar este comando, siempre seguiremos los mismos pasos que viste en la teoría:
+## 2. El Ciclo de Decisión (El Aggregate Root)
+El Aggregate Root (`Persona`) no solo sirve para leer el pasado, sino para **decidir el futuro**.
 
-1.  **Localizar**: Buscar el Stream (la lista `biografia`) usando el `PersonaId` del comando.
-2.  **Cargar y Reconstruir**: Crear una instancia de `Persona` (nuestro Aggregate Root) pasándole todos los hechos del pasado.
-3.  **Ejecutar Lógica**: Llamar a un método dentro de la clase `Persona` para que ella decida si la mudanza es válida.
-4.  **Generar el Hecho**: Si todo está bien, la clase `Persona` devuelve un nuevo hecho: `MudanzaRealizada`.
-5.  **Persistir**: Añadir ese nuevo hecho al final de la lista `biografia`.
-
----
-
-## 3. 🛠️ ¡Manos a la obra! (Tu Turno)
-
-Actualiza tu clase `Persona` en `Program.cs` para que sea capaz de procesar mudanzas. 
-
-### Paso A: Definir el nuevo hecho
-```csharp
-public record MudanzaRealizada(Guid PersonaId, string Ciudad);
-```
-
-### Paso B: Implementar la lógica de decisión
-Modifica la clase `Persona` para que tenga un método `DecidirMudanza`. **Importante:** La mudanza solo es válida si la persona ya tiene un nombre (ha nacido).
+Añade este método a tu clase `Persona`:
 
 ```csharp
-public class Persona 
+public object DecidirCambioNombre(string nuevoNombre)
 {
-    // ... estado anterior ...
-    public string CiudadActual { get; private set; }
-
-    public MudanzaRealizada DecidirMudanza(string nuevaCiudad)
+    // Usamos el estado que RECONSTRUIMOS en la sección anterior
+    if (!string.IsNullOrEmpty(this.Nombre))
     {
-        if (string.IsNullOrEmpty(Nombre)) 
-            throw new Exception("¡No puedes mudarte si no has nacido!");
-
-        return new MudanzaRealizada(Id, nuevaCiudad);
+        Console.WriteLine("REGLA: El nombre es inmutable después del nacimiento.");
+        return null; // No generamos ningún hecho nuevo
     }
 
-    private void Aplicar(object hito)
-    {
-        // ... otros hilos ...
-        if (hito is MudanzaRealizada m) { CiudadActual = m.Ciudad; }
-    }
+    // Si fuera válido, generaríamos un nuevo hecho
+    return new PersonaNacida(this.Id, nuevoNombre, DateTime.Now);
 }
 ```
 
-### Paso C: Procesa el comando
-Ahora, intenta ejecutar este flujo en tu `Main`:
-
-```csharp
-// 1. Recibimos el comando
-var comando = new Mudarse(idPersona, "Medellín");
-
-// 2. Reconstruimos el agregado (Load & Replay)
-var juan = new Persona(biografia);
-
-// 3. El Agregado decide (Execute)
-var nuevoHecho = juan.DecidirMudanza(comando.NuevaCiudad);
-
-// 4. Guardamos el resultado del futuro (Append)
-biografia.Add(nuevoHecho);
-
-Console.WriteLine($"Juan ahora vive en: {juan.CiudadActual} (Espera... ¡falta algo!)");
-```
-
 ---
 
-## ❓ El gran dilema
-Si ejecutas el código anterior, verás que `juan.CiudadActual` sigue estando vacía o desactualizada inmediatamente después del `Add`.
+## 3. 🛠️ ¡Pruébalo!
+Intenta forzar un cambio de nombre en tu `Program.cs`:
 
-**¿Por qué?** Porque acabas de guardar el hecho en el diario, pero ¡olvidaste "vivirlo"! Para que el objeto `juan` se entere del cambio, también tiene que `Aplicar` ese nuevo hecho sobre sí mismo.
+```csharp
+var comando = new CambiarNombre(idPersona, "Juan Sebastian");
 
-Este ciclo de: **Recibir -> Reconstruir -> Decidir -> Guardar** es el corazón de Event Sourcing. 
+// 1. Reconstruimos a Juan desde el pasado
+var juan = new Persona(biografia);
+
+// 2. Le pedimos que decida basado en su estado actual
+var resultado = juan.DecidirCambioNombre(comando.NuevoNombre);
+
+if (resultado != null)
+{
+    biografia.Add(resultado);
+}
+```
+
+### El Descubrimiento
+Acabas de ver la "Unidad de Consistencia". El Agregado (`Persona`) usó su estado reconstruido para proteger una regla de negocio. 
+
+Este es el ciclo real de Event Sourcing:
+1.  **Cargar** el pasado (Stream).
+2.  **Reconstruir** el estado (Apply).
+3.  **Decidir** el futuro (Comandos).
+4.  **Registrar** el resultado (Nuevos eventos).
 
 ---
 
