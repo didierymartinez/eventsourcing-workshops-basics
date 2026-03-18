@@ -61,8 +61,8 @@ Console.WriteLine($"{nombre} tiene {edad} años.");
 
 Este proceso de lectura se llama **Replay**. Has "vuelto a vivir" el pasado para entender el presente. Funciona perfecto para un ejemplo pequeño, pero a medida que nuestra aplicación crezca, tener estos bucles repartidos por todo el código se volverá un caos.
 
-### El jefe de la historia: El Aggregate Root
-Necesitamos a alguien que centralice esa biografía y sepa cómo interpretarla, un "Jefe" que reciba el diario y se encargue de despertar con su estado actualizado. A este jefe lo llamamos **Aggregate Root (Raíz del Agregado)**:
+### El protagonista de la historia: El Aggregate Root
+Necesitamos a un **Protagonista** que centralice esa biografía y sepa cómo interpretarla, alguien que reciba el diario y se encargue de "despertar" con su estado actualizado. A este personaje principal lo llamamos **Aggregate Root (Raíz del Agregado)**:
 
 ```csharp
 public class Persona 
