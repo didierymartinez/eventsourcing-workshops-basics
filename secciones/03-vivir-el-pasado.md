@@ -101,13 +101,13 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 ### 🧠 ¿Cuál es la diferencia entre Raíz y Agregado?
 
-Para que la historia de Juan sea coherente, no podemos tratar sus datos como si fueran piezas sueltas de un rompecabezas. Necesitamos entender quién manda y hasta dónde llega su autoridad.
+Para entender esto, usemos la analogía de una **Empresa**, que es mucho más clara:
 
--   **La Raíz (Aggregate Root - "El Protagonista")**: Es la clase `Persona`. Juan es el único punto de contacto con el mundo exterior. Él tiene la **Identidad** (el ID) y es a quien le pides que haga cosas (como "celebrar un cumpleaños"). No puedes ir y cambiarle la edad a Juan "por la espalda"; tienes que pedírselo a él.
--   **El Agregado (Aggregate - "La Esfera de Juan")**: Es el concepto completo. Es Juan **+** Su Memoria (Eventos) **+** Sus Reglas de Vida. El Agregado es la **Frontera de Consistencia**; es la barrera invisible que garantiza que toda la vida de Juan tenga sentido interno. Es lo que impide que Juan sea un anciano de 80 años si su fecha de nacimiento dice que nació hace apenas 20.
+-   **La Raíz (Aggregate Root - "El CEO")**: Es con quien tratas para hacer cambios. El CEO es la cara visible, el que tiene la firma autorizada y la **Identidad** legal. En nuestro código, Juan es el CEO. No hablas con sus recuerdos por separado, hablas con Juan.
+-   **El Agregado (Aggregate - "La Empresa completa")**: Es el edificio, el logo, los empleados y las reglas internas. Es la **Frontera de Consistencia**. Cuando le pides algo al CEO, él se encarga de coordinar a toda la "empresa" (sus recuerdos, su lógica) para que el cambio sea coherente.
 
 > [!IMPORTANT]
-> En nuestro código, tú no manipulas la "Edad" o el "Nombre" de forma aislada. Interactúas con el **Protagonista (Juan)**, y él se encarga de que todo su sistema interno (**El Agregado**) se mantenga verídico y ordenado. El Agregado asegura que Juan sea una unidad indivisible de verdad.
+> Piensa en **Juan como una organización de un solo hombre**. Tú interactúas con la **Raíz (Juan)**, y él garantiza que todo su sistema interno (**El Agregado**) se mantenga verídico. Ninguna parte de su biografía cambia si el "CEO" no lo autoriza tras revisar sus propias reglas.
 
 ---
 
