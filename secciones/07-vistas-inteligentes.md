@@ -61,6 +61,6 @@ Has completado el viaje. Has pasado de anotar en listas manuales a entender cóm
 
 ---
 
-[⬅️ Volver a la sección anterior](./06-marten-event-store.md)
+[⬅️ Volver a la sección anterior](./06-automatizando-el-diario.md)
 
 [🏠 Volver al inicio](../README.md)

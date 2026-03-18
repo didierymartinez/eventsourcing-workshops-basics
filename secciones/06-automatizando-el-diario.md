@@ -63,6 +63,6 @@ Console.WriteLine("¡Biografía guardada en el Event Store!");
 
 Ya sabemos guardar. Pero, ¿cómo recuperamos a Juan del baúl y sabemos cuántos años tiene sin volver a hacer bucles manuales?
 
-[⬅️ Volver a la sección anterior](./05-preparando-persistencia.md)
+[⬅️ Volver a la sección anterior](./05-el-baul-de-historias.md)
 
-[➡️ Siguiente sección: Lectura inteligente](./07-consultas-proyecciones.md)
+[➡️ Siguiente sección: Vistas inteligentes](./07-vistas-inteligentes.md)

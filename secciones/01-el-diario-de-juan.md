@@ -33,4 +33,4 @@ A esta forma de diseñar sistemas donde la "Fuente de la Verdad" no es una foto 
 
 ---
 
-[➡️ Siguiente sección: Preparando nuestro lienzo](./02-primer-proyecto.md)
+[➡️ Siguiente sección: Preparando el lienzo](./02-preparando-el-lienzo.md)

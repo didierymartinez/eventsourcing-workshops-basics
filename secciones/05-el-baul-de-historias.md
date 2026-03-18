@@ -47,6 +47,6 @@ Este almacén especializado en guardar los **Streams** (biografías) de tus enti
 
 Ahora que tenemos el lugar físico, necesitamos el "pegamento" profesional para que nuestro código C# deje de usar listas en memoria y empiece a escribir en este baúl de forma automática.
 
-[⬅️ Volver a la sección anterior](./04-el-problema.md)
+[⬅️ Volver a la sección anterior](./04-el-riesgo-de-olvidar.md)
 
-[➡️ Siguiente sección: Automatizando las biografías](./06-marten-event-store.md)
+[➡️ Siguiente sección: Automatizando el diario](./06-automatizando-el-diario.md)

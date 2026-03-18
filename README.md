@@ -16,13 +16,14 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 
 ## 📚 Secciones del workshop (Hoja de Ruta)
 
-1. [01 - 🧠 El rastro de lo que sucede](./secciones/01-intro-conceptos.md)
-2. [02 - 🚀 Preparando nuestro lienzo](./secciones/02-primer-proyecto.md)
-3. [03 - 📝 Guardando hechos en el código](./secciones/03-es-en-memoria.md)
-4. [04 - ⚠️ El gran problema: La Volatilidad](./secciones/04-el-problema.md)
-5. [05 - 🗄️ Un baúl que no se borra](./secciones/05-preparando-persistencia.md)
-6. [06 - 💾 Automatizando el historial](./secciones/06-marten-event-store.md)
-7. [07 - 📊 Consultas y vistas inteligentes](./secciones/07-consultas-proyecciones.md)
+1. [01 - 🧠 El diario de Juan: Biografía vs Foto](./secciones/01-el-diario-de-juan.md)
+2. [02 - 🚀 Preparando el lienzo](./secciones/02-preparando-el-lienzo.md)
+3. [03 - 📝 Vivir el pasado: El motor Apply](./secciones/03-vivir-el-pasado.md)
+4. [03b - 💡 Decidir el futuro: Comandos](./secciones/03b-decidir-el-futuro.md)
+5. [04 - ⚠️ El riesgo de olvidar: Volatilidad](./secciones/04-el-riesgo-de-olvidar.md)
+6. [05 - 🗄️ El baúl de historias: Event Store](./secciones/05-el-baul-de-historias.md)
+7. [06 - 💾 Automatizando el diario: Marten](./secciones/06-automatizando-el-diario.md)
+8. [07 - 📊 Vistas inteligentes: Proyecciones](./secciones/07-vistas-inteligentes.md)
 
 ---
 

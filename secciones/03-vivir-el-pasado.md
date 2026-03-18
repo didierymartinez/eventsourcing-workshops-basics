@@ -89,6 +89,6 @@ Console.WriteLine($"{juan.Nombre} vive en {juan.CiudadActual}");
 
 ---
 
-[⬅️ Volver a la sección anterior](./02-primer-proyecto.md)
+[⬅️ Volver a la sección anterior](./02-preparando-el-lienzo.md)
 
 [➡️ Siguiente sección: Tomando decisiones (Comandos)](./03b-ciclo-comandos.md)

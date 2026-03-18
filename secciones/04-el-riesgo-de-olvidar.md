@@ -24,6 +24,6 @@ Este problema nos obliga a buscar un **Almacén Persistente**. Pero no cualquier
 
 ---
 
-[⬅️ Volver a la sección anterior](./03-es-en-memoria.md)
+[⬅️ Volver a la sección anterior](./03b-decidir-el-futuro.md)
 
-[➡️ Siguiente sección: Un baúl que no se borra](./05-preparando-persistencia.md)
+[➡️ Siguiente sección: El baúl de historias](./05-el-baul-de-historias.md)
