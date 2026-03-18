@@ -74,12 +74,35 @@ public class Persona
     public int Edad { get; private set; } 
     public List<string> Hijos { get; private set; } = new();
 
-    // El Agregado se reconstruye leyendo su pasado
+    // El Aggregate Root se reconstruye leyendo su pasado (Replay)
     public Persona(IEnumerable<object> eventos)
     {
         foreach (var ev in eventos)
         {
-            Aplicar(ev);
+            // Al principio, procesamos todo aquí directamente
+            if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; }
+            if (ev is CumpleañosCelebrado) { Edad++; }
+            if (ev is HijoNacido h) { Hijos.Add(h.NombreHijo); }
+        }
+    }
+}
+```
+
+### El motor interno: El método Aplicar (Apply)
+Poner toda esa lógica en el constructor está bien para empezar, pero en Event Sourcing solemos extraer esa "traducción" de hechos a estado en un método privado llamado **`Aplicar`**. 
+
+¿Por qué? Porque más adelante, cuando Jhon tome decisiones nuevas en el presente, necesitaremos reutilizar esta misma lógica para actualizar su estado al instante. Así queda nuestro código refactorizado:
+
+```csharp
+public class Persona 
+{
+    // ... propiedades ...
+
+    public Persona(IEnumerable<object> eventos)
+    {
+        foreach (var ev in eventos)
+        {
+            Aplicar(ev); // Delegamos la reconstrucción
         }
     }
 
@@ -93,8 +116,8 @@ public class Persona
 }
 
 // ¡Uso profesional!
-var juan = new Persona(biografia);
-Console.WriteLine($"{juan.Nombre} tiene {juan.Edad} años y {juan.Hijos.Count} hijos.");
+var jhon = new Persona(biografia);
+Console.WriteLine($"{jhon.Nombre} tiene {jhon.Edad} años y {jhon.Hijos.Count} hijos.");
 ```
 
 En este modelo, la clase `Persona` es la encargada de cuidar que la historia de Jhon sea siempre coherente. Es quien "posee" la verdad de su biografía.
