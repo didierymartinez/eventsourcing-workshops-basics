@@ -49,7 +49,11 @@ historial.Add(new ProductoAgregado("Laptop Pro", 1, 1500m));
 historial.Add(new ProductoAgregado("Mouse Inalambrico", 1, 45m));
 ```
 
-A esta secuencia ininterrumpida de hechos que pertenecen a una misma entidad la llamamos **Stream** (Flujo). Una entidad equivale a un Stream.
+### ¿Qué es un Stream realmente?
+A esta secuencia ininterrumpida de hechos la llamamos **Stream** (Flujo). Una entidad equivale a un Stream.
+
+Piénsalo así: **Un Stream es la historia de vida de la entidad**. 
+> Es como tú: naces, creces, estudias la primaria, luego la secundaria, te gradúas de la universidad, te casas... Esa sucesión de hechos, en ese orden exacto, es lo que define quién eres hoy. Si cambiaras el orden (si te casaras antes de nacer), la historia no tendría sentido.
 
 ---
 
