@@ -3,48 +3,50 @@
 En la sección anterior preparamos nuestro lienzo. Ahora, vamos a empezar a escribir los primeros "párrafos" de la vida de Juan usando C#.
 
 ## 🎯 El Objetivo
-Imagina que quieres saber cuántos años tiene Juan hoy. **No puedes simplemente guardar `Edad = 34`**, porque eso solo sirve para el presente. Si borras el pasado, no hay forma de volver atrás y saber qué edad tenía en el año 2000.
+Imagina que quieres saber cuántos años tiene Juan hoy. **No puedes simplemente guardar `Edad = 34`**, porque eso solo sirve para el presente. Si borras el pasado, no hay forma de volver atrás y saber qué edad tenía en el año 2000. 
 
 ¿Cómo construimos un sistema que nos permita "recalcular" su realidad en cualquier momento simplemente leyendo su diario?
 
 ---
 
-### Poniendo nombre al diario de Juan
-Todo diario necesita un dueño en la portada. Sin un ID, las páginas no son más que notas sueltas que no le pertenecen a nadie. Por eso, lo primero que necesitamos es definir una "huella digital":
+## El dueño del diario (Identidad)
+Todo diario requiere un dueño. Sin un nombre o una huella digital, las páginas no son más que notas sueltas que no le pertenecen a nadie. En el mundo del software, lo primero que necesitamos es definir este vínculo inmutable:
 
 ```csharp
 // El ancla de nuestra historia
 var idPersona = Guid.NewGuid();
 ```
 
-Este **ID** es lo que nos permite decir que todos los hechos que siguen le pertenecen a una persona específica y a ninguna otra. Es lo que formalmente llamamos una **Identidad**.
+Este **ID** es lo que nos permite agrupar todos los hechos bajo una sola persona. Es su **Identidad**, y no cambiará sin importar cuántas cosas le pasen a Juan en el futuro.
 
-### Escribiendo los hitos en piedra
-Ahora que sabemos de quién es el diario, necesitamos registrar qué le ha pasado. Pero cuidado: aquí no guardamos "acciones" (como "Mudarse"), sino **hechos consumados** (pasado: "Se mudó").
+## Escribiendo los hitos (Los Hechos)
+Ahora que sabemos de quién es el diario, registramos lo que le ha pasado. Pero atención: aquí no guardamos "acciones" (como "Mudarse"), sino **hechos consumados** (pasado: "Se mudó"). 
 
-Para que estos hechos sean útiles, usamos **Records** en C#. Al ser inmutables, nos aseguran que el pasado no se puede "editar" por accidente; y al tener igualdad por valor, nos facilitan la vida al testear si lo que pasó es lo que esperábamos:
+En C# usamos **Records** para esto por dos razones que nos salvarán la vida:
+- **Inmutabilidad**: El pasado no se edita. Una vez que Juan nació, ese hecho está "escrito en piedra".
+- **Igualdad por valor**: Nos permite comparar si dos hitos son iguales basándonos en sus datos, lo cual es oro puro para hacer pruebas automáticas.
 
 ```csharp
 public record PersonaNacida(Guid PersonaId, string Nombre, DateTime FechaNacimiento);
 public record CumpleañosCelebrado(Guid PersonaId);
 ```
 
-### El orden en que ocurrió su vida
-Listo, ya tenemos los hitos de Juan, pero ahora necesitamos saber el orden en que ocurrieron. Un nacimiento después de un cumpleaños no tendría lógica. Por eso, necesitamos crear una **Biografía** donde guardamos todo en una secuencia organizada:
+## El orden de la historia (El Stream)
+Listo, ya tenemos los hitos, pero ahora necesitamos saber en qué orden ocurrieron. Un nacimiento después de un cumpleaños no tendría ningún sentido. Para mantener la lógica, creamos una biografía organizada cronológicamente:
 
 ```csharp
-// Guardamos todo en una lista para mantener la cronología
+// Guardamos los hechos en una lista para asegurar el orden
 var biografia = new List<object>();
 
 biografia.Add(new PersonaNacida(idPersona, "Juan", new DateTime(1990, 5, 10)));
-biografia.Add(new CumpleañosCelebrado(idPersona));
-biografia.Add(new CumpleañosCelebrado(idPersona));
+biografia.Add(new CumpleañosCelebrado(idPersona)); // 1 año
+biografia.Add(new CumpleañosCelebrado(idPersona)); // 2 años
 ```
 
-A esta secuencia de hechos organizada por tiempo la llamamos **Stream**. Es nuestra fuente de la verdad absoluta: si no está en el diario, no pasó.
+A esta secuencia organizada la llamamos **Stream**. Es nuestra fuente de la verdad absoluta: si algo no está en este flujo, simplemente nunca sucedió en la vida de Juan.
 
-### Recordar es volver a vivir
-Aquí es donde ocurre la magia. Para saber quién es Juan "hoy", ya no consultamos una tabla de estado actual. Simplemente nos sentamos a "leer" su biografía de principio a fin para reconstruir su realidad en el presente:
+## Recordar es volver a vivir (El Replay)
+Aquí es donde ocurre la magia. Para saber quién es Juan "hoy", ya no consultamos una tabla de estado actual. Simplemente nos sentamos a "leer" su biografía de principio a fin para reconstruir su realidad:
 
 ```csharp
 string nombre = "";
@@ -59,9 +61,9 @@ foreach (var hito in biografia)
 Console.WriteLine($"{nombre} tiene {edad} años.");
 ```
 
-Este proceso de lectura se llama **Replay**. Funciona perfecto para un ejemplo pequeño, pero a medida que nuestra aplicación crezca y tengamos miles de personas, tener estos bucles sueltos por todos lados se volverá inmanejable.
+Este proceso de lectura se llama **Replay**. Funciona perfecto para un ejemplo pequeño, pero a medida que nuestra aplicación crezca, tener estos bucles repartidos por todo el código será un caos de mantenimiento.
 
-### El Jefe de la Historia
+## El jefe de la historia (Aggregate Root)
 Para poner orden, necesitamos un **Jefe** que centralice esa biografía y sepa cómo interpretarla. Alguien que reciba el diario y se encargue de "despertar" con su estado actualizado. A este jefe lo llamamos **Aggregate Root (Raíz del Agregado)**.
 
 ```csharp
@@ -90,6 +92,8 @@ public class Persona
 var juan = new Persona(biografia);
 Console.WriteLine($"{juan.Nombre} tiene {juan.Edad} años.");
 ```
+
+En este modelo, la clase `Persona` es la encargada de cuidar que la historia de Juan sea siempre coherente.
 
 ---
 
