@@ -99,15 +99,16 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 ### 🧠 ¿Cuál es la diferencia entre Raíz y Agregado?
 
-Esta es la parte donde muchos se confunden, así que vamos a separar el **Interlocutor** de la **Frontera**:
+Para no confundirnos entre el código y la arquitectura, vamos a separar el **Rol** de la **Frontera**:
 
--   **La Raíz (Aggregate Root - "El Interlocutor")**: Es la clase `Persona` y su instancia `juan`. Piensa en él como el **CEO**. Es con quien hablas, quien tiene la firma autorizada (el ID) y quien recibe las peticiones. Si quieres que algo cambie, se lo pides a la Raíz.
--   **El Agregado (Aggregate - "La Unidad de Coherencia")**: No es un objeto de código, es una **frontera invisible**. Es el "Juan" completo: su cuerpo, sus recuerdos, su pasado y sus reglas. Piensa en él como la **Empresa**. La Raíz (Juan/CEO) vive dentro de esta frontera y su trabajo es asegurar que nada de lo que pase rompa las leyes de la "empresa" (por ejemplo, que no pueda cumplir años si no ha nacido).
+-   **La Raíz (Aggregate Root - "El Punto de Acceso")**: Es la clase **`Persona`**. En la arquitectura, la Raíz es la "puerta de entrada". Cuando en tu código creas una instancia como `var juan = new Persona()`, ese objeto específico es quien asume el rol de **CEO**: es el único punto de contacto autorizado para realizar cambios.
+-   **El Agregado (Aggregate - "La Frontera de Consistencia")**: Es el concepto total. Es el perímetro invisible que envuelve a Juan, su pasado y sus reglas. Piensa en él como la **Empresa**. El Agregado NO es una clase; es la garantía de que nada de lo que le pase a Juan (el objeto Raíz) rompa las leyes de su propia vida (la frontera).
 
 > [!IMPORTANT]
-> **La clase `Persona`** es nuestra Raíz (Root). Aunque en el código solo veas esta clase, ella representa a todo el **Agregado**. 
+> **La Raíz (`Persona`)** es el objeto que "da la cara". 
+> **El Agregado** es el sistema completo que ese objeto protege. 
 > 
-> El **Agregado** es esa frontera invisible que protege la historia de Juan. Al usar la clase `Persona`, te aseguras de que nadie pueda entrar a modificar su pasado sin pasar por las reglas que hemos escrito. Es una unidad indivisible: o se acepta todo el cambio en su vida, o no se acepta nada.
+> Tú le pides cosas a la **Raíz**, y ella se asegura de que se cumplan las reglas de todo el **Agregado**. Es una unidad indivisible: o se acepta todo el cambio en la vida de Juan, o no se acepta nada.
 
 ---
 
