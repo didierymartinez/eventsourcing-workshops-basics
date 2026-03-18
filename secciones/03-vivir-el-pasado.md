@@ -99,13 +99,15 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 ### 🧠 ¿Cuál es la diferencia entre Raíz y Agregado?
 
-Imagina un gran **Navío en alta mar**. Para que el barco llegue a puerto de forma segura, no puedes hablar con cada madera del casco o cada grano de pólvora por separado; necesitas a alguien que responda por todo el conjunto y mantenga el rumbo.
+### 🧠 ¿Cuál es la diferencia entre Raíz y Agregado?
 
--   **La Raíz (Aggregate Root - "El Capitán")**: Es la clase `Persona`. El Capitán es el único con el que el mundo exterior habla. Él tiene la **Identidad** (el ID), firma la bitácora y toma las decisiones finales basados en lo que ha vivido. Si quieres cambiar el rumbo, hablas con el Capitán, no con el mástil.
--   **El Agregado (Aggregate - "El Navío")**: Es el concepto completo. No es solo el Capitán, sino el Capitán **+** Su Tripulación **+** Sus Provisiones **+** Su Bitácora (Eventos) **+** Las Reglas de Navegación. El Agregado es la **Frontera de Consistencia**; asegura que si el barco gira a la derecha, toda la estructura gire con él y nadie se caiga al agua.
+Para que la historia de Juan sea coherente, no podemos tratar sus datos como si fueran piezas sueltas de un rompecabezas. Necesitamos entender quién manda y hasta dónde llega su autoridad.
+
+-   **La Raíz (Aggregate Root - "El Protagonista")**: Es la clase `Persona`. Juan es el único punto de contacto con el mundo exterior. Él tiene la **Identidad** (el ID) y es a quien le pides que haga cosas (como "celebrar un cumpleaños"). No puedes ir y cambiarle la edad a Juan "por la espalda"; tienes que pedírselo a él.
+-   **El Agregado (Aggregate - "La Esfera de Juan")**: Es el concepto completo. Es Juan **+** Su Memoria (Eventos) **+** Sus Reglas de Vida. El Agregado es la **Frontera de Consistencia**; es la barrera invisible que garantiza que toda la vida de Juan tenga sentido interno. Es lo que impide que Juan sea un anciano de 80 años si su fecha de nacimiento dice que nació hace apenas 20.
 
 > [!IMPORTANT]
-> En nuestro código, tú no manipulas la "Edad" o el "Nombre" desde afuera de forma aislada. Tú interactúas con la **Raíz (Juan)**, y él se encarga de que todo su historial (**El Agregado**) sea coherente y verídico. Si Juan dice que nació en 1990, el Agregado garantiza que no puedas celebrar su cumpleaños número 5 en 1992.
+> En nuestro código, tú no manipulas la "Edad" o el "Nombre" de forma aislada. Interactúas con el **Protagonista (Juan)**, y él se encarga de que todo su sistema interno (**El Agregado**) se mantenga verídico y ordenado. El Agregado asegura que Juan sea una unidad indivisible de verdad.
 
 ---
 
