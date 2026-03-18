@@ -18,12 +18,13 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 
 1. [01 - 🧠 El diario de Jhon: Biografía vs Foto](./secciones/01-el-diario-de-juan.md)
 2. [02 - 🚀 Preparando el lienzo](./secciones/02-preparando-el-lienzo.md)
-3. [03 - 📝 Vivir el pasado: El motor Apply](./secciones/03-vivir-el-pasado.md)
-4. [03b - 💡 Decidir el futuro: Comandos](./secciones/03b-decidir-el-futuro.md)
-5. [04 - ⚠️ El riesgo de olvidar: Volatilidad](./secciones/04-el-riesgo-de-olvidar.md)
-6. [05 - 🗄️ El baúl de historias: Event Store](./secciones/05-el-baul-de-historias.md)
-7. [06 - 💾 Automatizando el diario: Marten](./secciones/06-automatizando-el-diario.md)
-8. [07 - 📊 Vistas inteligentes: Proyecciones](./secciones/07-vistas-inteligentes.md)
+3. [03 - 📝 Vivir el pasado: Reconstrucción en el constructor](./secciones/03-vivir-el-pasado.md)
+4. [03c - 🏗️ Refactorizando el motor: El AggregateRoot](./secciones/03c-refactorizando-el-motor.md)
+5. [03b - 💡 Decidir el futuro: Comandos](./secciones/03b-decidir-el-futuro.md)
+6. [04 - ⚠️ El riesgo de olvidar: Volatilidad](./secciones/04-el-riesgo-de-olvidar.md)
+7. [05 - 🗄️ El baúl de historias: Event Store](./secciones/05-el-baul-de-historias.md)
+8. [06 - 💾 Automatizando el diario: Marten](./secciones/06-automatizando-el-diario.md)
+9. [07 - 📊 Vistas inteligentes: Proyecciones](./secciones/07-vistas-inteligentes.md)
 
 ---
 

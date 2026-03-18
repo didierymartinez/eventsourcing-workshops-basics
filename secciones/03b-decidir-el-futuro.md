@@ -69,6 +69,6 @@ Este es el ciclo real de Event Sourcing:
 
 ---
 
-[⬅️ Volver a la sección anterior](./03-vivir-el-pasado.md)
+[⬅️ Volver a la sección anterior](./03c-refactorizando-el-motor.md)
 
 [➡️ Siguiente sección: El riesgo de olvidar](./04-el-riesgo-de-olvidar.md)

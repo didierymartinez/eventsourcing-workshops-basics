@@ -88,34 +88,8 @@ public class Persona
 }
 ```
 
-### El motor interno: El método Aplicar (Apply)
-Poner toda esa lógica en el constructor está bien para empezar, pero en Event Sourcing solemos extraer esa "traducción" de hechos a estado en un método privado llamado **`Aplicar`**. 
-
-¿Por qué? Porque más adelante, cuando Jhon tome decisiones nuevas en el presente, necesitaremos reutilizar esta misma lógica para actualizar su estado al instante. Así queda nuestro código refactorizado:
-
 ```csharp
-public class Persona 
-{
-    // ... propiedades ...
 
-    public Persona(IEnumerable<object> eventos)
-    {
-        foreach (var ev in eventos)
-        {
-            Aplicar(ev); // Delegamos la reconstrucción
-        }
-    }
-
-    // El motor que transforma hechos en estado
-    private void Aplicar(object ev)
-    {
-        if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; }
-        if (ev is CumpleañosCelebrado) { Edad++; }
-        if (ev is HijoNacido h) { Hijos.Add(h.NombreHijo); }
-    }
-}
-
-// ¡Uso profesional!
 var jhon = new Persona(biografia);
 Console.WriteLine($"{jhon.Nombre} tiene {jhon.Edad} años y {jhon.Hijos.Count} hijos.");
 ```
@@ -141,4 +115,4 @@ Para no confundirnos entre el código y la arquitectura, vamos a separar el **Ro
 
 [⬅️ Volver a la sección anterior](./02-preparando-el-lienzo.md)
 
-[➡️ Siguiente sección: Decidir el futuro (Comandos)](./03b-decidir-el-futuro.md)
+[➡️ Siguiente sección: Refactorizando el motor](./03c-refactorizando-el-motor.md)
