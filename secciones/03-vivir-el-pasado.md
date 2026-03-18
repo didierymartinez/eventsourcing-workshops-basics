@@ -101,18 +101,18 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 ---
 
-### 🧠 ¿Cuál es la diferencia entre Root y Aggregate?
+### 🧠 ¿Cuál es la diferencia entre Aggregate Root y Aggregate?
 
 Para no confundirnos entre el código y la arquitectura, vamos a separar el **Rol** de la **Frontera**:
 
--   **El Root (Aggregate Root - "El Punto de Acceso")**: Es la clase **`Persona`**. En la arquitectura, el Root es la "puerta de entrada" y el único punto de contacto autorizado para realizar cambios. Incluso si quieres añadir un hijo, debes pedírselo al objeto `Persona`, no puedes manipular la lista de hijos por separado.
--   **El Agregado (Aggregate - "La Frontera de Consistencia")**: Es el concepto total. Es el perímetro invisible que envuelve a Juan, su pasado, sus hijos y sus reglas. El Agregado NO es una clase; es la garantía de que nada de lo que le pase a Juan (la Raíz) o a sus relaciones (sus hijos) rompa las reglas de su vida.
+-   **El Aggregate Root (Punto de Acceso)**: Es la clase **`Persona`**. En la arquitectura, el Aggregate Root es la "puerta de entrada" y el único punto de contacto autorizado para realizar cambios. Incluso si quieres añadir un hijo, debes pedírselo al objeto `Persona`, no puedes manipular la lista de hijos por separado.
+-   **El Aggregate (Frontera de Consistencia)**: Es el concepto total. Es el perímetro invisible que envuelve a Juan, su pasado, sus hijos y sus leyes internas. El Aggregate NO es una clase; es la garantía de que nada de lo que le pase a Juan (el Aggregate Root) o a sus relaciones (sus hijos) rompa la coherencia de su historia.
 
 > [!IMPORTANT]
-> **El Root (`Persona`)** es el objeto que "da la cara". 
+> **El Aggregate Root (`Persona`)** es el objeto que "da la cara". 
 > **El Aggregate** es el sistema completo (incluyendo sus hijos y su historia) que ese objeto protege. 
 > 
-> Tú le pides cosas al **Root**, y él se asegura de que se cumplan las reglas de todo el **Aggregate**. Es una unidad indivisible: no puedes modificar un "Hijo" sin que el Root lo valide y lo registre en la biografía completa.
+> Tú le pides cosas al **Aggregate Root**, y él se asegura de que se cumplan las reglas de todo el **Aggregate**. Es una unidad indivisible: no puedes modificar un "Hijo" sin que el Aggregate Root lo valide y lo registre en la biografía completa.
 
 ---
 
