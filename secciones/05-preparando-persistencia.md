@@ -40,9 +40,11 @@ docker exec -it almacen-hechos psql -U postgres -l
 ---
 
 ### El Descubrimiento
-Este almacén resistente que acabas de lanzar está corriendo un motor de base de datos llamado **PostgreSQL**, y la caja contenedora se gestiona con una herramienta llamada **Docker**. 
+Este contenedor persistente que acabas de lanzar está corriendo **PostgreSQL**, gestionado por **Docker**. 
 
-Ahora tenemos el lugar físico, pero necesitamos el "pegamento" para conectar nuestro código C# con este baúl de forma automática.
+Pero lo más importante es el concepto: este almacén especializado en guardar los **Streams** de tus entidades sin que el tiempo o los reinicios los borren se conoce como un **Event Store**. 
+
+Ahora que tenemos el lugar físico (el Event Store), necesitamos el "pegamento" para conectar nuestro código C# con él de forma elegante.
 
 ---
 
