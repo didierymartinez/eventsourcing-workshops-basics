@@ -39,6 +39,6 @@ Abre el archivo `Program.cs` y borra todo su contenido. Queremos un lienzo total
 
 ---
 
-[⬅️ Volver a la sección anterior](./01-el-diario-de-juan.md)
+[⬅️ Volver a la sección anterior](./01-el-diario-de-jhon.md)
 
 [➡️ Siguiente sección: Vivir el pasado](./03-vivir-el-pasado.md)

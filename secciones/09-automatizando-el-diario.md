@@ -1,4 +1,4 @@
-# 06 - Automatizando las biografías
+# 09 - Automatizando las biografías
 
 Ya tenemos el baúl (Docker/Postgres). Pero en la sección 03 vimos que manejar listas de `object` y hacer bucles manualmente para contar cumpleaños es mucho trabajo y es fácil cometer errores.
 
@@ -63,6 +63,6 @@ Console.WriteLine("¡Biografía guardada en el Event Store!");
 
 Ya sabemos guardar. Pero, ¿cómo recuperamos a Jhon del baúl y sabemos cuántos años tiene sin volver a hacer bucles manuales?
 
-[⬅️ Volver a la sección anterior](./05-el-baul-de-historias.md)
+[⬅️ Volver a la sección anterior](./08-el-baul-de-historias.md)
 
-[➡️ Siguiente sección: Vistas inteligentes](./07-vistas-inteligentes.md)
+[➡️ Siguiente sección: Vistas inteligentes](./10-vistas-inteligentes.md)

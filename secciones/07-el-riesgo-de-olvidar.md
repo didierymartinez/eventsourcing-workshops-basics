@@ -1,4 +1,4 @@
-# 04 - El gran problema: La pérdida de identidad
+# 07 - El gran problema: La pérdida de identidad
 
 Nuestra biografía en C# funciona perfectamente, pero tiene un fallo fatal.
 
@@ -24,6 +24,6 @@ Este problema nos obliga a buscar un **Almacén Persistente**. Pero no cualquier
 
 ---
 
-[⬅️ Volver a la sección anterior](./03b-decidir-el-futuro.md)
+[⬅️ Volver a la sección anterior](./06-el-flujo-de-vida.md)
 
-[➡️ Siguiente sección: El baúl de historias](./05-el-baul-de-historias.md)
+[➡️ Siguiente sección: El baúl de historias](./08-el-baul-de-historias.md)

@@ -1,4 +1,4 @@
-# 03c - Refactorizando el motor: El AggregateRoot
+# 04 - Refactorizando el motor: El AggregateRoot
 
 En la sección anterior logramos reconstruir la vida de Jhon leyendo su diario directamente en el constructor. Sin embargo, a medida que Jhon viva más hitos (bodas, mudanzas, trabajos), ese constructor se llenará de un `if` interminable.
 
@@ -118,4 +118,4 @@ public class Persona : AggregateRoot
 
 [⬅️ Volver a la sección anterior](./03-vivir-el-pasado.md)
 
-[➡️ Siguiente sección: Decidir el futuro (Comandos)](./03b-decidir-el-futuro.md)
+[➡️ Siguiente sección: Decidir el futuro (Comandos)](./05-decidir-el-futuro.md)

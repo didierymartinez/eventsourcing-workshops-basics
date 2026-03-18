@@ -16,15 +16,16 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 
 ## 📚 Secciones del workshop (Hoja de Ruta)
 
-1. [01 - 🧠 El diario de Jhon: Biografía vs Foto](./secciones/01-el-diario-de-juan.md)
+1. [01 - 🧠 El diario de Jhon: Biografía vs Foto](./secciones/01-el-diario-de-jhon.md)
 2. [02 - 🚀 Preparando el lienzo](./secciones/02-preparando-el-lienzo.md)
-3. [03 - 📝 Vivir el pasado: Reconstrucción en el constructor](./secciones/03-vivir-el-pasado.md)
-4. [03c - 🏗️ Refactorizando el motor: El AggregateRoot](./secciones/03c-refactorizando-el-motor.md)
-5. [03b - 💡 Decidir el futuro: Comandos](./secciones/03b-decidir-el-futuro.md)
-6. [04 - ⚠️ El riesgo de olvidar: Volatilidad](./secciones/04-el-riesgo-de-olvidar.md)
-7. [05 - 🗄️ El baúl de historias: Event Store](./secciones/05-el-baul-de-historias.md)
-8. [06 - 💾 Automatizando el diario: Marten](./secciones/06-automatizando-el-diario.md)
-9. [07 - 📊 Vistas inteligentes: Proyecciones](./secciones/07-vistas-inteligentes.md)
+3. [03 - 📝 Vivir el pasado: El motor Apply](./secciones/03-vivir-el-pasado.md)
+4. [04 - 🏗️ Refactorizando el motor: El AggregateRoot](./secciones/04-refactorizando-el-motor.md)
+5. [05 - 💡 Decidir el futuro: Comandos y Reglas](./secciones/05-decidir-el-futuro.md)
+6. [06 - 🌊 El flujo de vida: Manejando múltiples biografías (EventStream)](./secciones/06-el-flujo-de-vida.md)
+7. [07 - ⚠️ El riesgo de olvidar: Volatilidad](./secciones/07-el-riesgo-de-olvidar.md)
+8. [08 - 🗄️ El baúl de historias: Event Store](./secciones/08-el-baul-de-historias.md)
+9. [09 - 💾 Automatizando el diario: Marten](./secciones/09-automatizando-el-diario.md)
+10. [10 - 📊 Vistas inteligentes: Proyecciones](./secciones/10-vistas-inteligentes.md)
 
 ---
 

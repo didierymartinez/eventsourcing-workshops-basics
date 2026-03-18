@@ -38,9 +38,15 @@ Listo, ya tenemos los hitos, pero ahora nos enfrentamos a un problema: el tiempo
 var biografia = new List<object>();
 
 biografia.Add(new PersonaNacida(idPersona, "Jhon", new DateTime(1990, 5, 10)));
-biografia.Add(new CumpleañosCelebrado(idPersona)); // 1 año
-biografia.Add(new HijoNacido(idPersona, "Pedro")); // ¡Jhon ahora es padre!
-biografia.Add(new CumpleañosCelebrado(idPersona)); // 2 años
+
+// Celebramos sus primeros 30 cumpleaños
+for (int i = 0; i < 30; i++)
+{
+    biografia.Add(new CumpleañosCelebrado(idPersona));
+}
+
+biografia.Add(new HijoNacido(idPersona, "Pedro")); // ¡A los 30 años, Jhon es padre!
+biografia.Add(new CumpleañosCelebrado(idPersona)); // Cumple 31 años
 ```
 
 Al unir todas estas páginas en el orden exacto, acabas de crear un **Stream** (Flujo). En el mundo de los eventos, el **Stream** no es solo una lista; es la **Fuente de la Verdad única**. Si un hito no está en este flujo, para nuestro sistema simplemente nunca sucedió.
@@ -51,20 +57,24 @@ Al unir todas estas páginas en el orden exacto, acabas de crear un **Stream** (
 ```csharp
 string nombre = "";
 int edad = 0;
+List<string> hijos = new();
 
 foreach (var hito in biografia)
 {
     if (hito is PersonaNacida n) { nombre = n.Nombre; }
     if (hito is CumpleañosCelebrado) { edad++; }
+    if (hito is HijoNacido h) { hijos.Add(h.NombreHijo); }
 }
 
-Console.WriteLine($"{nombre} tiene {edad} años.");
+Console.WriteLine($"Persona: {nombre} tiene {edad} años y {hijos.Count} hijos.");
 ```
 
 Este proceso de lectura se llama **Replay**. Has "vuelto a vivir" el pasado para entender el presente. Funciona perfecto para un ejemplo pequeño, pero a medida que nuestra aplicación crezca, tener estos bucles repartidos por todo el código se volverá un caos.
 
+¿Notaste cómo tuvimos que usar variables sueltas (`nombre`, `edad`, `hijos`) para capturar la información? **Saltar de este código imperativo a un código de objetos significa conceptualizar estas variables como propiedades de un objeto llamado `Persona`.**
+
 ### El protagonista de la historia: El Aggregate Root
-Necesitamos a un **Protagonista** que centralice esa biografía y sepa cómo interpretarla, alguien que reciba el diario y se encargue de "despertar" con su estado actualizado. A este personaje principal lo llamamos **Aggregate Root (Raíz del Agregado)**:
+Necesitamos a un **Protagonista** que centralice esa biografía y sepa cómo interpretarla, alguien que reciba el diario y se encargue de "despertar" con su estado (propiedades) actualizado. A este personaje principal lo llamamos **Aggregate Root (Raíz del Agregado)**:
 
 ```csharp
 public class Persona 
@@ -91,7 +101,10 @@ public class Persona
 ```csharp
 
 var jhon = new Persona(biografia);
-Console.WriteLine($"{jhon.Nombre} tiene {jhon.Edad} años y {jhon.Hijos.Count} hijos.");
+
+// ¡La transición a objetos es evidente aquí!
+// Ya no imprimimos variables sueltas, sino que accedemos a las propiedades del objeto Persona.
+Console.WriteLine($"Persona: {jhon.Nombre} tiene {jhon.Edad} años y {jhon.Hijos.Count} hijos.");
 ```
 
 En este modelo, la clase `Persona` es la encargada de cuidar que la historia de Jhon sea siempre coherente. Es quien "posee" la verdad de su biografía.
@@ -115,4 +128,4 @@ Para no confundirnos entre el código y la arquitectura, vamos a separar el **Ro
 
 [⬅️ Volver a la sección anterior](./02-preparando-el-lienzo.md)
 
-[➡️ Siguiente sección: Refactorizando el motor](./03c-refactorizando-el-motor.md)
+[➡️ Siguiente sección: Refactorizando el motor](./04-refactorizando-el-motor.md)
