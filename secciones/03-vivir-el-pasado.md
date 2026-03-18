@@ -9,30 +9,21 @@ Imagina que quieres saber cuántos años tiene Juan hoy. **No puedes simplemente
 
 ---
 
-## El dueño del diario (Identidad)
-Todo diario requiere un dueño. Sin un nombre o una huella digital, las páginas no son más que notas sueltas que no le pertenecen a nadie. En el mundo del software, lo primero que necesitamos es definir este vínculo inmutable:
+Todo diario requiere un dueño en la portada. Sin un nombre o una huella digital, las páginas no son más que notas sueltas que no le pertenecen a nadie. En el mundo del software, lo primero que necesitamos es definir este vínculo inmutable que llamamos **Identidad**:
 
 ```csharp
 // El ancla de nuestra historia
 var idPersona = Guid.NewGuid();
 ```
 
-Este **ID** es lo que nos permite agrupar todos los hechos bajo una sola persona. Es su **Identidad**, y no cambiará sin importar cuántas cosas le pasen a Juan en el futuro.
-
-## Escribiendo los hitos (Los Hechos)
-Ahora que sabemos de quién es el diario, registramos lo que le ha pasado. Pero atención: aquí no guardamos "acciones" (como "Mudarse"), sino **hechos consumados** (pasado: "Se mudó"). 
-
-En C# usamos **Records** para esto por dos razones que nos salvarán la vida:
-- **Inmutabilidad**: El pasado no se edita. Una vez que Juan nació, ese hecho está "escrito en piedra".
-- **Igualdad por valor**: Nos permite comparar si dos hitos son iguales basándonos en sus datos, lo cual es oro puro para hacer pruebas automáticas.
+Ahora que sabemos de quién es el diario, necesitamos registrar qué le ha pasado. Pero atención: aquí no guardamos "acciones" (como "Mudarse"), sino **hechos consumados** (pasado: "Se mudó"). En C# usamos **Records** para estos hechos porque nos aseguran que el pasado no se edita (inmutabilidad) y nos facilitan comparar hitos basándonos en sus datos (igualdad por valor):
 
 ```csharp
 public record PersonaNacida(Guid PersonaId, string Nombre, DateTime FechaNacimiento);
 public record CumpleañosCelebrado(Guid PersonaId);
 ```
 
-## El orden de la historia (El Stream)
-Listo, ya tenemos los hitos, pero ahora necesitamos saber en qué orden ocurrieron. Un nacimiento después de un cumpleaños no tendría ningún sentido. Para mantener la lógica, creamos una biografía organizada cronológicamente:
+Listo, ya tenemos los hitos, pero ahora necesitamos saber en qué orden ocurrieron. Un nacimiento después de un cumpleaños no tendría ningún sentido. Por eso, para mantener la cronología, creamos una biografía organizada:
 
 ```csharp
 // Guardamos los hechos en una lista para asegurar el orden
@@ -43,10 +34,7 @@ biografia.Add(new CumpleañosCelebrado(idPersona)); // 1 año
 biografia.Add(new CumpleañosCelebrado(idPersona)); // 2 años
 ```
 
-A esta secuencia organizada la llamamos **Stream**. Es nuestra fuente de la verdad absoluta: si algo no está en este flujo, simplemente nunca sucedió en la vida de Juan.
-
-## Recordar es volver a vivir (El Replay)
-Aquí es donde ocurre la magia. Para saber quién es Juan "hoy", ya no consultamos una tabla de estado actual. Simplemente nos sentamos a "leer" su biografía de principio a fin para reconstruir su realidad:
+A esta secuencia organizada la llamamos **Stream**. Es nuestra fuente de la verdad absoluta: si algo no está en este flujo, simplemente nunca sucedió en la vida de Juan. Pero, ¿cómo usamos esto para saber su edad? Aquí es donde ocurre la magia. Ya no consultamos una tabla estática; simplemente nos sentamos a "leer" su biografía de principio a fin para reconstruir su realidad en el presente:
 
 ```csharp
 string nombre = "";
@@ -101,7 +89,7 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 Aunque a veces los usamos como sinónimos, hay una jerarquía importante:
 
-- **Aggregate Root (La Raíz)**: Es la clase `Persona`. El objeto físico con el que hablas en tu código (el "Capitán"). Es quien tiene el ID.
+- **Aggregate Root (La Raíz)**: Es la clase `Persona`. El objeto físico con el que hablas en tu código (el "Capitán").
 - **Agregado (Aggregate)**: Es el concepto completo. Es **Juan + Su Diario + Su Lógica**. Es la frontera invisible que asegura que toda su vida sea coherente.
 
 > [!IMPORTANT]
