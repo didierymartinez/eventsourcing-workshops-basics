@@ -1,79 +1,89 @@
-# 05 - Decidir el futuro: Comandos y Reglas
+# 05 - Continuar la historia: Agregando eventos
 
-Jhon ya tiene una biografía y sabe quién es. Pero la vida sigue, y Jhon quiere tomar decisiones. Hasta ahora solo hemos visto el pasado, pero ¿cómo manejamos las intenciones de cambio en el presente?
+Jhon ya tiene una biografía y sabe quién es. Pero la vida sigue, y queremos agregar nuevos capítulos a su historia. Hasta ahora solo hemos visto cómo reconstruir el pasado, pero ¿cómo agregamos nuevos hitos en el presente?
 
 ## 🎯 El Objetivo
-Jhon quiere cambiar su nombre. Pero tenemos una regla sagrada: **Una vez que naces con un nombre, no puedes cambiarlo en este sistema.**
-
-Vamos a aprender cómo usar el estado que ya tenemos para proteger esta regla.
+Jhon sigue viviendo y experimentando nuevos hitos: bodas, mudanzas, nuevos trabajos. Nuestro objetivo es aprender cómo registrar estos nuevos sucesos a través de nuestro objeto `Persona`.
 
 ---
 
-## 1. La Intención (El Comando)
-En Event Sourcing, diferenciamos claramente entre un hecho pasado y una intención presente.
-- **Hito (Evento)**: Algo que YA pasó (`PersonaNacida`). Es inmutable.
-- **Intención (Comando)**: Algo que QUEREMOS que pase. Puede ser rechazado.
-
-Definamos nuestro primer comando como un `record` simple:
+## 1. El Nuevo Hito
+En Event Sourcing, todo lo que altera la historia se registra como un evento adicional. Vamos a definir un par de nuevos eventos para la vida de Jhon:
 
 ```csharp
-// "Quiero cambiar mi nombre a este nuevo valor"
-public record CambiarNombre(Guid PersonaId, string NuevoNombre);
+public record PersonaCasada(Guid PersonaId, string NombrePareja);
+public record PersonaMudada(Guid PersonaId, string NuevaCiudad);
 ```
 
-## 2. ¿Quién toma la decisión?
-La clase `Persona` no solo sirve para "recordar" su edad. Su función principal es ser el **Guardián de las Reglas**. 
+## 2. Es quien autoriza agregar eventos a su biografía
+Aquí hay un detalle clave (y muy sutil) en Event Sourcing: La clase `Persona` es la dueña de las **reglas** de su historia, pero sorprendentemente **NO almacena la lista físicamente**. Si te fijas, su constructor lee los eventos del pasado para reconstruirse, pero nunca guarda una referencia directa a la `Lista<object> biografia`.
 
-Para decidir si un comando es válido, Jhon necesita mirar su estado actual (el que reconstruyó en la sección anterior). Añadamos esta lógica a la clase `Persona`:
+Por lo tanto, a Jhon no le "insertamos" eventos a la fuerza; nosotros le pedimos que evalúe realizar una acción y él, a cambio, **emite un nuevo evento** como resultado. Alguien más en el sistema será el encargado de tomar ese evento y guardarlo en el baúl para el futuro.
+
+Por ahora, como estamos en el "camino feliz", asumimos que Jhon acepta generar cualquier evento nuevo sin poner condiciones. Añadamos esta lógica a la clase `Persona`:
 
 ```csharp
-public class Persona 
+public class Persona : AggregateRoot
 {
-    // ... propiedades y constructor ...
+    public string NombrePareja { get; private set; }
+    // Asumimos que la propiedad Ciudad ya existe desde la refactorización anterior
 
-    public object Decidir(CambiarNombre comando)
+    // ... propiedades, constructor y métodos Apply básicos ...
+
+    public PersonaCasada RegistrarMatrimonio(string nombrePareja)
     {
-        // 1. Validamos la regla: ¿Ya tiene un nombre?
-        if (!string.IsNullOrEmpty(this.Nombre))
-        {
-            Console.WriteLine("REGLA: El nombre es inmutable. No se puede cambiar.");
-            return null; // Decisión: No pasa nada
-        }
-
-        // 2. Si es válido, generamos un nuevo hito
-        return new PersonaNacida(this.Id, comando.NuevoNombre, DateTime.Now);
+        // Generamos un nuevo hito para la biografía
+        return new PersonaCasada(this.Id, nombrePareja);
     }
+
+    public PersonaMudada RegistrarMudanza(string nuevaCiudad)
+    {
+        // En una aplicación real, aquí validaríamos las reglas de negocio usando el estado reconstruido
+        return new PersonaMudada(this.Id, nuevaCiudad);
+    }
+
+    // El motor actualiza el estado cuando ESTOS eventos ocurren en el pasado
+    private void Apply(PersonaCasada c) => NombrePareja = c.NombrePareja;
+    private void Apply(PersonaMudada m) => Ciudad = m.NuevaCiudad;
 }
 ```
 
-## 3. 🛠️ El Ciclo de Decisión en el Program.cs
-Por ahora, vamos a ejecutar esto de la forma más sencilla posible en nuestra consola:
+## 3. 🛠️ El Ciclo de Vida en el Program.cs
+Vamos a ejecutar esto de la forma más sencilla posible en nuestra consola:
 
 ```csharp
-// 1. Alguien envía un comando
-var comando = new CambiarNombre(idPersona, "Jhon Sebastian");
-
-// 2. Traemos a Jhon a la vida (reconstruimos su estado desde la lista)
+// 1. Traemos a Jhon a la vida (reconstruimos su estado desde la lista)
 var jhon = new Persona(biografia);
 
-// 3. Jhon decide qué hacer con el comando
-var resultado = jhon.Decidir(comando);
+Console.WriteLine($"[ANTES] {jhon.Nombre} vive en {jhon.Ciudad} y su pareja es: {(string.IsNullOrEmpty(jhon.NombrePareja) ? "Nadie" : jhon.NombrePareja)}");
 
-// 4. Si Jhon generó un hito nuevo, lo guardamos en su biografía
-if (resultado != null)
-{
-    biografia.Add(resultado);
-}
+// 2. Le pedimos a Jhon que registre nuevos eventos en su vida
+var eventoBoda = jhon.RegistrarMatrimonio("María");
+var eventoMudanza = jhon.RegistrarMudanza("Madrid");
+
+// 3. Guardamos estos nuevos hitos en su biografía oficial (esto sucede fúera de la clase Persona)
+biografia.Add(eventoBoda);
+biografia.Add(eventoMudanza);
+
+// Para ver el resultado final, reconstruimos a Jhon DESDE CERO leyendo su biografía actualizada.
+// ¡Esta es la clave! Persona no maneja la lista de su vida, alguien más (el sistema) lo hace.
+var jhonActualizado = new Persona(biografia);
+
+Console.WriteLine($"[DESPUÉS] {jhonActualizado.Nombre} ahora está casado con {jhonActualizado.NombrePareja} y vive en {jhonActualizado.Ciudad}.");
 ```
 
 ### El Descubrimiento
-Acabas de ver el corazón del diseño basado en el dominio:
-1. **Cargar**: Recuperas el pasado.
+Acabas de ver el flujo básico para interactuar con el dominio:
+1. **Cargar**: Recuperas el pasado (la biografía).
 2. **Reconstruir**: Pones al objeto en su estado actual.
-3. **Decidir**: El objeto valida el comando y, si es correcto, emite un **nuevo evento**.
+3. **Actuar**: Le pides al objeto que realice una acción y genere un **nuevo evento**.
+
+> [!TIP]
+> Intuitivamente, cada acción que le pides a Jhon (como llamar a `RegistrarMatrimonio`) es una petición que le haces al sistema. En diseño de software, a esta intención de hacer algo se le llama **Comando**.
+> Aquí vemos una regla de oro: **Los Comandos son los encargados de generar los Eventos** (siempre a través del Aggregate Root).
 
 ---
 
 [⬅️ Volver a la sección anterior](./04-refactorizando-el-motor.md)
 
-[➡️ Siguiente sección: El flujo de vida (EventStream)](./06-el-flujo-de-vida.md)
+[➡️ Siguiente sección: El Command Handler](./06-el-command-handler.md)

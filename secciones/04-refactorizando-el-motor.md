@@ -15,6 +15,7 @@ public class Persona
 {
     public Guid Id { get; private set; }
     public string Nombre { get; private set; }
+    public string Ciudad { get; private set; }
     public int Edad { get; private set; }
     public List<string> Hijos { get; private set; } = new();
 
@@ -28,7 +29,7 @@ public class Persona
 
     private void Aplicar(object ev)
     {
-        if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; }
+        if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; Ciudad = n.Ciudad; }
         if (ev is CumpleañosCelebrado) { Edad++; }
         if (ev is HijoNacido h) { Hijos.Add(h.NombreHijo); }
     }
@@ -68,6 +69,7 @@ Ahora Jhon (nuestra `Persona`) es mucho más elegante:
 public class Persona : AggregateRoot
 {
     public string Nombre { get; private set; }
+    public string Ciudad { get; private set; }
     public int Edad { get; private set; }
     public List<string> Hijos { get; private set; } = new();
 
@@ -78,7 +80,7 @@ public class Persona : AggregateRoot
 
     protected override void Aplicar(object ev)
     {
-        if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; }
+        if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; Ciudad = n.Ciudad; }
         if (ev is CumpleañosCelebrado) { Edad++; }
         if (ev is HijoNacido h) { Hijos.Add(h.NombreHijo); }
     }
@@ -105,7 +107,7 @@ public class Persona : AggregateRoot
     }
 
     // Sobrecargas específicas: Corto, claro y tipado.
-    private void Apply(PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; }
+    private void Apply(PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; Ciudad = n.Ciudad; }
     private void Apply(CumpleañosCelebrado e) => Edad++;
     private void Apply(HijoNacido h) => Hijos.Add(h.NombreHijo);
 }

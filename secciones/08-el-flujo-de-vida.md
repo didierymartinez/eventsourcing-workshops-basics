@@ -1,4 +1,4 @@
-# 06 - El flujo de vida: Manejando múltiples biografías
+# 08 - El flujo universal: Manejando múltiples biografías
 
 Hasta ahora, nuestro sistema es perfecto... si Jhon fuera la única persona en el mundo. Pero la realidad es que una aplicación real maneja miles de biografías al mismo tiempo.
 
@@ -95,6 +95,6 @@ if (hito != null) flujoJhon.Append(hito);
 
 ---
 
-[⬅️ Volver a la sección anterior](./05-decidir-el-futuro.md)
+[⬅️ Volver a la sección anterior](./07-el-almacen-en-memoria.md)
 
-[➡️ Siguiente sección: El riesgo de olvidar](./07-el-riesgo-de-olvidar.md)
+[➡️ Siguiente sección: El riesgo de olvidar](./09-el-riesgo-de-olvidar.md)

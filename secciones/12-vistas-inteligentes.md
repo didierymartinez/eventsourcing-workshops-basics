@@ -1,4 +1,4 @@
-# 10 - Consultas y vistas inteligentes
+# 12 - Consultas y vistas inteligentes
 
 Llegamos a la última etapa. Ya guardamos la historia, pero ahora necesitamos leerla de forma eficiente.
 
@@ -61,6 +61,6 @@ Has completado el viaje. Has pasado de anotar en listas manuales a entender cóm
 
 ---
 
-[⬅️ Volver a la sección anterior](./09-automatizando-el-diario.md)
+[⬅️ Volver a la sección anterior](./11-automatizando-el-diario.md)
 
 [🏠 Volver al inicio](../README.md)

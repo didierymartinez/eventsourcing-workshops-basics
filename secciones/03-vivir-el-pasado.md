@@ -25,7 +25,7 @@ Ahora que sabemos de quién es el diario, necesitamos registrar qué le ha pasad
 En el código, estos hitos del pasado se representan mejor usando **Records**. ¿Por qué? Porque el pasado está "escrito en piedra". Los Records nos garantizan **Inmutabilidad**, asegurando que nadie pueda "editar" la fecha de nacimiento de Jhon por error, y nos facilitan comparar hitos basándonos en sus datos (**Igualdad por valor**):
 
 ```csharp
-public record PersonaNacida(Guid PersonaId, string Nombre, DateTime FechaNacimiento);
+public record PersonaNacida(Guid PersonaId, string Nombre, DateTime FechaNacimiento, string Ciudad);
 public record CumpleañosCelebrado(Guid PersonaId);
 public record HijoNacido(Guid PersonaId, string NombreHijo);
 ```
@@ -37,7 +37,7 @@ Listo, ya tenemos los hitos, pero ahora nos enfrentamos a un problema: el tiempo
 // Guardamos los hechos en una lista para asegurar el orden
 var biografia = new List<object>();
 
-biografia.Add(new PersonaNacida(idPersona, "Jhon", new DateTime(1990, 5, 10)));
+biografia.Add(new PersonaNacida(idPersona, "Jhon", new DateTime(1990, 5, 10), "Bogotá"));
 
 // Celebramos sus primeros 30 cumpleaños
 for (int i = 0; i < 30; i++)
@@ -57,16 +57,17 @@ Al unir todas estas páginas en el orden exacto, acabas de crear un **Stream** (
 ```csharp
 string nombre = "";
 int edad = 0;
+string ciudad = "";
 List<string> hijos = new();
 
 foreach (var hito in biografia)
 {
-    if (hito is PersonaNacida n) { nombre = n.Nombre; }
+    if (hito is PersonaNacida n) { nombre = n.Nombre; ciudad = n.Ciudad; }
     if (hito is CumpleañosCelebrado) { edad++; }
     if (hito is HijoNacido h) { hijos.Add(h.NombreHijo); }
 }
 
-Console.WriteLine($"Persona: {nombre} tiene {edad} años y {hijos.Count} hijos.");
+Console.WriteLine($"Persona: {nombre} tiene {edad} años, nació en {ciudad} y tiene {hijos.Count} hijos.");
 ```
 
 Este proceso de lectura se llama **Replay**. Has "vuelto a vivir" el pasado para entender el presente. Funciona perfecto para un ejemplo pequeño, pero a medida que nuestra aplicación crezca, tener estos bucles repartidos por todo el código se volverá un caos.
@@ -81,6 +82,7 @@ public class Persona
 {
     public Guid Id { get; private set; }
     public string Nombre { get; private set; }
+    public string Ciudad { get; private set; }
     public int Edad { get; private set; } 
     public List<string> Hijos { get; private set; } = new();
 
@@ -90,7 +92,7 @@ public class Persona
         foreach (var ev in eventos)
         {
             // Al principio, procesamos todo aquí directamente
-            if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; }
+            if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; Ciudad = n.Ciudad; }
             if (ev is CumpleañosCelebrado) { Edad++; }
             if (ev is HijoNacido h) { Hijos.Add(h.NombreHijo); }
         }
@@ -104,7 +106,7 @@ var jhon = new Persona(biografia);
 
 // ¡La transición a objetos es evidente aquí!
 // Ya no imprimimos variables sueltas, sino que accedemos a las propiedades del objeto Persona.
-Console.WriteLine($"Persona: {jhon.Nombre} tiene {jhon.Edad} años y {jhon.Hijos.Count} hijos.");
+Console.WriteLine($"Persona: {jhon.Nombre} tiene {jhon.Edad} años, nació en {jhon.Ciudad} y tiene {jhon.Hijos.Count} hijos.");
 ```
 
 En este modelo, la clase `Persona` es la encargada de cuidar que la historia de Jhon sea siempre coherente. Es quien "posee" la verdad de su biografía.

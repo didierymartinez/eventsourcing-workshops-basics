@@ -20,12 +20,14 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 2. [02 - 🚀 Preparando el lienzo](./secciones/02-preparando-el-lienzo.md)
 3. [03 - 📝 Vivir el pasado: El motor Apply](./secciones/03-vivir-el-pasado.md)
 4. [04 - 🏗️ Refactorizando el motor: El AggregateRoot](./secciones/04-refactorizando-el-motor.md)
-5. [05 - 💡 Decidir el futuro: Comandos y Reglas](./secciones/05-decidir-el-futuro.md)
-6. [06 - 🌊 El flujo de vida: Manejando múltiples biografías (EventStream)](./secciones/06-el-flujo-de-vida.md)
-7. [07 - ⚠️ El riesgo de olvidar: Volatilidad](./secciones/07-el-riesgo-de-olvidar.md)
-8. [08 - 🗄️ El baúl de historias: Event Store](./secciones/08-el-baul-de-historias.md)
-9. [09 - 💾 Automatizando el diario: Marten](./secciones/09-automatizando-el-diario.md)
-10. [10 - 📊 Vistas inteligentes: Proyecciones](./secciones/10-vistas-inteligentes.md)
+5. [05 - 💡 Continuar la historia: Agregando eventos](./secciones/05-decidir-el-futuro.md)
+6. [06 - 🛠️ El Command Handler](./secciones/06-el-command-handler.md)
+7. [07 - 📦 Abstracción del Almacén: El Event Store en memoria](./secciones/07-el-almacen-en-memoria.md)
+8. [08 - 🌊 El flujo universal: Manejando múltiples biografías (EventStream)](./secciones/08-el-flujo-de-vida.md)
+9. [09 - ⚠️ El riesgo de olvidar: Volatilidad](./secciones/09-el-riesgo-de-olvidar.md)
+10. [10 - 🗄️ Un baúl para nuestras historias: Docker y PostgreSQL](./secciones/10-el-baul-de-historias.md)
+11. [11 - 💾 Automatizando las biografías: Marten](./secciones/11-automatizando-el-diario.md)
+12. [12 - 📊 Consultas y vistas inteligentes: Proyecciones](./secciones/12-vistas-inteligentes.md)
 
 ---
 

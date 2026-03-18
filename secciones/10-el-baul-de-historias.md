@@ -1,4 +1,4 @@
-# 08 - Un baúl para nuestras historias
+# 10 - Un baúl para nuestras historias
 
 En la sección anterior vimos que "Jhon" desaparecía cada vez que cerrábamos el programa. Necesitamos un baúl resistente donde guardar su biografía para que sea eterna.
 
@@ -47,6 +47,6 @@ Este almacén especializado en guardar los **Streams** (biografías) de tus enti
 
 Ahora que tenemos el lugar físico, necesitamos el "pegamento" profesional para que nuestro código C# deje de usar listas en memoria y empiece a escribir en este baúl de forma automática.
 
-[⬅️ Volver a la sección anterior](./07-el-riesgo-de-olvidar.md)
+[⬅️ Volver a la sección anterior](./09-el-riesgo-de-olvidar.md)
 
-[➡️ Siguiente sección: Automatizando el diario](./09-automatizando-el-diario.md)
+[➡️ Siguiente sección: Automatizando el diario](./11-automatizando-el-diario.md)
