@@ -99,13 +99,14 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 ### 🧠 ¿Cuál es la diferencia entre Raíz y Agregado?
 
-Para que la historia de Juan no sea un caos, necesitamos entender quién manda y hasta dónde llega su integridad:
+Esta es la parte donde muchos se confunden, así que vamos a separar el **Interlocutor** de la **Frontera**:
 
--   **La Raíz (Aggregate Root - "El Individuo")**: Es la clase `Persona`. Juan es el único punto de contacto legal y lógico con el mundo. Él es quien tiene la **Identidad** (el ID). Para cualquier cambio en su vida, hablas con Juan; no intentas hablar con sus recuerdos o sus células por separado.
--   **El Agregado (Aggregate - "La Integridad del Ser")**: Es el conjunto completo: Juan **+** Su Memoria (Eventos) **+** Sus Reglas. Es la **Frontera de Consistencia**. Es la barrera que asegura que toda la "máquina humana" de Juan funcione como una sola unidad. Es lo que impide que Juan celebre un cumpleaños si su memoria dice que aún no ha pasado un año desde el anterior.
+-   **La Raíz (Aggregate Root - "El Interlocutor")**: Es la clase `Persona` y su instancia `juan`. Piensa en él como el **CEO**. Es con quien hablas, quien tiene la firma autorizada (el ID) y quien recibe las peticiones. Si quieres que algo cambie, se lo pides a la Raíz.
+-   **El Agregado (Aggregate - "La Unidad de Coherencia")**: No es un objeto de código, es una **frontera invisible**. Es el "Juan" completo: su cuerpo, sus recuerdos, su pasado y sus reglas. Piensa en él como la **Empresa**. La Raíz (Juan/CEO) vive dentro de esta frontera y su trabajo es asegurar que nada de lo que pase rompa las leyes de la "empresa" (por ejemplo, que no pueda cumplir años si no ha nacido).
 
 > [!IMPORTANT]
-> Piensa en el **Agregado** como el "Sistema Juan". Tú interactúas con la **Raíz (Juan)**, y él se encarga de que todo su sistema interno se mantenga coherente. Juan protege su propia integridad: si algo contradice su pasado, él simplemente no lo permite.
+> **Juan (el objeto)** es la Raíz. **La Biografía de Juan (el conjunto de datos y reglas)** es el Agregado. 
+> Interactúas con la Raíz para asegurar la integridad de todo el Agregado. Es una unidad indivisible: o se acepta todo el cambio en su vida, o no se acepta nada.
 
 ---
 
