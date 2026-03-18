@@ -101,18 +101,18 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 ---
 
-### 🧠 ¿Cuál es la diferencia entre Raíz y Agregado?
+### 🧠 ¿Cuál es la diferencia entre Root y Aggregate?
 
 Para no confundirnos entre el código y la arquitectura, vamos a separar el **Rol** de la **Frontera**:
 
--   **La Raíz (Aggregate Root - "El Punto de Acceso")**: Es la clase **`Persona`**. En la arquitectura, la Raíz es la "puerta de entrada". Cuando en tu código creas una instancia como `var juan = new Persona()`, ese objeto específico es quien asume el rol de **CEO**: es el único punto de contacto autorizado para realizar cambios. Incluso si quieres añadir un hijo, hablas con Juan (`Persona`), no con la lista de hijos directamente.
+-   **El Root (Aggregate Root - "El Punto de Acceso")**: Es la clase **`Persona`**. En la arquitectura, el Root es la "puerta de entrada" y el único punto de contacto autorizado para realizar cambios. Incluso si quieres añadir un hijo, debes pedírselo al objeto `Persona`, no puedes manipular la lista de hijos por separado.
 -   **El Agregado (Aggregate - "La Frontera de Consistencia")**: Es el concepto total. Es el perímetro invisible que envuelve a Juan, su pasado, sus hijos y sus reglas. El Agregado NO es una clase; es la garantía de que nada de lo que le pase a Juan (la Raíz) o a sus relaciones (sus hijos) rompa las reglas de su vida.
 
 > [!IMPORTANT]
-> **La Raíz (`Persona`)** es el objeto que "da la cara". 
-> **El Agregado** es el sistema completo (incluyendo sus hijos y su historia) que ese objeto protege. 
+> **El Root (`Persona`)** es el objeto que "da la cara". 
+> **El Aggregate** es el sistema completo (incluyendo sus hijos y su historia) que ese objeto protege. 
 > 
-> Tú le pides cosas a la **Raíz**, y ella se asegura de que se cumplan las reglas de todo el **Agregado**. Es una unidad indivisible: no puedes modificar un "Hijo" sin que la Raíz lo valide y lo registre en la biografía completa.
+> Tú le pides cosas al **Root**, y él se asegura de que se cumplan las reglas de todo el **Aggregate**. Es una unidad indivisible: no puedes modificar un "Hijo" sin que el Root lo valide y lo registre en la biografía completa.
 
 ---
 
