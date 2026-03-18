@@ -1,68 +1,68 @@
-# 06 - Automatizando el historial
+# 06 - Automatizando las biografías
 
-Tenemos los hechos y tenemos el baúl (PostgreSQL). Pero todavía nos falta algo: no queremos escribir código manual para traducir nuestros records a tablas de base de datos.
+Ya tenemos el baúl (Docker/Postgres). Pero en la sección 03 vimos que manejar listas de `object` y hacer bucles manualmente para contar cumpleaños es mucho trabajo y es fácil cometer errores.
 
 ## 🎯 El Objetivo
-Queremos una herramienta que tome nuestros hechos tal cual están en C# y los guarde en el baúl sin que tengamos que preocuparnos por abrir conexiones, escribir SQL o serializar datos. 
+¿Y si existiera una herramienta que se encargue de guardar los hechos en el baúl y de reconstruir a Juan por nosotros automáticamente?
 
-Buscamos "conectar y listo" para que podamos enfocarnos en el negocio.
+Esa herramienta existe y se llama **Marten**.
 
 ---
 
-## 1. Buscando eficiencia
+## 1. Instalando el asistente
+Marten es una librería que convierte a PostgreSQL en un **Event Store** de primera clase para .NET.
 
-En lugar de construir nuestro propio motor de persistencia, vamos a usar una herramienta diseñada específicamente para esto.
+Abre tu terminal en la carpeta del proyecto y ejecuta:
 
-### Instalación
-En la terminal, dentro de la carpeta de tu proyecto, ejecuta:
 ```bash
 dotnet add package Marten
 ```
 
----
-
-## 2. Conectando el proyecto al baúl
-En tu `Program.cs`, vamos a configurar cómo nuestra app debe hablar con el almacén.
+## 2. Conectando el diario al baúl
+Ahora, vamos a configurar Marten en nuestro `Program.cs`. Reemplaza el contenido de tu archivo con lo siguiente (manteniendo tus `record` de la sección 03):
 
 ```csharp
 using Marten;
+using Taller.HistoriaVida;
 
-// Configuramos la conexión automática
-var store = DocumentStore.For(opt =>
+// 1. Configuramos la conexión al baúl
+var store = DocumentStore.For(opts =>
 {
-    opt.Connection("Host=localhost;Port=5432;Database=taller-hechos;Username=postgres;Password=Marten123");
+    opts.Connection("Host=localhost;Database=historias_vida;Username=postgres;Password=mysecretpassword");
 });
-```
 
----
+// 2. Abrimos una "sesión" para escribir en el diario
+using var session = store.LightweightSession();
 
-## 3. Guardando hechos de forma profesional
+var idPersona = Guid.NewGuid();
 
-```csharp
-var idOrden = Guid.NewGuid();
-
-await using var session = store.LightweightSession();
-
-// Enviamos los hechos al baúl
-session.Events.StartStream(idOrden, 
-    new OrdenCreada(idOrden, "FAC-999"),
-    new ProductoAgregado("Monitor Curvo 34", 1, 450m)
+// 3. ¡Anclamos nuevos hechos! 
+// Marten se encarga de saber a qué Stream pertenecen
+session.Events.StartStream<Persona>(idPersona, 
+    new PersonaNacida(idPersona, "Juan", new DateTime(1990, 5, 10)),
+    new CumpleañosCelebrado(idPersona, new DateTime(1991, 5, 10))
 );
 
 await session.SaveChangesAsync();
 
-Console.WriteLine("¡Hechos guardados de forma segura y permanente!");
+Console.WriteLine("¡Biografía guardada en el Event Store!");
 ```
 
 ---
 
-### El Descubrimiento
-Acabas de automatizar todo lo que antes era manual. La herramienta que está haciendo este trabajo inteligente de convertir tus records en historia persistente se llama **Marten**. 
+## 3. El Descubrimiento: Automatización y Stream Id
+¿Notaste que ya no creamos una `List<object>` manual? 
 
-Marten es quien permite que tu PostgreSQL actúe como un **Event Store** de alto nivel.
+*   **Marten es el bibliotecario**: Él recibe tus hechos y los guarda en el baúl digital.
+*   **Stream Id**: Cuando usamos `idPersona`, Marten lo usa como el ID del flujo. Él sabe que todos esos eventos pertenecen a la misma "pestaña" del archivador.
+
+> [!NOTE]
+> ¿Te acuerdas de la duda sobre el ID dentro del hecho? Marten guarda el `idPersona` en una columna especial llamada `stream_id`. Así que incluso si el hecho no lo tuviera, Marten sabría de quién es.
 
 ---
 
+Ya sabemos guardar. Pero, ¿cómo recuperamos a Juan del baúl y sabemos cuántos años tiene sin volver a hacer bucles manuales?
+
 [⬅️ Volver a la sección anterior](./05-preparando-persistencia.md)
 
-[➡️ Siguiente sección: Consultas y vistas inteligentes](./07-consultas-proyecciones.md)
+[➡️ Siguiente sección: Lectura inteligente](./07-consultas-proyecciones.md)

@@ -1,53 +1,52 @@
-# 05 - Un baúl que no se borra
+# 05 - Un baúl para nuestras historias
 
-Ya experimentamos el dolor de perder nuestros datos al reiniciar la aplicación. Es hora de buscar una solución permanente.
+En la sección anterior vimos que "Juan" desaparecía cada vez que cerrábamos el programa. Necesitamos un baúl resistente donde guardar su biografía para que sea eterna.
 
 ## 🎯 El Objetivo
-Necesitamos un lugar que sea capaz de guardar nuestra lista de hechos (nuestro Event Store) de tal manera que, si el servidor explota o la aplicación se reinicia, podamos volver a leer el historial exactamente donde lo dejamos.
+Lograr que si guardamos un cumpleaños hoy, mañana (o después de reiniciar la computadora) ese cumpleaños siga ahí. 
 
-¿Cómo podemos externalizar ese almacenamiento fuera de la memoria de nuestro programa?
-
----
-
-## 1. La solución al problema
-Para que nuestros hechos "sobrevivan", usaremos un **Contenedor**. Es como una caja fuerte digital que vive fuera de tu aplicación y guarda la información en el disco duro.
+Necesitamos una base de datos, pero no una que guarde "tablas", sino una que guarde **Streams** (nuestros diarios).
 
 ---
 
-## 2. Preparando el baúl persistente
+## 1. La herramienta: El Contenedor
+Para no ensuciar tu computadora con instalaciones pesadas, usaremos una "caja" virtual llamada **Docker**. Dentro de esa caja, pondremos un motor de base de datos llamado **PostgreSQL**.
 
-Ejecuta el siguiente comando en tu terminal para crear este almacén:
+### Paso 1: Crear el baúl
+Asegúrate de tener Docker instalado y ejecutando. Crea un archivo llamado `docker-compose.yml` en la raíz de tu proyecto `Taller.HistoriaVida` con este contenido:
 
-```bash
-docker run --name almacen-hechos -e POSTGRES_PASSWORD=Marten123 -e POSTGRES_DB=taller-hechos -p 5432:5432 -d postgres
+```yaml
+services:
+  baul-historias:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: historias_vida
+    ports:
+      - "5432:5432"
 ```
 
-### ¿Qué acabas de hacer?
-- Has creado una "caja" persistente llamada `almacen-hechos`.
-- Le has creado un espacio llamado `taller-hechos` para guardar nuestra información.
-
----
-
-## 3. Verificar que el baúl está abierto
-Para confirmar que todo está listo para recibir nuestros hechos, ejecuta:
+### Paso 2: Encender el baúl
+Abre tu terminal y ejecuta:
 
 ```bash
-docker exec -it almacen-hechos psql -U postgres -l
+docker compose up -d
 ```
 
-> Si ves **taller-hechos** en la lista, el baúl está listo.
+---
+
+## 2. El Descubrimiento: El Event Store
+Acabas de encender un servidor. Pero lo importante no es el software (`PostgreSQL`), sino el rol que va a cumplir en nuestra arquitectura.
+
+Este almacén especializado en guardar los **Streams** (biografías) de tus entidades sin que el tiempo o los reinicios los borren se conoce conceptualmente como un **Event Store**.
+
+> [!TIP]
+> Un **Event Store** es una base de datos optimizada para añadir hechos al final de una lista (Append-only) y leerlos en orden cronológico. Tal como un diario real.
 
 ---
 
-### El Descubrimiento
-Este contenedor persistente que acabas de lanzar está corriendo **PostgreSQL**, gestionado por **Docker**. 
-
-Pero lo más importante es el concepto: este almacén especializado en guardar los **Streams** de tus entidades sin que el tiempo o los reinicios los borren se conoce como un **Event Store**. 
-
-Ahora que tenemos el lugar físico (el Event Store), necesitamos el "pegamento" para conectar nuestro código C# con él de forma elegante.
-
----
+Ahora que tenemos el lugar físico, necesitamos el "pegamento" profesional para que nuestro código C# deje de usar listas en memoria y empiece a escribir en este baúl de forma automática.
 
 [⬅️ Volver a la sección anterior](./04-el-problema.md)
 
-[➡️ Siguiente sección: Automatizando el historial](./06-marten-event-store.md)
+[➡️ Siguiente sección: Automatizando las biografías](./06-marten-event-store.md)
