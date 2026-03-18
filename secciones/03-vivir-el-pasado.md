@@ -99,15 +99,13 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 
 ### 🧠 ¿Cuál es la diferencia entre Raíz y Agregado?
 
-### 🧠 ¿Cuál es la diferencia entre Raíz y Agregado?
+Para que la historia de Juan no sea un caos, necesitamos entender quién manda y hasta dónde llega su integridad:
 
-Para entender esto, usemos la analogía de una **Empresa**, que es mucho más clara:
-
--   **La Raíz (Aggregate Root - "El CEO")**: Es con quien tratas para hacer cambios. El CEO es la cara visible, el que tiene la firma autorizada y la **Identidad** legal. En nuestro código, Juan es el CEO. No hablas con sus recuerdos por separado, hablas con Juan.
--   **El Agregado (Aggregate - "La Empresa completa")**: Es el edificio, el logo, los empleados y las reglas internas. Es la **Frontera de Consistencia**. Cuando le pides algo al CEO, él se encarga de coordinar a toda la "empresa" (sus recuerdos, su lógica) para que el cambio sea coherente.
+-   **La Raíz (Aggregate Root - "El Individuo")**: Es la clase `Persona`. Juan es el único punto de contacto legal y lógico con el mundo. Él es quien tiene la **Identidad** (el ID). Para cualquier cambio en su vida, hablas con Juan; no intentas hablar con sus recuerdos o sus células por separado.
+-   **El Agregado (Aggregate - "La Integridad del Ser")**: Es el conjunto completo: Juan **+** Su Memoria (Eventos) **+** Sus Reglas. Es la **Frontera de Consistencia**. Es la barrera que asegura que toda la "máquina humana" de Juan funcione como una sola unidad. Es lo que impide que Juan celebre un cumpleaños si su memoria dice que aún no ha pasado un año desde el anterior.
 
 > [!IMPORTANT]
-> Piensa en **Juan como una organización de un solo hombre**. Tú interactúas con la **Raíz (Juan)**, y él garantiza que todo su sistema interno (**El Agregado**) se mantenga verídico. Ninguna parte de su biografía cambia si el "CEO" no lo autoriza tras revisar sus propias reglas.
+> Piensa en el **Agregado** como el "Sistema Juan". Tú interactúas con la **Raíz (Juan)**, y él se encarga de que todo su sistema interno se mantenga coherente. Juan protege su propia integridad: si algo contradice su pasado, él simplemente no lo permite.
 
 ---
 
