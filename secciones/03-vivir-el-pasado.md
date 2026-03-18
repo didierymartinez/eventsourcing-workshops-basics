@@ -10,27 +10,51 @@ Imagina que quieres saber cuántos años tiene Juan hoy.
 
 ---
 
-## 1. El Protagonista y sus Vivencias
-Todo diario necesita un dueño en la portada (ID) y unos hechos registrados (Records).
+## 1. El Protagonista (La Identidad)
+Todo diario necesita un dueño en la portada. Sin un ID, las páginas no son más que notas sueltas.
 
 ```csharp
+// El ancla de nuestra historia
 var idPersona = Guid.NewGuid();
+```
 
-// Definimos qué puede pasar
+En el mundo del software, a esto lo llamamos **Identidad**. Es como tu huella digital o tu número de pasaporte: no cambia nunca. Es lo que nos permite decir: *"Todos estos hechos le pertenecen a ESTA persona específica"*.
+
+---
+
+## 2. Las Vivencias (Los Hechos)
+Ahora definimos **qué puede pasarle**. Pero en Event Sourcing no guardamos "acciones", guardamos **hechos consumados**.
+
+### ¿Cómo representamos un hecho en C#?
+Usamos **Records** en lugar de clases por dos razones vitales:
+
+1.  **Inmutabilidad**: Un `record` no se puede modificar. El pasado está "escrito en piedra".
+2.  **Igualdad por valor**: Dos registros son iguales si sus datos coinciden. Esto es clave para validar que el sistema generó el hecho correcto (`hechoGenerado == hechoEsperado`).
+
+```csharp
 public record PersonaNacida(Guid PersonaId, string Nombre, DateTime FechaNacimiento);
 public record CumpleañosCelebrado(Guid PersonaId);
-
-// El Diario (Stream)
-var biografia = new List<object>();
-
-biografia.Add(new PersonaNacida(idPersona, "Juan", new DateTime(1990, 5, 10)));
-biografia.Add(new CumpleañosCelebrado(idPersona)); // 1 año
-biografia.Add(new CumpleañosCelebrado(idPersona)); // 2 años
 ```
 
 ---
 
-## 2. Recalculando la Realidad (El foreach)
+## 3. El Diario (El Stream)
+Tener hechos sueltos no sirve de nada sin orden. Un nacimiento después de un cumpleaños no tendría lógica.
+
+```csharp
+// Usamos una Lista para garantizar la secuencia cronológica
+var biografia = new List<object>();
+
+biografia.Add(new PersonaNacida(idPersona, "Juan", new DateTime(1990, 5, 10)));
+biografia.Add(new CumpleañosCelebrado(idPersona));
+biografia.Add(new CumpleañosCelebrado(idPersona));
+```
+
+A esta secuencia la llamamos **Stream** (Flujo). El Stream es la **Fuente de la Verdad**.
+
+---
+
+## 4. Recalculando la Realidad (Proceso Manual)
 Para saber quién es Juan "hoy", no consultamos una base de datos de "estado actual". Consultamos el diario y procesamos los hechos uno por uno.
 
 ```csharp
@@ -39,26 +63,19 @@ int edad = 0;
 
 foreach (var hito in biografia)
 {
-    if (hito is PersonaNacida n) 
-    { 
-        nombre = n.Nombre; 
-    }
-    
-    if (hito is CumpleañosCelebrado) 
-    { 
-        edad++; // ¡No guardamos el número, lo VOLVEMOS a contar!
-    }
+    if (hito is PersonaNacida n) { nombre = n.Nombre; }
+    if (hito is CumpleañosCelebrado) { edad++; }
 }
 
 Console.WriteLine($"{nombre} tiene {edad} años.");
 ```
 
-Este proceso de leer el pasado para entender el presente es lo que llamamos **Replay** (Re-ejecución).
+Este proceso de leer el pasado para entender el presente es lo que llamamos **Replay**. Funciona, pero si tenemos muchas personas, tener este `foreach` suelto por todos lados será un caos.
 
 ---
 
-## 3. El Descubrimiento: La Clase (Aggregate Root)
-Hacer un `foreach` suelto por todo el código cada vez que queramos saber la edad de Juan es desordenado. Necesitamos un **Jefe** que centralice esa lógica y proteja esos datos. 
+## 5. El Descubrimiento: La clase (Aggregate Root)
+Necesitamos un **Jefe** que centralice esa lógica y proteja esos datos. Alguien que reciba la biografía y se encargue de reconstruirse a sí mismo.
 
 A este jefe lo llamamos **Aggregate Root (Raíz del Agregado)**.
 
@@ -69,14 +86,18 @@ public class Persona
     public string Nombre { get; private set; }
     public int Edad { get; private set; } 
 
-    // El Agregado se "despierta" leyendo su pasado
     public Persona(IEnumerable<object> eventos)
     {
         foreach (var ev in eventos)
         {
-            if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; }
-            if (ev is CumpleañosCelebrado) { Edad++; }
+            Aplicar(ev);
         }
+    }
+
+    private void Aplicar(object ev)
+    {
+        if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; }
+        if (ev is CumpleañosCelebrado) { Edad++; }
     }
 }
 
@@ -85,13 +106,13 @@ var juan = new Persona(biografia);
 Console.WriteLine($"{juan.Nombre} tiene {juan.Edad} años.");
 ```
 
-### ¿Cuál es la diferencia real?
+### 🧠 ¿Raíz o Agregado? (La diferencia final)
 
-- **Aggregate Root (La Raíz)**: Es la clase `Persona`. Es el objeto físico que vive en tu memoria RAM. Es el "Capitán" con el que hablas para pedirle datos.
-- **Agregado (Aggregate)**: Es el concepto completo. Es **Juan (el objeto) + Su diario (la lista) + La lógica de conteo**. Es la unidad de verdad que asegura que todo tenga sentido (ej: que no puedas cumplir años sin haber nacido).
+- **Aggregate Root (La Raíz)**: Es la clase `Persona`. El objeto físico en memoria con el que interactúas.
+- **Agregado (Aggregate)**: Es el concepto completo. Es **Juan (objeto) + Su diario (Stream) + Su lógica**. 
 
 > [!IMPORTANT]
-> El **Aggregate Root** es la puerta de entrada. El **Agregado** es todo lo que hay detrás de la puerta cuidando que la historia de Juan sea consistente.
+> El **Aggregate Root** es la puerta de entrada (la clase). El **Agregado** es todo lo que hay detrás de la puerta cuidando que la historia de Juan sea consistente.
 
 ---
 
