@@ -3,7 +3,7 @@
 Nuestra biografía en C# funciona perfectamente, pero tiene un fallo fatal.
 
 ## 🎯 El Objetivo
-Ejecuta tu programa varias veces. ¿Qué pasa con los cumpleaños de Juan cada vez que reinicias la consola?
+Ejecuta tu programa varias veces. ¿Qué pasa con los cumpleaños de Jhon cada vez que reinicias la consola?
 
 Exacto: **Vuelven a empezar de cero**.
 
@@ -13,7 +13,7 @@ Exacto: **Vuelven a empezar de cero**.
 En el mundo real, una persona no olvida quién es cada vez que se va a dormir. Pero nuestro programa sí. 
 
 Al guardar la `List<object> biografia` en la memoria RAM, estamos condenados a perder la historia en cuanto el proceso se detenga. 
-- Si la luz se va: **Juan deja de existir**.
+- Si la luz se va: **Jhon deja de existir**.
 - Si cerramos Visual Studio: **La biografía se borra**.
 
 ## 2. El desafío

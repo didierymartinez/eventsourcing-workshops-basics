@@ -1,6 +1,6 @@
 # 05 - Un baúl para nuestras historias
 
-En la sección anterior vimos que "Juan" desaparecía cada vez que cerrábamos el programa. Necesitamos un baúl resistente donde guardar su biografía para que sea eterna.
+En la sección anterior vimos que "Jhon" desaparecía cada vez que cerrábamos el programa. Necesitamos un baúl resistente donde guardar su biografía para que sea eterna.
 
 ## 🎯 El Objetivo
 Lograr que si guardamos un cumpleaños hoy, mañana (o después de reiniciar la computadora) ese cumpleaños siga ahí. 

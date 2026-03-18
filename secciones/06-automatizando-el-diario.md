@@ -3,7 +3,7 @@
 Ya tenemos el baúl (Docker/Postgres). Pero en la sección 03 vimos que manejar listas de `object` y hacer bucles manualmente para contar cumpleaños es mucho trabajo y es fácil cometer errores.
 
 ## 🎯 El Objetivo
-¿Y si existiera una herramienta que se encargue de guardar los hechos en el baúl y de reconstruir a Juan por nosotros automáticamente?
+¿Y si existiera una herramienta que se encargue de guardar los hechos en el baúl y de reconstruir a Jhon por nosotros automáticamente?
 
 Esa herramienta existe y se llama **Marten**.
 
@@ -39,7 +39,7 @@ var idPersona = Guid.NewGuid();
 // 3. ¡Anclamos nuevos hechos! 
 // Marten se encarga de saber a qué Stream pertenecen
 session.Events.StartStream<Persona>(idPersona, 
-    new PersonaNacida(idPersona, "Juan", new DateTime(1990, 5, 10)),
+    new PersonaNacida(idPersona, "Jhon", new DateTime(1990, 5, 10)),
     new CumpleañosCelebrado(idPersona, new DateTime(1991, 5, 10))
 );
 
@@ -61,7 +61,7 @@ Console.WriteLine("¡Biografía guardada en el Event Store!");
 
 ---
 
-Ya sabemos guardar. Pero, ¿cómo recuperamos a Juan del baúl y sabemos cuántos años tiene sin volver a hacer bucles manuales?
+Ya sabemos guardar. Pero, ¿cómo recuperamos a Jhon del baúl y sabemos cuántos años tiene sin volver a hacer bucles manuales?
 
 [⬅️ Volver a la sección anterior](./05-el-baul-de-historias.md)
 

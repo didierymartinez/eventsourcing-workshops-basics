@@ -1,15 +1,15 @@
 # 03 - Vivir el pasado: El motor Apply
 
-En la sección anterior preparamos nuestro lienzo. Ahora, vamos a empezar a escribir los primeros "párrafos" de la vida de Juan usando C#.
+En la sección anterior preparamos nuestro lienzo. Ahora, vamos a empezar a escribir los primeros "párrafos" de la vida de Jhon usando C#.
 
 ## 🎯 El Objetivo
-Imagina que quieres saber cuántos años tiene Juan hoy. **No puedes simplemente guardar `Edad = 34`**, porque eso solo sirve para el presente. Si borras el pasado, no hay forma de volver atrás y saber qué edad tenía en el año 2000. 
+Imagina que quieres saber cuántos años tiene Jhon hoy. **No puedes simplemente guardar `Edad = 34`**, porque eso solo sirve para el presente. Si borras el pasado, no hay forma de volver atrás y saber qué edad tenía en el año 2000. 
 
 ¿Cómo construimos un sistema que nos permita "recalcular" su realidad en cualquier momento simplemente leyendo su diario?
 
 ---
 
-### Poniendo nombre al diario de Juan
+### Poniendo nombre al diario de Jhon
 Todo diario requiere un dueño en la portada. Sin un ID, las páginas no son más que notas sueltas. Por eso, empezamos definiendo nuestra "huella digital", lo que llamamos su **Identidad**:
 
 ```csharp
@@ -22,7 +22,7 @@ Este **ID** es el hilo que une todas las páginas de su biografía sin importar 
 ### Escribiendo los hitos en piedra
 Ahora que sabemos de quién es el diario, necesitamos registrar qué le ha pasado. Pero atención: aquí no guardamos "acciones" (como "Mudarse"), sino **hechos consumados**. 
 
-En el código, estos hitos del pasado se representan mejor usando **Records**. ¿Por qué? Porque el pasado está "escrito en piedra". Los Records nos garantizan **Inmutabilidad**, asegurando que nadie pueda "editar" la fecha de nacimiento de Juan por error, y nos facilitan comparar hitos basándonos en sus datos (**Igualdad por valor**):
+En el código, estos hitos del pasado se representan mejor usando **Records**. ¿Por qué? Porque el pasado está "escrito en piedra". Los Records nos garantizan **Inmutabilidad**, asegurando que nadie pueda "editar" la fecha de nacimiento de Jhon por error, y nos facilitan comparar hitos basándonos en sus datos (**Igualdad por valor**):
 
 ```csharp
 public record PersonaNacida(Guid PersonaId, string Nombre, DateTime FechaNacimiento);
@@ -37,9 +37,9 @@ Listo, ya tenemos los hitos, pero ahora nos enfrentamos a un problema: el tiempo
 // Guardamos los hechos en una lista para asegurar el orden
 var biografia = new List<object>();
 
-biografia.Add(new PersonaNacida(idPersona, "Juan", new DateTime(1990, 5, 10)));
+biografia.Add(new PersonaNacida(idPersona, "Jhon", new DateTime(1990, 5, 10)));
 biografia.Add(new CumpleañosCelebrado(idPersona)); // 1 año
-biografia.Add(new HijoNacido(idPersona, "Pedro")); // ¡Juan ahora es padre!
+biografia.Add(new HijoNacido(idPersona, "Pedro")); // ¡Jhon ahora es padre!
 biografia.Add(new CumpleañosCelebrado(idPersona)); // 2 años
 ```
 
@@ -97,7 +97,7 @@ var juan = new Persona(biografia);
 Console.WriteLine($"{juan.Nombre} tiene {juan.Edad} años y {juan.Hijos.Count} hijos.");
 ```
 
-En este modelo, la clase `Persona` es la encargada de cuidar que la historia de Juan sea siempre coherente. Es quien "posee" la verdad de su biografía.
+En este modelo, la clase `Persona` es la encargada de cuidar que la historia de Jhon sea siempre coherente. Es quien "posee" la verdad de su biografía.
 
 ---
 
@@ -106,7 +106,7 @@ En este modelo, la clase `Persona` es la encargada de cuidar que la historia de 
 Para no confundirnos entre el código y la arquitectura, vamos a separar el **Rol** de la **Frontera**:
 
 -   **El Aggregate Root (Punto de Acceso)**: Es la clase **`Persona`**. En la arquitectura, el Aggregate Root es la "puerta de entrada" y el único punto de contacto autorizado para realizar cambios. Incluso si quieres añadir un hijo, debes pedírselo al objeto `Persona`, no puedes manipular la lista de hijos por separado.
--   **El Aggregate (Frontera de Consistencia)**: Es el concepto total. Es el perímetro invisible que envuelve a Juan, su pasado, sus hijos y sus leyes internas. El Aggregate NO es una clase; es la garantía de que nada de lo que le pase a Juan (el Aggregate Root) o a sus relaciones (sus hijos) rompa la coherencia de su historia.
+-   **El Aggregate (Frontera de Consistencia)**: Es el concepto total. Es el perímetro invisible que envuelve a Jhon, su pasado, sus hijos y sus leyes internas. El Aggregate NO es una clase; es la garantía de que nada de lo que le pase a Jhon (el Aggregate Root) o a sus relaciones (sus hijos) rompa la coherencia de su historia.
 
 > [!IMPORTANT]
 > **El Aggregate Root (`Persona`)** es el objeto que "da la cara". 

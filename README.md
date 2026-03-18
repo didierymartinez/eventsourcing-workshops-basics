@@ -16,7 +16,7 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 
 ## 📚 Secciones del workshop (Hoja de Ruta)
 
-1. [01 - 🧠 El diario de Juan: Biografía vs Foto](./secciones/01-el-diario-de-juan.md)
+1. [01 - 🧠 El diario de Jhon: Biografía vs Foto](./secciones/01-el-diario-de-juan.md)
 2. [02 - 🚀 Preparando el lienzo](./secciones/02-preparando-el-lienzo.md)
 3. [03 - 📝 Vivir el pasado: El motor Apply](./secciones/03-vivir-el-pasado.md)
 4. [03b - 💡 Decidir el futuro: Comandos](./secciones/03b-decidir-el-futuro.md)

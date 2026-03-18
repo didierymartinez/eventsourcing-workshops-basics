@@ -1,9 +1,9 @@
 # 03b - Tomando decisiones (Comandos)
 
-Juan ya tiene una biografía y sabe quién es. Pero la vida sigue, y Juan quiere tomar decisiones.
+Jhon ya tiene una biografía y sabe quién es. Pero la vida sigue, y Jhon quiere tomar decisiones.
 
 ## 🎯 El Objetivo
-Juan quiere cambiar su nombre. Pero tenemos una regla: **Una vez que naces con un nombre, no puedes cambiarlo en este sistema.**
+Jhon quiere cambiar su nombre. Pero tenemos una regla: **Una vez que naces con un nombre, no puedes cambiarlo en este sistema.**
 
 ¿Cómo usamos lo que ya sabemos para proteger esta regla?
 
@@ -44,9 +44,9 @@ public object DecidirCambioNombre(string nuevoNombre)
 Intenta forzar un cambio de nombre en tu `Program.cs`:
 
 ```csharp
-var comando = new CambiarNombre(idPersona, "Juan Sebastian");
+var comando = new CambiarNombre(idPersona, "Jhon Sebastian");
 
-// 1. Reconstruimos a Juan desde el pasado
+// 1. Reconstruimos a Jhon desde el pasado
 var juan = new Persona(biografia);
 
 // 2. Le pedimos que decida basado en su estado actual
