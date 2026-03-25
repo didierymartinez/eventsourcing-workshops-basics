@@ -3,7 +3,7 @@
 Ya tenemos el baúl (Docker/Postgres). Pero en la sección 03 vimos que manejar listas de `object` y hacer bucles manualmente para contar cumpleaños es mucho trabajo y es fácil cometer errores.
 
 ## 🎯 El Objetivo
-¿Y si existiera una herramienta que se encargue de guardar los hechos en el baúl y de reconstruir a Jhon por nosotros automáticamente?
+¿Y si existiera una herramienta que se encargue de guardar los hechos en el baúl y de rehidratar a Jhon por nosotros automáticamente?
 
 Esa herramienta existe y se llama **Marten**.
 

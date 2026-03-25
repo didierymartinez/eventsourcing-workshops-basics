@@ -3,17 +3,17 @@
 Llegamos a la última etapa. Ya guardamos la historia, pero ahora necesitamos leerla de forma eficiente.
 
 ## 🎯 El Objetivo
-Si una orden tiene miles de hechos, reconstruir el total sumándolos todos cada vez que el cliente refresca la página es ineficiente y lento.
+Si una orden tiene miles de hechos, rehidratar el total sumándolos todos cada vez que el cliente refresca la página es ineficiente y lento.
 
 ¿Cómo podemos tener una "foto" instantánea del total sin perder el historial de los hechos?
 
 ---
 
-## 1. Reconstrucción automática
+## 1. Rehidratación automática
 Antes de pasar a la solución avanzada, veamos cómo la herramienta automatiza lo que hicimos en la sección 03.
 
 ```csharp
-// Le pedimos a la herramienta que reconstruya el estado final por nosotros
+// Le pedimos a la herramienta que rehidrate el estado final por nosotros
 var orden = await session.Events.AggregateStreamAsync<OrdenCompra>(idOrden);
 
 Console.WriteLine($"Orden recuperada: {orden.Numero}");

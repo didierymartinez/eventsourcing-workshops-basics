@@ -52,7 +52,7 @@ biografia.Add(new CumpleañosCelebrado(idPersona)); // Cumple 31 años
 Al unir todas estas páginas en el orden exacto, acabas de crear un **Stream** (Flujo). En el mundo de los eventos, el **Stream** no es solo una lista; es la **Fuente de la Verdad única**. Si un hito no está en este flujo, para nuestro sistema simplemente nunca sucedió.
 
 ### Recordar es volver a vivir
-¿Cómo usamos esta biografía para saber su edad? Aquí es donde ocurre la magia. Ya no consultamos una tabla estática; simplemente nos sentamos a "leer" su historia de principio a fin para reconstruir su realidad:
+¿Cómo usamos esta biografía para saber su edad? Aquí es donde ocurre la magia. Ya no consultamos una tabla estática; simplemente nos sentamos a "leer" su historia de principio a fin para reconstruir su realidad (a este proceso la industria lo llama **Rehidratar** el estado o **State Rehydration**):
 
 ```csharp
 string nombre = "";
@@ -70,7 +70,7 @@ foreach (var hito in biografia)
 Console.WriteLine($"Persona: {nombre} tiene {edad} años, nació en {ciudad} y tiene {hijos.Count} hijos.");
 ```
 
-Este proceso de lectura se llama **Replay**. Has "vuelto a vivir" el pasado para entender el presente. Funciona perfecto para un ejemplo pequeño, pero a medida que nuestra aplicación crezca, tener estos bucles repartidos por todo el código se volverá un caos.
+Este proceso de lectura se llama **Replay**. Has "vuelto a vivir" el pasado para rehidratar el presente. Funciona perfecto para un ejemplo pequeño, pero a medida que nuestra aplicación crezca, tener estos bucles repartidos por todo el código se volverá un caos.
 
 ¿Notaste cómo tuvimos que usar variables sueltas (`nombre`, `edad`, `hijos`) para capturar la información? **Saltar de este código imperativo a un código de objetos significa conceptualizar estas variables como propiedades de un objeto llamado `Persona`.**
 
@@ -86,7 +86,7 @@ public class Persona
     public int Edad { get; private set; } 
     public List<string> Hijos { get; private set; } = new();
 
-    // El Aggregate Root se reconstruye leyendo su pasado (Replay)
+    // El Aggregate Root se rehidrata leyendo su pasado (Replay)
     public Persona(IEnumerable<object> eventos)
     {
         foreach (var ev in eventos)

@@ -1,6 +1,6 @@
 # 05 - Continuar la historia: Agregando eventos
 
-Jhon ya tiene una biografía y sabe quién es. Pero la vida sigue, y queremos agregar nuevos capítulos a su historia. Hasta ahora solo hemos visto cómo reconstruir el pasado, pero ¿cómo agregamos nuevos hitos en el presente?
+Jhon ya tiene una biografía y sabe quién es. Pero la vida sigue, y queremos agregar nuevos capítulos a su historia. Hasta ahora solo hemos visto cómo rehidratar el pasado, pero ¿cómo agregamos nuevos hitos en el presente?
 
 ## 🎯 El Objetivo
 Jhon sigue viviendo y experimentando nuevos hitos: bodas, mudanzas, nuevos trabajos. Nuestro objetivo es aprender cómo registrar estos nuevos sucesos a través de nuestro objeto `Persona`.
@@ -16,7 +16,7 @@ public record PersonaMudada(Guid PersonaId, string NuevaCiudad);
 ```
 
 ## 2. Es quien autoriza agregar eventos a su biografía
-Aquí hay un detalle clave (y muy sutil) en Event Sourcing: La clase `Persona` es la dueña de las **reglas** de su historia, pero sorprendentemente **NO almacena la lista físicamente**. Si te fijas, su constructor lee los eventos del pasado para reconstruirse, pero nunca guarda una referencia directa a la `Lista<object> biografia`.
+Aquí hay un detalle clave (y muy sutil) en Event Sourcing: La clase `Persona` es la dueña de las **reglas** de su historia, pero sorprendentemente **NO almacena la lista físicamente**. Si te fijas, su constructor lee los eventos del pasado para rehidratarse, pero nunca guarda una referencia directa a la `Lista<object> biografia`.
 
 Por lo tanto, a Jhon no le "insertamos" eventos a la fuerza; nosotros le pedimos que evalúe realizar una acción y él, a cambio, **emite un nuevo evento** como resultado. Alguien más en el sistema será el encargado de tomar ese evento y guardarlo en el baúl para el futuro.
 
@@ -38,7 +38,7 @@ public class Persona : AggregateRoot
 
     public PersonaMudada RegistrarMudanza(string nuevaCiudad)
     {
-        // En una aplicación real, aquí validaríamos las reglas de negocio usando el estado reconstruido
+        // En una aplicación real, aquí validaríamos las reglas de negocio usando el estado rehidratado
         return new PersonaMudada(this.Id, nuevaCiudad);
     }
 
@@ -52,7 +52,7 @@ public class Persona : AggregateRoot
 Vamos a ejecutar esto de la forma más sencilla posible en nuestra consola:
 
 ```csharp
-// 1. Traemos a Jhon a la vida (reconstruimos su estado desde la lista)
+// 1. Traemos a Jhon a la vida (rehidratamos su estado desde la lista)
 var jhon = new Persona(biografia);
 
 Console.WriteLine($"[ANTES] {jhon.Nombre} vive en {jhon.Ciudad} y su pareja es: {(string.IsNullOrEmpty(jhon.NombrePareja) ? "Nadie" : jhon.NombrePareja)}");
@@ -65,7 +65,7 @@ var eventoMudanza = jhon.RegistrarMudanza("Madrid");
 biografia.Add(eventoBoda);
 biografia.Add(eventoMudanza);
 
-// Para ver el resultado final, reconstruimos a Jhon DESDE CERO leyendo su biografía actualizada.
+// Para ver el resultado final, rehidratamos a Jhon DESDE CERO leyendo su biografía actualizada.
 // ¡Esta es la clave! Persona no maneja la lista de su vida, alguien más (el sistema) lo hace.
 var jhonActualizado = new Persona(biografia);
 
@@ -75,7 +75,7 @@ Console.WriteLine($"[DESPUÉS] {jhonActualizado.Nombre} ahora está casado con {
 ### El Descubrimiento
 Acabas de ver el flujo básico para interactuar con el dominio:
 1. **Cargar**: Recuperas el pasado (la biografía).
-2. **Reconstruir**: Pones al objeto en su estado actual.
+2. **Rehidratar**: Pones al objeto en su estado actual (haciendo el Replay de su historia).
 3. **Actuar**: Le pides al objeto que realice una acción y genere un **nuevo evento**.
 
 > [!TIP]

@@ -11,7 +11,7 @@ No. Para eso tiene a su **Biógrafo Oficial (El Command Handler)**.
 
 Cuando surge una nueva situación (un Comando), el Biógrafo:
 1. Va a la hemeroteca y trae todos los apuntes pasados sobre la vida de Jhon (los eventos).
-2. Se los presenta a Jhon para que recuerde exactamente quién es y dónde está (reconstrucción).
+2. Se los presenta a Jhon para que recuerde exactamente quién es y dónde está (rehidratación).
 3. Le presenta la nueva situación o decisión.
 4. Escucha el veredicto de Jhon (el nuevo evento emitido) y **el Biógrafo es quien va a archivarlo al estante correcto**.
 
@@ -85,7 +85,7 @@ var comandoBoda = new MatrimonioSolicitado(idPersona, "María");
 biografo.TramitarBoda(comandoBoda); 
 
 // ¡Ahora la _biografia tiene el nuevo evento!
-// Para VER el nuevo estado, reconstruimos a Jhon desde la lista actualizada.
+// Para VER el nuevo estado, rehidratamos a Jhon desde la lista actualizada.
 var jhonActualizado = new Persona(biografia);
 Console.WriteLine($"Jhon está casado con: {jhonActualizado.NombrePareja}");
 ```
@@ -96,7 +96,7 @@ Console.WriteLine($"Jhon está casado con: {jhonActualizado.NombrePareja}");
 >
 > Esto significa que cuando el Handler ejecuta `_biografia.Add(eventoBoda)`, está añadiendo el evento a **la misma lista** que vive en el `Program.cs`. Son el mismo objeto físico en RAM.
 >
-> Por eso al reconstruir a Jhon después con `new Persona(biografia)`, la lista ya tiene los nuevos eventos y su estado refleja las últimas acciones.
+> Por eso al rehidratar a Jhon después con `new Persona(biografia)`, la lista ya tiene los nuevos eventos y su estado refleja las últimas acciones.
 >
 > Sin embargo, este mecanismo de "compartir lista" es muy frágil y difícil de escalar. ¿Qué pasa cuando tenemos múltiples personas, o cuando la aplicación se reinicia? Eso es exactamente lo que resolveremos en la siguiente sección: el **Event Store**.
 
@@ -164,7 +164,7 @@ var comandoMudanza = new MudanzaSolicitada(idPersona, "Madrid");
 var handlerMudanza = new MudanzaSolicitadaHandler(biografia);
 handlerMudanza.Handle(comandoMudanza);
 
-// Para probar que los Handlers realmente hicieron su trabajo, reconstruimos a Jhon desde el historial
+// Para probar que los Handlers realmente hicieron su trabajo, rehidratamos a Jhon desde el historial
 var jhonFinal = new Persona(biografia);
 
 Console.WriteLine($"[VERIFICACIÓN] {jhonFinal.Nombre} ahora está casado con {jhonFinal.NombrePareja} y vive en {jhonFinal.Ciudad}.");
@@ -183,4 +183,4 @@ Es hora de formalizar un almacén oficial: El Event Store.
 
 [⬅️ Volver a la sección anterior](./05-decidir-el-futuro.md)
 
-[➡️ Siguiente sección: Abstracción del Almacén](./07-el-almacen-en-memoria.md)
+[➡️ Siguiente sección: El flujo de vida (EventStream)](./07-el-flujo-de-vida.md)
