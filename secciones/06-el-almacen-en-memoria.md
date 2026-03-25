@@ -1,4 +1,4 @@
-# 08 - El Almacén en Memoria: El Event Store
+# 06 - El Almacén en Memoria: El Event Store
 
 En la sección anterior logramos que el `EventStream<T>` manejara perfectamente el flujo de vida de un solo individuo aislando su `List<IEvent>` física.
 
@@ -121,21 +121,6 @@ public class EventStream<T> where T : AggregateRoot, new()
         }
         return entidad; // A este proceso de reconstruir el estado se le llama "Rehidratar" (Rehydrate)
     }
-
-    // Empaqueta el evento de negocio y lo envía al almacén
-    public void Append(object nuevoEvento)
-    {
-        _version++; // Nueva página/versión en la biografía
-
-        var eventoAlmacenado = new EventoAlmacenado(
-            AggregateId: _aggregateId,
-            Version: _version,
-            Timestamp: DateTime.UtcNow,
-            EventData: nuevoEvento
-        );
-
-        _store.AppendEvent(eventoAlmacenado);
-    }
 }
 ```
 
@@ -149,25 +134,25 @@ Ahora el programa arquitectónico está completo y escalable para cualquier núm
 // Un solo Event Store (Diccionario) para TODA la aplicación
 IEventStore store = new InMemoryEventStore();
 
-// Abrimos una ventana (Stream) enfocada solo a Jhon
+// (Pre-llenamos el almacén con historia pasada para simular una base de datos)
+var idJhon = Guid.NewGuid();
+store.AppendEvent(new EventoAlmacenado(idJhon, 1, DateTime.UtcNow, new PersonaNacida(idJhon, "Jhon", "Bogotá")));
+store.AppendEvent(new EventoAlmacenado(idJhon, 2, DateTime.UtcNow, new MatrimonioRegistrado(idJhon, "María")));
+
+var idAna = Guid.NewGuid();
+store.AppendEvent(new EventoAlmacenado(idAna, 1, DateTime.UtcNow, new PersonaNacida(idAna, "Ana", "Medellín")));
+
+// Ahora sí, la magia pura de la Lectura:
+// Abrimos una ventana (Stream) enfocada solo a Jhon y lo rehidratamos
 var flujoJhon = new EventStream<Persona>(store, idJhon);
-
-// Abrimos una ventana (Stream) enfocada solo a Ana
-var flujoAna  = new EventStream<Persona>(store, idAna);
-
-// Registramos la vida de Jhon
 var jhon = flujoJhon.Get();
-var eventoBoda = jhon.RegistrarMatrimonio("María"); // Retorna el record puro
-flujoJhon.Append(eventoBoda);
 
-// Registramos la vida de Ana (el Store garantiza que no se mezclen los IDs)
+// Abrimos una ventana (Stream) enfocada solo a Ana y la rehidratamos
+var flujoAna  = new EventStream<Persona>(store, idAna);
 var ana = flujoAna.Get();
-var eventoMudanza = ana.RegistrarMudanza("Medellín");
-flujoAna.Append(eventoMudanza);
 
-// VERIFICAR MÁGIA: reconstruimos a Jhon desde el Store
-var jhonFinal = flujoJhon.Get();
-Console.WriteLine($"{jhonFinal.Nombre} está casado con {jhonFinal.NombrePareja}");
+Console.WriteLine($"{jhon.Nombre} está casado con {jhon.NombrePareja}");
+Console.WriteLine($"{ana.Nombre} vive en {ana.Ciudad}");
 ```
 
 ---
@@ -183,12 +168,25 @@ IEventStore  (Storage centralizado que agrupa a todos)
     └── EventStream<Mascota> (idRex)  → Solo ve los eventos de Rex
 ```
 
+> [!NOTE]
+> **Filosofía Arquitectónica: ¿Dónde quedó el Patrón Repositorio Clásico?**
+>
+> En la arquitectura clásica y el DDD (Domain-Driven Design) ortodoxo, existe una regla dogmática: *"Tu Dominio jamás debe saber que existe una Base de Datos"*. Esta separación de responsabilidades nos obliga tradicionalmente a dividir el almacenamiento en dos roles muy marcados:
+> 
+> 1. **El Repositorio Lógico (El idealista):** En nuestro código creamos una interfaz puramente enfocada en tratar objetos de negocio en memoria (ej. `IPersonaRepository.Get(id)`). Esta interfaz vive en la capa limpia del sistema. En nuestro workshop, este rol lo asume el `EventStream<T>`, el cual actúa como nuestro repositorio abstracto: encapsula la magia de instanciar y rehidratar personas de manera agnóstica a cómo se guarden realmente.
+> 
+> 2. **El Store Físico (El obrero de infraestructura):** En la capa inferior, vive nuestro `IEventStore` (y su implementación `InMemoryEventStore`). Este no sabe qué diablos es una `Persona` ni cuáles son las reglas del negocio. Solo sabe hablar de diccionarios (mañana tablas SQL), bytes, Guids y números de Versión. 
+>
+> **La herencia estricta** dicta que para mantener el "código limpio", un arquitecto te obligaría a escribir docenas de clases Repositorio (una por cada Agregado en tu app) cuyo único propósito fuera inyectar el `IEventStore`, extraer sobres genéricos y transformarlos a Dominio. Esto genera muchísimo código "puente" repetitivo.
+>
+> **Alerta de spoiler:** A medida que avancemos hacia frameworks de producción en este workshop, descubrirás que las herramientas más potentes del ecosistema .NET desafían abiertamente esta tradición. En lugar de obligarte a escribir clases Repositorio intermedias, te entregarán **súper-interfaces unificadas** que actúan al mismo tiempo como Store Físico (manejan la transacción a BD) y como Repositorio Lógico (te devuelven el Agregado hidratado). Para algunos puristas esto es un *"pecado"* arquitectónico, pero en la vida real, es una de las mayores bendiciones para la productividad y el rendimiento.
+
 Pero todavía hay una fragilidad enorme de la que tenemos que hacernos cargo: si el servidor se reinicia, el `InMemoryEventStore` pierde todo su glorioso diccionario. 
 
-En la siguiente sección exploramos las consecuencias de esa volatilidad temporal y las reglas necesarias para solucionarla (Input/Output).
+En la siguiente sección exploraremos cómo nuestro Agregado (`Persona`) toma el control de su propio destino y comienza a generar estos eventos por sí mismo, protegiendo las reglas del negocio.
 
 ---
 
-[⬅️ Volver a la sección anterior](./07-el-flujo-de-vida.md)
+[⬅️ Volver a la sección anterior](./05-el-flujo-de-vida.md)
 
-[➡️ Siguiente sección: El Riesgo de Olvidar](./09-el-riesgo-de-olvidar.md)
+[➡️ Siguiente sección: Decidir el futuro (Emitir eventos)](./07-decidir-el-futuro.md)

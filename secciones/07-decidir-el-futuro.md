@@ -1,4 +1,4 @@
-# 05 - Continuar la historia: Agregando eventos
+# 07 - Decidir el futuro: Emitir eventos
 
 Jhon ya tiene una biografía y sabe quién es. Pero la vida sigue, y queremos agregar nuevos capítulos a su historia. Hasta ahora solo hemos visto cómo rehidratar el pasado, pero ¿cómo agregamos nuevos hitos en el presente?
 
@@ -48,28 +48,55 @@ public class Persona : AggregateRoot
 }
 ```
 
-## 3. 🛠️ El Ciclo de Vida en el Program.cs
-Vamos a ejecutar esto de la forma más sencilla posible en nuestra consola:
+## 3. Enseñando al Stream a escribir
+
+En las secciones anteriores, diseñamos nuestro `EventStream<T>` exclusivamente como un experto lector para rehidratar el pasado. Pero ahora que nuestra `Persona` genera nuevos Eventos de Dominio en el presente, necesitamos que el Stream tenga la capacidad inversa: **escribir y guardar**.
+
+Añadamos por primera vez el método `Append` a nuestro `EventStream<T>`. Este método recibirá un Evento de Dominio "puro", lo empaquetará en su respectivo sobre (`EventoAlmacenado`) protegiendo el orden de la historia (`_version++`), y se lo entregará firmemente al vigilante (`IEventStore`):
 
 ```csharp
-// 1. Traemos a Jhon a la vida (rehidratamos su estado desde la lista)
-var jhon = new Persona(biografia);
+public class EventStream<T> where T : AggregateRoot, new()
+{
+    // ... código de lectura previo (Get) y variables (_store, _aggregateId, _version) ...
 
-Console.WriteLine($"[ANTES] {jhon.Nombre} vive en {jhon.Ciudad} y su pareja es: {(string.IsNullOrEmpty(jhon.NombrePareja) ? "Nadie" : jhon.NombrePareja)}");
+    public void Append(object domainEvent)
+    {
+        _version++; // Nueva página/versión en la biografía
 
-// 2. Le pedimos a Jhon que registre nuevos eventos en su vida
-var eventoBoda = jhon.RegistrarMatrimonio("María");
-var eventoMudanza = jhon.RegistrarMudanza("Madrid");
+        var eventoAlmacenado = new EventoAlmacenado(
+            AggregateId: _aggregateId,
+            Version: _version,
+            Timestamp: DateTime.UtcNow,
+            EventData: domainEvent
+        );
 
-// 3. Guardamos estos nuevos hitos en su biografía oficial (esto sucede fúera de la clase Persona)
-biografia.Add(eventoBoda);
-biografia.Add(eventoMudanza);
+        _store.AppendEvent(eventoAlmacenado);
+    }
+}
+```
 
-// Para ver el resultado final, rehidratamos a Jhon DESDE CERO leyendo su biografía actualizada.
-// ¡Esta es la clave! Persona no maneja la lista de su vida, alguien más (el sistema) lo hace.
-var jhonActualizado = new Persona(biografia);
+## 4. 🛠️ El Ciclo de Vida en el Program.cs
+Vamos a integrar finalmente esta capacidad bidireccional de lectura y escritura:
 
-Console.WriteLine($"[DESPUÉS] {jhonActualizado.Nombre} ahora está casado con {jhonActualizado.NombrePareja} y vive en {jhonActualizado.Ciudad}.");
+```csharp
+// 0. Instanciamos el almacén (asumimos que 'store' ya existe)
+var streamJhon = new EventStream<Persona>(store, idJhon);
+
+// 1. CARGAMOS: Traemos a Jhon a la vida desde el almacén central
+var jhon = streamJhon.Get();
+Console.WriteLine($"[ANTES] Jhon vive en {jhon.Ciudad}");
+
+// 2. ACTUAMOS: Le pedimos a Jhon que registre un nuevo hito en su vida
+var eventoMudanza = jhon.RegistrarMudanza("Nueva York");
+
+// 3. GUARDAMOS: Enviamos el evento de vuelta al stream para que se guarde
+streamJhon.Append(eventoMudanza);
+
+// Para ver el resultado final, rehidratamos a Jhon DESDE CERO 
+var streamDeVerificacion = new EventStream<Persona>(store, idJhon);
+var jhonActualizado = streamDeVerificacion.Get();
+
+Console.WriteLine($"[DESPUÉS] Jhon vive ahora en {jhonActualizado.Ciudad}.");
 ```
 
 ### El Descubrimiento
@@ -84,6 +111,6 @@ Acabas de ver el flujo básico para interactuar con el dominio:
 
 ---
 
-[⬅️ Volver a la sección anterior](./04-refactorizando-el-motor.md)
+[⬅️ Volver a la sección anterior](./06-el-almacen-en-memoria.md)
 
-[➡️ Siguiente sección: El Command Handler](./06-el-command-handler.md)
+[➡️ Siguiente sección: El Command Handler](./08-el-command-handler.md)

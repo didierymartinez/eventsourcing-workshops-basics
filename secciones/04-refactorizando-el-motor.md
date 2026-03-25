@@ -40,7 +40,7 @@ public class Persona
 
 Si mañana llega un nuevo cliente a nuestra agencia para documentar la vida de una `Mascota` o una `Empresa`, tendríamos que copiar y pegar en cada nueva clase la propiedad `Id` y todo el método `Load` con su bucle `foreach` para recorrer eventos.
 
-Aunque la lista siga siendo de tipo `object` (un problema de tipado que resolveremos más adelante en la Sección 07), la mecánica fundamental de **"leer una lista de historia e ir aplicando cada evento uno por uno"** es universal para cualquier entidad en Event Sourcing.
+Aunque la lista siga siendo de tipo `object` (un problema de tipado que resolveremos más adelante en la Sección 05), la mecánica fundamental de **"leer una lista de historia e ir aplicando cada evento uno por uno"** es universal para cualquier entidad en Event Sourcing.
 
 Vamos a crear una **Clase Base Abstracta** que comparta esta "mecánica" (el motor) con todos:
 
@@ -163,4 +163,4 @@ public class Persona : AggregateRoot
 
 [⬅️ Volver a la sección anterior](./03-vivir-el-pasado.md)
 
-[➡️ Siguiente sección: Decidir el futuro (Comandos)](./05-decidir-el-futuro.md)
+[➡️ Siguiente sección: El flujo de vida (EventStream)](./05-el-flujo-de-vida.md)

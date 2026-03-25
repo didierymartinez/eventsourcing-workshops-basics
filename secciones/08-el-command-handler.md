@@ -1,4 +1,4 @@
-# 06 - El Command Handler
+# 08 - El Command Handler
 
 En la sección anterior vimos que podíamos instanciar a Jhon, pedirle que ejecute acciones y guardar esos eventos en nuestra lista. 
 
@@ -44,33 +44,37 @@ Primero, construyamos a nuestro Biógrafo combinando todos los Handlers relacion
 // 2. El Manejador que actúa como nuestro Biógrafo Oficial
 public class PersonaCommandHandlers
 {
-    // Por ahora le pasamos la "base de datos" por el constructor
-    private readonly List<object> _biografia;
+    // Le pasamos el Archivero Central
+    private readonly IEventStore _store;
 
-    public PersonaCommandHandlers(List<object> biografia)
+    public PersonaCommandHandlers(IEventStore store)
     {
-        _biografia = biografia;
+        _store = store;
     }
 
-    // Nuestro Biógrafo anota un matrimonio con el método que se nos ocurra
+    // Nuestro Biógrafo anota un matrimonio
     public void TramitarBoda(MatrimonioSolicitado comando)
     {
-        // 1. Cargar: Recuperar el estado actual de Jhon
-        var jhon = new Persona(_biografia);
+        // 1. Cargar: Abrimos el cajón de Jhon en el archivero
+        var stream = new EventStream<Persona>(_store, comando.PersonaId);
+        var jhon = stream.Get();
 
         // 2. Actuar: Le pasamos la intención verificada al Agregado
         var eventoBoda = jhon.RegistrarMatrimonio(comando.NombrePareja);
 
-        // 3. Guardar: Almacenar los nuevos hechos
-        _biografia.Add(eventoBoda);
+        // 3. Guardar: Almacenar el nuevo hecho en el stream
+        stream.Append(eventoBoda);
     }
 
     // Nuestro Biógrafo anota una mudanza
     public void ProcesarMudanza(MudanzaSolicitada comando)
     {
-        var jhon = new Persona(_biografia);
+        var stream = new EventStream<Persona>(_store, comando.PersonaId);
+        var jhon = stream.Get();
+        
         var eventoMudanza = jhon.RegistrarMudanza(comando.NuevaCiudad);
-        _biografia.Add(eventoMudanza);
+        
+        stream.Append(eventoMudanza);
     }
 }
 
@@ -91,14 +95,9 @@ Console.WriteLine($"Jhon está casado con: {jhonActualizado.NombrePareja}");
 ```
 
 > [!NOTE]
-> **¿Cómo modifica el Biógrafo la lista "real"?**
-> En C#, `List<object>` es un **tipo por referencia**. Cuando haces `new PersonaCommandHandlers(biografia)`, NO se copia la lista; se pasa un "apuntador" a la misma lista en memoria.
->
-> Esto significa que cuando el Handler ejecuta `_biografia.Add(eventoBoda)`, está añadiendo el evento a **la misma lista** que vive en el `Program.cs`. Son el mismo objeto físico en RAM.
->
-> Por eso al rehidratar a Jhon después con `new Persona(biografia)`, la lista ya tiene los nuevos eventos y su estado refleja las últimas acciones.
->
-> Sin embargo, este mecanismo de "compartir lista" es muy frágil y difícil de escalar. ¿Qué pasa cuando tenemos múltiples personas, o cuando la aplicación se reinicia? Eso es exactamente lo que resolveremos en la siguiente sección: el **Event Store**.
+> **El Aismlamiento Perfecto**
+> Al pasarle el `IEventStore` al `CommandHandler`, hemos logrado desacoplar completamente las reglas de negocio de la infraestructura de almacenamiento.
+> A la clase `PersonaCommandHandlers` no le importa si el `IEventStore` guarda los datos en RAM, en un disco duro, o en una red distribuida. Simplemente le pide el Stream, actúa y guarda.
 
 ### 🛠️ Paso 3: Abstraer al Biógrafo (La Interfaz Genérica)
 
@@ -120,30 +119,36 @@ public interface ICommandHandler<in TCommand>
 // 2. Un Biógrafo especializado exclusivamente en matrimonios
 public class MatrimonioSolicitadoHandler : ICommandHandler<MatrimonioSolicitado>
 {
-    private readonly List<object> _biografia;
+    private readonly IEventStore _store;
 
-    public MatrimonioSolicitadoHandler(List<object> biografia) => _biografia = biografia;
+    public MatrimonioSolicitadoHandler(IEventStore store) => _store = store;
 
     public void Handle(MatrimonioSolicitado comando)
     {
-        var jhon = new Persona(_biografia);
+        var stream = new EventStream<Persona>(_store, comando.PersonaId);
+        var jhon = stream.Get();
+        
         var eventoBoda = jhon.RegistrarMatrimonio(comando.NombrePareja);
-        _biografia.Add(eventoBoda);
+        
+        stream.Append(eventoBoda);
     }
 }
 
 // 3. Otro Biógrafo especializado exclusivamente en mudanzas
 public class MudanzaSolicitadaHandler : ICommandHandler<MudanzaSolicitada>
 {
-    private readonly List<object> _biografia;
+    private readonly IEventStore _store;
 
-    public MudanzaSolicitadaHandler(List<object> biografia) => _biografia = biografia;
+    public MudanzaSolicitadaHandler(IEventStore store) => _store = store;
 
     public void Handle(MudanzaSolicitada comando)
     {
-        var jhon = new Persona(_biografia);
+        var stream = new EventStream<Persona>(_store, comando.PersonaId);
+        var jhon = stream.Get();
+        
         var eventoMudanza = jhon.RegistrarMudanza(comando.NuevaCiudad);
-        _biografia.Add(eventoMudanza);
+        
+        stream.Append(eventoMudanza);
     }
 }
 ```
@@ -156,16 +161,17 @@ Ahora, el código de "arranque" de nuestra aplicación (ya sea una API REST o un
 ```csharp
 // Llenamos el formulario de la primera acción
 var comandoBoda = new MatrimonioSolicitado(idPersona, "María");
-var handlerBoda = new MatrimonioSolicitadoHandler(biografia);
+var handlerBoda = new MatrimonioSolicitadoHandler(store); // Inyectamos el EventStore
 handlerBoda.Handle(comandoBoda);
 
 // Llenamos otro formulario para una segunda acción
 var comandoMudanza = new MudanzaSolicitada(idPersona, "Madrid");
-var handlerMudanza = new MudanzaSolicitadaHandler(biografia);
+var handlerMudanza = new MudanzaSolicitadaHandler(store);
 handlerMudanza.Handle(comandoMudanza);
 
-// Para probar que los Handlers realmente hicieron su trabajo, rehidratamos a Jhon desde el historial
-var jhonFinal = new Persona(biografia);
+// Para probar que los Handlers realmente hicieron su trabajo
+var streamFinal = new EventStream<Persona>(store, idPersona);
+var jhonFinal = streamFinal.Get();
 
 Console.WriteLine($"[VERIFICACIÓN] {jhonFinal.Nombre} ahora está casado con {jhonFinal.NombrePareja} y vive en {jhonFinal.Ciudad}.");
 ```
@@ -173,14 +179,14 @@ Console.WriteLine($"[VERIFICACIÓN] {jhonFinal.Nombre} ahora está casado con {j
 ---
 
 ### El Descubrimiento
-Acabamos de abstraer la intermediación de acciones únicas. Nuestro **Aggregate Root** (`Persona`) cuida las reglas vitales puras, mientras que el **Command Handler** (`PersonaCommandHandlers`) se ocupa del trabajo sucio de infraestructura: despertar a la persona y guardar sus memorias para ese evento particular.
+Acabamos de abstraer la intermediación de acciones únicas. Nuestro **Aggregate Root** (`Persona`) cuida las reglas vitales puras, mientras que el **Command Handler** (`MudanzaSolicitadaHandler`) se ocupa del trabajo sucio de la arquitectura: conseguir las herramientas (`EventStream`), despertar a la persona y guardar sus memorias para ese evento particular.
 
-Pero espera... Sigue habiendo un cable suelto. El Handler depende directamente de una cruda `List<object>`. ¿Qué pasa si Jhon tiene 1 millón de eventos? ¿El Handler tiene que pasarlos todos por valor? ¿Qué pasa si Jhon no está solo?
+¡Felicidades! Acabas de construir desde cero el flujo arquitectónico completo y profesional de Event Sourcing en Memoria.
 
-Es hora de formalizar un almacén oficial: El Event Store.
+Pero todavía hay una fragilidad enorme de la que tenemos que hacernos cargo: si el servidor se apaga, todo desaparece. En la siguiente sección, enfrentaremos el mundo real: persistencia e I/O.
 
 ---
 
-[⬅️ Volver a la sección anterior](./05-decidir-el-futuro.md)
+[⬅️ Volver a la sección anterior](./07-decidir-el-futuro.md)
 
-[➡️ Siguiente sección: El flujo de vida (EventStream)](./07-el-flujo-de-vida.md)
+[➡️ Siguiente sección: El Tiempo de Espera (I/O y Task)](./09-el-riesgo-de-olvidar.md)

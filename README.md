@@ -21,18 +21,18 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 2. [02 - 🚀 Preparando el lienzo](./secciones/02-preparando-el-lienzo.md)
 3. [03 - 📝 Vivir el pasado: El motor Apply](./secciones/03-vivir-el-pasado.md)
 4. [04 - 🏗️ Refactorizando el motor: El AggregateRoot](./secciones/04-refactorizando-el-motor.md)
-5. [05 - 💡 Continuar la historia: Agregando eventos](./secciones/05-decidir-el-futuro.md)
-6. [06 - 🛠️ El Command Handler](./secciones/06-el-command-handler.md)
-7. [07 - 🌊 El flujo de vida: EventStream](./secciones/07-el-flujo-de-vida.md)
-8. [08 - 📦 El Almacén en Memoria: El Event Store](./secciones/08-el-almacen-en-memoria.md)
+5. [05 - 🌊 El flujo de vida: EventStream](./secciones/05-el-flujo-de-vida.md)
+6. [06 - 📦 El Almacén en Memoria: El Event Store](./secciones/06-el-almacen-en-memoria.md)
+7. [07 - 💡 Decidir el futuro: Emitir eventos](./secciones/07-decidir-el-futuro.md)
+8. [08 - 🛠️ El Command Handler](./secciones/08-el-command-handler.md)
 
 **Fase 2: Transición a la Infraestructura .NET**
 9. [09 - ⏳ El tiempo de espera: I/O, async/await y el riesgo de olvidar](./secciones/09-el-riesgo-de-olvidar.md)
 10. [10 - 🛎️ El Recepcionista (Dependency Injection)](./secciones/10-inyeccion-de-dependencias.md)
 
-**Fase 3: Persistencia Real con Marten**
-11. [11 - 🗄️ El archivero incombustible: Docker y Postgres](./secciones/11-docker-postgres.md)
-12. [12 - 🪄 El bibliotecario experto: Introducción a Marten (Próximamente)](./secciones/12-introduccion-a-marten.md)
+**Fase 3: Persistencia Avanzada y Event Sourcing como Profesional**
+11. [11 - 🐳 El Baúl Incombustible (Docker, PostgreSQL y el tipo de dato JSONB)](./secciones/11-docker-postgres.md)
+12. [12 - 🗄️ El Bibliotecario Experto (Introducción a Marten)](./secciones/12-introduccion-a-marten.md)
 
 **Fase 4: Desacoplamiento (Wolverine)**
 13. [13 - 📨 El Correo Interno: Wolverine (Próximamente)](./secciones/13-wolverine.md)

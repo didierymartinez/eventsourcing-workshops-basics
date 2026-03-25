@@ -151,6 +151,6 @@ Pero antes, tenemos que despedir a los intermediarios que arman estas clases man
 
 ---
 
-[⬅️ Volver a la sección anterior](./08-el-almacen-en-memoria.md)
+[⬅️ Volver a la sección anterior](./08-el-command-handler.md)
 
 [➡️ Siguiente sección: El Recepcionista (Inyección de Dependencias)](./10-inyeccion-de-dependencias.md)
