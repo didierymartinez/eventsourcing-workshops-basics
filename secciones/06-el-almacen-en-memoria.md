@@ -114,12 +114,14 @@ public class EventStream<T> where T : AggregateRoot, new()
         
         var eventos = _store.GetEvents(_aggregateId);
 
-        foreach (var ev in eventos)
-        {
-            entidad.Load(new[] { ev.EventData });
-            _version = ev.Version; // Nos actualizamos a la última versión leída
-        }
-        return entidad; // A este proceso de reconstruir el estado se le llama "Rehidratar" (Rehydrate)
+        // ASIGNACIÓN DE IDENTIDAD: El stream le dice al objeto quién es.
+        entidad.Id = _aggregateId;
+
+        // REHIDRATACIÓN: El motor procesa la historia.
+        entidad.Load(eventos.Select(e => e.EventData));
+
+        _version = eventos.LastOrDefault()?.Version ?? 0;
+        return entidad;
     }
 }
 ```
@@ -136,11 +138,11 @@ IEventStore store = new InMemoryEventStore();
 
 // (Pre-llenamos el almacén con historia pasada para simular una base de datos)
 var idJhon = Guid.NewGuid();
-store.AppendEvent(new EventoAlmacenado(idJhon, 1, DateTime.UtcNow, new PersonaNacida(idJhon, "Jhon", "Bogotá")));
-store.AppendEvent(new EventoAlmacenado(idJhon, 2, DateTime.UtcNow, new MatrimonioRegistrado(idJhon, "María")));
+store.AppendEvent(new EventoAlmacenado(idJhon, 1, DateTime.UtcNow, new PersonaNacida("Jhon", new DateTime(1990, 5, 10), "Bogotá")));
+store.AppendEvent(new EventoAlmacenado(idJhon, 2, DateTime.UtcNow, new MatrimonioRegistrado("María")));
 
 var idAna = Guid.NewGuid();
-store.AppendEvent(new EventoAlmacenado(idAna, 1, DateTime.UtcNow, new PersonaNacida(idAna, "Ana", "Medellín")));
+store.AppendEvent(new EventoAlmacenado(idAna, 1, DateTime.UtcNow, new PersonaNacida("Ana", new DateTime(1995, 3, 22), "Medellín")));
 
 // Ahora sí, la magia pura de la Lectura:
 // Abrimos una ventana (Stream) enfocada solo a Jhon y lo rehidratamos

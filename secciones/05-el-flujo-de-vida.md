@@ -52,18 +52,16 @@ Ahora construimos la clase envoltorio genérica. Observa cómo "esconde" la list
 > La restricción `where T : AggregateRoot, new()` garantiza que el tipo que metamos aquí sí o sí tenga el método `Load` y pueda instanciarse vacío (`new()`).
 
 ```csharp
-using System.Linq;
+// Recordatorio: Nuestra clase base ahora tiene una propiedad Id para la identidad
+public abstract class AggregateRoot 
+{
+    public Guid Id { get; set; }
+    // ... motor Load y Apply ...
+}
 
 public class EventStream<T> where T : AggregateRoot, new()
 {
-    // La lista base ahora es estrictamente de Sobres Oficiales.
-    // Ocultaremos esta lista al mundo exterior para proteger su integridad.
     private readonly List<EventoAlmacenado> _eventosInternos;
-    
-    // Guardamos el ID específico de la entidad (ej: el idJhon).
-    // Lo necesitamos para "sellar" cada nuevo sobre de memoria que crearemos en el futuro,
-    // garantizando que, si esta lista se guarda en una base de datos global, 
-    // nunca se nos mezclen los eventos de Jhon con los eventos de Ana.
     private readonly Guid _aggregateId;
 
     public EventStream(List<EventoAlmacenado> listaBase, Guid aggregateId)
@@ -75,16 +73,17 @@ public class EventStream<T> where T : AggregateRoot, new()
     // RESPONSABILIDAD 1: Entregar el objeto rehidratado
     public T Get()
     {
-        var entidad = new T(); // Instanciamos cualquier T en blanco
+        var entidad = new T(); 
         
-        // Extraemos solo el contenido (EventData) de cada sobre
+        // ASIGNACIÓN DE IDENTIDAD: Igual que hará Marten en el futuro,
+        // nosotros le estampamos el Id al objeto antes de despertarlo.
+        entidad.Id = _aggregateId;
+
         var domainEvents = _eventosInternos.Select(e => e.EventData);
         
-        // Gracias a la restricción "where T : AggregateRoot" en la definición de la clase,
-        // el compilador sabe con certeza que 'entidad' (ya sea Persona o Mascota) 
-        // obligatoriamente posee el motor base y podemos llamar al método .Load() 
-        // para rehidratarlo de una sentada.
+        // REHIDRATACIÓN: El motor solo se preocupa por los datos.
         entidad.Load(domainEvents); 
+
         return entidad;
     }
 }

@@ -9,25 +9,15 @@ Imagina que quieres saber cuántos años tiene Jhon hoy. **No puedes simplemente
 
 ---
 
-### Poniendo nombre al diario de Jhon
-Todo diario requiere un dueño en la portada. Sin un ID, las páginas no son más que notas sueltas. Por eso, empezamos definiendo nuestra "huella digital", lo que llamamos su **Identidad**:
-
-```csharp
-// El ancla de nuestra historia
-var idPersona = Guid.NewGuid();
-```
-
-Este **ID** es el hilo que une todas las páginas de su biografía sin importar cuántas cosas le pasen en el futuro.
-
 ### Escribiendo los hitos en piedra
 Ahora que sabemos de quién es el diario, necesitamos registrar qué le ha pasado. Pero atención: aquí no guardamos "acciones" (como "Mudarse"), sino **hechos consumados**. 
 
 En el código, estos hitos del pasado se representan mejor usando **Records**. ¿Por qué? Porque el pasado está "escrito en piedra". Los Records nos garantizan **Inmutabilidad**, asegurando que nadie pueda "editar" la fecha de nacimiento de Jhon por error, y nos facilitan comparar hitos basándonos en sus datos (**Igualdad por valor**):
 
 ```csharp
-public record PersonaNacida(Guid PersonaId, string Nombre, DateTime FechaNacimiento, string Ciudad);
-public record CumpleañosCelebrado(Guid PersonaId);
-public record HijoNacido(Guid PersonaId, string NombreHijo);
+public record PersonaNacida(string Nombre, DateTime FechaNacimiento, string Ciudad);
+public record CumpleañosCelebrado();
+public record HijoNacido(string NombreHijo);
 ```
 
 ### El orden preciso de su vida
@@ -37,16 +27,16 @@ Listo, ya tenemos los hitos, pero ahora nos enfrentamos a un problema: el tiempo
 // Guardamos los hechos en una lista para asegurar el orden
 var biografia = new List<object>();
 
-biografia.Add(new PersonaNacida(idPersona, "Jhon", new DateTime(1990, 5, 10), "Bogotá"));
+biografia.Add(new PersonaNacida("Jhon", new DateTime(1990, 5, 10), "Bogotá"));
 
 // Celebramos sus primeros 30 cumpleaños
 for (int i = 0; i < 30; i++)
 {
-    biografia.Add(new CumpleañosCelebrado(idPersona));
+    biografia.Add(new CumpleañosCelebrado());
 }
 
-biografia.Add(new HijoNacido(idPersona, "Pedro")); // ¡A los 30 años, Jhon es padre!
-biografia.Add(new CumpleañosCelebrado(idPersona)); // Cumple 31 años
+biografia.Add(new HijoNacido("Pedro")); // ¡A los 30 años, Jhon es padre!
+biografia.Add(new CumpleañosCelebrado()); // Cumple 31 años
 ```
 
 Al unir todas estas páginas en el orden exacto, acabas de crear un **Stream** (Flujo). En el mundo de los eventos, el **Stream** no es solo una lista; es la **Fuente de la Verdad única**. Si un hito no está en este flujo, para nuestro sistema simplemente nunca sucedió.
@@ -70,17 +60,23 @@ foreach (var hito in biografia)
 Console.WriteLine($"Persona: {nombre} tiene {edad} años, nació en {ciudad} y tiene {hijos.Count} hijos.");
 ```
 
-Este proceso de lectura se llama **Replay**. Has "vuelto a vivir" el pasado para rehidratar el presente. Funciona perfecto para un ejemplo pequeño, pero a medida que nuestra aplicación crezca, tener estos bucles repartidos por todo el código se volverá un caos.
+Este proceso de lectura se llama **Replay**. Has "vuelto a vivir" el pasado para rehidratar el presente.
 
 ¿Notaste cómo tuvimos que usar variables sueltas (`nombre`, `edad`, `hijos`) para capturar la información? **Saltar de este código imperativo a un código de objetos significa conceptualizar estas variables como propiedades de un objeto llamado `Persona`.**
 
-### El protagonista de la historia: El Aggregate Root
-Necesitamos a un **Protagonista** que centralice esa biografía y sepa cómo interpretarla, alguien que reciba el diario y se encargue de "despertar" con su estado (propiedades) actualizado. A este personaje principal lo llamamos **Aggregate Root (Raíz del Agregado)**:
+### De variables sueltas a una clase que estructura el estado
+
+Las variables `nombre`, `edad`, `ciudad` e `hijos` son útiles para un script puntual, pero en una aplicación real necesitamos algo mejor: una **clase** que agrupe todas esas variables como propiedades tipadas, que pueda ser instanciada múltiples veces (para Jhon, para Ana, para 1.000 personas), y que centralice la lógica de cómo interpretar la historia.
+
+En diseño de software orientado al dominio (DDD), a esta clase se le da un nombre muy específico: **Aggregate Root** (Raíz del Agregado). El nombre tiene dos partes con significados distintos:
+
+- **Agregado** (*Aggregate*): "Clase" es un concepto del lenguaje de programación — puede ser un helper, un servicio, un DTO. "Agregado" en cambio es un **concepto del dominio del negocio**: describe una frontera de consistencia, es decir, un grupo de objetos que las *reglas del negocio* exigen tratar como una unidad indivisible. Jhon no es solo un nombre y una edad — para el negocio, Jhon es el conjunto de su historia, sus hijos y sus datos, y ninguna parte de ese conjunto puede modificarse de forma independiente sin romper la coherencia del todo. El Agregado es esa frontera; existe en el diseño *antes* de que abramos el editor.
+- **Raíz** (*Root*): porque dentro de ese conjunto, esta clase es el **único punto de entrada autorizado**. Nadie puede tocar las ramas (por ejemplo, la lista de hijos) sin pasar por la raíz. Es como la raíz de un árbol: sostiene y controla todo lo que cuelga de ella.
+
 
 ```csharp
 public class Persona 
 {
-    public Guid Id { get; private set; }
     public string Nombre { get; private set; }
     public string Ciudad { get; private set; }
     public int Edad { get; private set; } 
@@ -92,7 +88,7 @@ public class Persona
         foreach (var ev in eventos)
         {
             // Al principio, procesamos todo aquí directamente
-            if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; Ciudad = n.Ciudad; }
+            if (ev is PersonaNacida n) { Nombre = n.Nombre; Ciudad = n.Ciudad; }
             if (ev is CumpleañosCelebrado) { Edad++; }
             if (ev is HijoNacido h) { Hijos.Add(h.NombreHijo); }
         }
@@ -119,12 +115,6 @@ Para no confundirnos entre el código y la arquitectura, vamos a separar el **Ro
 
 -   **El Aggregate Root (Punto de Acceso)**: Es la clase **`Persona`**. En la arquitectura, el Aggregate Root es la "puerta de entrada" y el único punto de contacto autorizado para realizar cambios. Incluso si quieres añadir un hijo, debes pedírselo al objeto `Persona`, no puedes manipular la lista de hijos por separado.
 -   **El Aggregate (Frontera de Consistencia)**: Es el concepto total. Es el perímetro invisible que envuelve a Jhon, su pasado, sus hijos y sus leyes internas. El Aggregate NO es una clase; es la garantía de que nada de lo que le pase a Jhon (el Aggregate Root) o a sus relaciones (sus hijos) rompa la coherencia de su historia.
-
-> [!IMPORTANT]
-> **El Aggregate Root (`Persona`)** es el objeto que "da la cara". 
-> **El Aggregate** es el sistema completo (incluyendo sus hijos y su historia) que ese objeto protege. 
-> 
-> Tú le pides cosas al **Aggregate Root**, y él se asegura de que se cumplan las reglas de todo el **Aggregate**. Es una unidad indivisible: no puedes modificar un "Hijo" sin que el Aggregate Root lo valide y lo registre en la biografía completa.
 
 ---
 

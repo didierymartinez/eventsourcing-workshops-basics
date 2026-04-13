@@ -6,14 +6,13 @@ Vamos a limpiar nuestra arquitectura siguiendo el principio de **"Separación de
 
 ## 🛠️ Refactor 1: Extraer la lógica de "Traducción"
 
-Lo primero es sacar el procesamiento de los eventos de en medio del constructor. Queremos que el constructor solo "orqueste" la lectura, pero que otro método se encargue de saber qué hacer con cada hito.
+Ahora sí, refactorizamos el motor:
 
 A este método lo llamaremos **`Aplicar`** (o *Apply* en inglés):
 
 ```csharp
 public class Persona 
 {
-    public Guid Id { get; private set; }
     public string Nombre { get; private set; }
     public string Ciudad { get; private set; }
     public int Edad { get; private set; }
@@ -23,22 +22,20 @@ public class Persona
     {
         foreach (var ev in eventos)
         {
-            Aplicar(ev); // Limpito
+            Aplicar(ev);
         }
     }
 
     private void Aplicar(object ev)
     {
-        if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; Ciudad = n.Ciudad; }
+        if (ev is PersonaNacida n) { Nombre = n.Nombre; Ciudad = n.Ciudad; }
         if (ev is CumpleañosCelebrado) { Edad++; }
         if (ev is HijoNacido h) { Hijos.Add(h.NombreHijo); }
     }
 }
 ```
 
-## 🏗️ Refactor 2: Generalizando con AggregateRoot
-
-Si mañana llega un nuevo cliente a nuestra agencia para documentar la vida de una `Mascota` o una `Empresa`, tendríamos que copiar y pegar en cada nueva clase la propiedad `Id` y todo el método `Load` con su bucle `foreach` para recorrer eventos.
+Si mañana llega un nuevo cliente a nuestra agencia para documentar la vida de una `Mascota` o una `Empresa`, tendríamos que copiar y pegar en cada nueva clase el método `Aplicar` con su bucle `foreach`.
 
 Aunque la lista siga siendo de tipo `object` (un problema de tipado que resolveremos más adelante en la Sección 05), la mecánica fundamental de **"leer una lista de historia e ir aplicando cada evento uno por uno"** es universal para cualquier entidad en Event Sourcing.
 
@@ -56,10 +53,6 @@ Vamos a crear una **Clase Base Abstracta** que comparta esta "mecánica" (el mot
 ```csharp
 public abstract class AggregateRoot
 {
-    // El ID se asigna cuando la clase hija procesa su primer evento de creación 
-    // (ej: cuando Persona aplica PersonaNacida)
-    public Guid Id { get; protected set; }
-
     protected AggregateRoot() { }
 
     // El motor genérico de rehidratación (State Rehydration)
@@ -76,8 +69,6 @@ public abstract class AggregateRoot
 }
 ```
 
-Ahora Jhon (nuestra `Persona`) es mucho más elegante:
-
 ```csharp
 public class Persona : AggregateRoot
 {
@@ -93,12 +84,14 @@ public class Persona : AggregateRoot
 
     protected override void Aplicar(object ev)
     {
-        if (ev is PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; Ciudad = n.Ciudad; }
+        if (ev is PersonaNacida n) { Nombre = n.Nombre; Ciudad = n.Ciudad; }
         if (ev is CumpleañosCelebrado) { Edad++; }
         if (ev is HijoNacido h) { Hijos.Add(h.NombreHijo); }
     }
 }
 ```
+
+Ahora Jhon tiene una estructura profesional, y si quisiéramos crear una `Mascota`, solo tendríamos que heredar de `AggregateRoot` y reusar el motor `Load`.
 
 ## 🚀 Refactor 3: El toque final con Overloads (Elegancia Pro)
 
@@ -113,8 +106,6 @@ Así queda el motor definitivo en **`AggregateRoot`**:
 ```csharp
 public abstract class AggregateRoot
 {
-    public Guid Id { get; protected set; }
-
     protected AggregateRoot() { }
 
     // El motor definitivo de rehidratación
@@ -139,9 +130,7 @@ public class Persona : AggregateRoot
     public Persona(IEnumerable<object> eventos) => Load(eventos);
 
     // Ya no hay `if`. Solo hay sobrecargas limpias.
-    // OJO: Deben ser 'protected' o 'internal' para que la clase base (el dynamic) las encuentre, 
-    // pero se mantengan ocultas del mundo exterior.
-    protected void Apply(PersonaNacida n) { Id = n.PersonaId; Nombre = n.Nombre; Ciudad = n.Ciudad; }
+    protected void Apply(PersonaNacida n) { Nombre = n.Nombre; Ciudad = n.Ciudad; }
     protected void Apply(CumpleañosCelebrado e) { Edad++; }
     protected void Apply(HijoNacido h) { Hijos.Add(h.NombreHijo); }
 }
