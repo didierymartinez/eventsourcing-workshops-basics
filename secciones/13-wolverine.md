@@ -182,6 +182,38 @@ serviceCollection.AddWolverine(ExtensionDiscovery.ManualOnly, options =>
 
 ---
 
+## 🔬 Cómo lo hace Wolverine por dentro (que no sea una caja negra)
+
+Es tu `CommandHandler` instanciado a mano, pero automatizado. Esto pasa realmente:
+
+**1. Al arrancar — descubrimiento.** Wolverine escanea los ensamblados que le indicaste (`Discovery.IncludeAssembly`) y busca, **por convención**, métodos `Handle`/`HandleAsync` cuyo primer parámetro sea un mensaje. Arma un **registro**: `tipo de mensaje → handler que lo procesa`.
+
+**2. Al arrancar — generación de código.** Por cada tipo de mensaje, Wolverine **escribe y compila una clase C#** (el "MessageHandler") que hace, explícitamente, lo que tú harías a mano:
+```csharp
+// Código que Wolverine GENERA (simplificado) — lo puedes leer con: dotnet run -- codegen write
+public class RegistrarMatrimonio_Handler
+{
+    public async Task Handle(RegistrarMatrimonio msg, IDocumentSession session, CancellationToken ct)
+    {
+        // (middleware antes: abrir transacción / UnitOfWork)
+        var persona = await session.Events.FetchForWriting<Persona>(msg.PersonaId, ct); // cargar
+        var eventos = RegistrarMatrimonioHandler.Handle(msg, persona.Aggregate);         // TU decide
+        foreach (var e in eventos) persona.AppendOne(e);                                 // append
+        await session.SaveChangesAsync(ct);                                              // (middleware después: commit)
+    }
+}
+```
+Por eso es rápido y **no** usa reflexión por llamada (§22): es una llamada directa, generada una vez.
+
+**3. Al enviar un mensaje.** `IMessageBus.InvokeAsync(cmd)` busca en el registro el handler. Si el destino es **local**, lo ejecuta en proceso; si está **ruteado a un transporte** (cola), serializa el mensaje + su **envelope** (§25) y lo entrega al broker.
+
+**4. Durabilidad (Outbox/Inbox).** Con `.IntegrateWithWolverine()`, Wolverine crea tablas en Postgres (cola de salientes/entrantes). Un **agente de durabilidad** en background mueve los mensajes salientes al transporte con reintentos, y marca como procesados los entrantes (dedup). Todo dentro de la transacción de Marten → atomicidad (§14).
+
+> [!TIP]
+> Igual que con Marten ("mira el SQL"), aquí el lema es **"mira el código generado"**: `dotnet run -- codegen write` y abre `./Internal/Generated/WolverineHandlers/`. No hay caja negra: hay un archivo C# que puedes leer y depurar.
+
+---
+
 ### El Descubrimiento
 
 Con Wolverine hemos eliminado el acoplamiento directo entre el **que pide** (el endpoint HTTP) y el **que ejecuta** (el Handler):

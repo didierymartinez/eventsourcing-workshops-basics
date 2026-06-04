@@ -6,6 +6,9 @@ El modelo de **Event Sourcing** y **CQRS** introduce paradigmas que rompen la me
 
 Este workshop introductorio está diseñado puramente para aislar, afilar y dominar las "herramientas del arquitecto" **antes** de construir el motor de eventos. 
 
+> [!TIP]
+> 📍 **Esto es el Nivel 0 — Nivelación (opcional).** Aquí los conceptos se ven **en aislamiento**, sin Event Sourcing. Es para quien aún no domina records, interfaces, polimorfismo, DI o DDD básico. Si ya los manejas, **salta al workshop principal** ([`../README.md`](../README.md)), donde estos mismos conceptos se **descubren en contexto** (el viaje con Jhon). No es obligatorio hacerlo primero; es una red de seguridad.
+
 A lo largo de este recorrido, no guardaremos nada en archivos de texto exóticos ni simularemos transacciones temporales. Nos enfocaremos en código puro, limpio y empresarial.
 
 ## 🗺️ El Mapa

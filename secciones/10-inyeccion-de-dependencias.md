@@ -101,6 +101,61 @@ await handlerBoda.HandleAsync(comandoBoda);
 >
 > Y un adelanto clave: **Wolverine intenta NO usar el contenedor en runtime** — *genera código* que hace la inyección de forma explícita (más rápido y, sobre todo, **inspeccionable**). Lo veremos en la sección de reflexión-vs-codegen. Ahí la "magia" desaparece del todo: lees el código generado.
 
+> [!NOTE]
+> 🌱 **Semilla — inyección por método, no solo por constructor.** Toda la vida en .NET inyectamos por **constructor** (`public Handler(IEventStore store)`). Wolverine, por su modelo de codegen, **prefiere inyección por método**: las dependencias se piden como **parámetros del propio `Handle`**:
+> ```csharp
+> // Wolverine prefiere esto (method injection):
+> public static Task Handle(AprobarOrden cmd, IDocumentSession session) { ... }
+> ```
+> ¿Por qué? Menos ceremonia (no necesitas constructor ni campos) y Wolverine inyecta exactamente lo que cada método necesita en el código que genera. No es obligatorio —la inyección por constructor también funciona— pero es el estilo idiomático del Critter Stack. Guárdalo: cuando veas dependencias en la *firma del método*, no es raro, es a propósito.
+
+---
+
+## 🧬 Desarmemos la "magia": un mini-contenedor en ~20 líneas
+
+Dijimos que el contenedor no es magia de C#, sino **diccionario + reflexión + recursión**. Probémoslo construyendo uno de juguete:
+
+```csharp
+// 🟢 Un contenedor mínimo
+public class MiniContenedor
+{
+    // El "libro" del recepcionista: interfaz -> clase concreta que la cumple
+    private readonly Dictionary<Type, Type> _registro = new();
+
+    public void Register<TServicio, TImpl>() => _registro[typeof(TServicio)] = typeof(TImpl);
+
+    public object Resolve(Type tipo)
+    {
+        // 1. Si pidieron una interfaz, busca su implementación en el libro
+        var concreto = _registro.TryGetValue(tipo, out var impl) ? impl : tipo;
+
+        // 2. Mira el constructor y resuelve CADA dependencia recursivamente (reflexión)
+        var ctor = concreto.GetConstructors().First();
+        var argumentos = ctor.GetParameters()
+                             .Select(p => Resolve(p.ParameterType))  // ← recursión
+                             .ToArray();
+
+        // 3. Crea la instancia con sus dependencias ya armadas
+        return Activator.CreateInstance(concreto, argumentos)!;
+    }
+
+    public T Resolve<T>() => (T)Resolve(typeof(T));
+}
+```
+
+Úsalo igual que el contenedor "real":
+
+```csharp
+var c = new MiniContenedor();
+c.Register<IEventStore, InMemoryEventStore>();
+// Pedimos el Handler: el contenedor lee su constructor, ve que necesita IEventStore,
+// lo fabrica, lo inyecta, y nos devuelve el Handler listo. Sin un solo 'new' nuestro.
+var handler = c.Resolve<MatrimonioSolicitadoHandler>();
+```
+
+> [!TIP]
+> 🏷️ Eso es **todo** lo esencial de un contenedor IoC: un registro, lectura del constructor por **reflexión**, y **recursión** para las dependencias anidadas. El de .NET añade ciclos de vida (Singleton/Scoped/Transient), validación y rendimiento — pero el corazón es esto. La próxima vez que `AddSingleton<...>()` "haga magia", recuerda: **acabas de escribir esa magia**. (Y recuerda §22: Wolverine evita incluso esta reflexión en runtime *generando* el código de resolución.)
+
 La Inyección de Dependencias no es solo una comodidad, es el **puente que conecta el dominio con la infraestructura**. 
 
 Nuestros Handlers de la Fase 1 (`MatrimonioSolicitadoHandler`) exigen en su constructor un `IEventStore`. Ellos **no tienen idea** si la persistencia ocurre en RAM, en Postgres o en un archivo de texto. A ellos no les importa; el Recepcionista se encarga del trabajo sucio.

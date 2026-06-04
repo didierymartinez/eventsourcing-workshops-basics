@@ -6,6 +6,9 @@ Bienvenido al workshop práctico para aprender a usar [Marten](https://martendb.
 
 Aprenderás a modelar eventos, almacenarlos y consultarlos usando Event Sourcing con Marten y PostgreSQL en .NET, siguiendo un enfoque paso a paso y práctico.
 
+> [!TIP]
+> **¿Por dónde empiezo?** Este es el **workshop principal** (el viaje con Jhon). Si aún no dominas los fundamentos de C#/diseño (records, interfaces, polimorfismo, patrón comando/repositorio, inyección de dependencias, DDD básico, async), pasa primero por el **Nivel 0 — Nivelación**: [`fundamentals-workshop/`](./fundamentals-workshop/README.md). Si ya los dominas, arranca aquí; cuando un tema asuma un fundamento, lo enlazaremos a su sección de nivelación en vez de repetirlo.
+
 ## 🧠 ¿Qué aprenderás?
 
 Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
@@ -38,14 +41,11 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 13. [13 - 📨 El Correo Interno: Wolverine](./secciones/13-wolverine.md) ✅
 14. [14 - 🤝 El Compromiso Inquebrantable: Outbox](./secciones/14-outbox.md) ✅
 
-**Fase 5: Consultas (CQRS)**
-15. [15 - 📊 El Censo: Límites del Event Store (Próximamente)](./secciones/15-limites-busqueda.md)
-16. [16 - 👁️ Vistas Inteligentes: CQRS y Proyecciones (Próximamente)](./secciones/16-proyecciones.md)
+**Fase 5: Consultas (CQRS)** → cubierto por [§20 - CQRS y Proyecciones](./secciones/20-cqrs-y-proyecciones.md) ✅
 
-**Fase 6: Cierre Magistral**
-17. [17 - 🚀 La Plantilla Cosmos.BuildingBlocks](./secciones/17-plantilla-cosmos.md) ✅
+**Fase 6: Profundización y Plantilla** → §18-§26 (Decider, Versionado, Testing, Codegen, ACL, Envelope, dos BCs) y [§17 - La Plantilla Cosmos.BuildingBlocks](./secciones/17-plantilla-cosmos.md) ✅
 
-> ⚠️ Este listado numérico es **histórico**. El workshop es **evolutivo**: el orden de aprendizaje real y las secciones que vienen están en el [**ROADMAP.md**](./ROADMAP.md).
+> ⚠️ Este listado numérico es **histórico**. El workshop es **evolutivo**: el **orden de aprendizaje real** y las secciones que vienen están en el [**ROADMAP.md**](./ROADMAP.md) — síguelo a él, no a los números de archivo.
 
 ---
 
@@ -56,6 +56,8 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 - [**CONCEPTOS-PROFUNDO.md**](./CONCEPTOS-PROFUNDO.md) — 🧠 auditoría conceptual profunda: cada concepto con su mecanismo bajo el capó, malentendidos y tradeoffs.
 - [**REVISION-CRITICA.md**](./REVISION-CRITICA.md) — revisión crítica y replanteamiento (huecos y mejoras pendientes).
 - [**INSPIRACION-MARTEN-WOLVERINE.md**](./INSPIRACION-MARTEN-WOLVERINE.md) — 📚 qué enseñan Marten y Wolverine que deberíamos introducir.
+- [**INTEGRACION-PROGRESIVA.md**](./INTEGRACION-PROGRESIVA.md) — 🌱 currículo en espiral: dónde se siembra cada concepto.
+- [**EVOLUCION-POR-CODIGO.md**](./EVOLUCION-POR-CODIGO.md) — 🧬 método naive→dolor→refactor→patrón y qué semillas volver arcos de código.
 
 ---
 

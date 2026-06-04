@@ -98,6 +98,37 @@ public class RegistrarPersonaHandler
 
 ---
 
+## 🧬 Evolucionemos: ¿qué eventos publicamos al resto del sistema?
+
+Recoge la semilla de §01 ("no todos los hechos le importan a todo el mundo"). Cuando Jhon se casa, emites `PersonaCasada`. ¿La publicamos al bus para que *todos* los demás servicios se enteren?
+
+```csharp
+// 💥 Lo ingenuo: publicar TODOS los eventos al bus
+foreach (var evento in agregado.EventosNuevos)
+    await bus.PublishAsync(evento);
+// Problema: PersonaCumplioAños es un detalle INTERNO; nadie afuera lo necesita.
+// Y si otro Bounded Context se "engancha" a un campo interno de PersonaCasada,
+// quedamos acoplados: no podremos cambiar ese evento sin romperle a otros.
+```
+
+La distinción es de diseño: hay eventos **de dominio** (internos, dentro de tu Bounded Context) y eventos **de integración** (públicos, contrato con otros BCs). Marcamos cada uno y dejamos que el agregado los separe:
+
+```csharp
+// 🔧 Marcamos el alcance de cada evento con interfaces (las de Cosmos)
+public record PersonaCumpleañosCelebrado(...) : IPrivateEvent;   // interno: se queda en casa
+public record PersonaCasada(Guid Id, string Pareja) : IPublicEvent; // integración: otros lo necesitan
+
+// El AggregateRoot ya sabe separarlos (API real de Cosmos.BuildingBlocks):
+IPrivateEvent[] internos = persona.GetPrivateEvents();  // se procesan dentro del BC
+IPublicEvent[]  publicos = persona.GetPublicEvents();   // SOLO estos van al bus
+```
+
+> [!TIP]
+> 🏷️ **El nombre.** Un `IPublicEvent` es una **API pública**: una vez publicado, otros equipos dependen de su forma (por eso su versionado, §19, es tan delicado). Un `IPrivateEvent` puedes cambiarlo con libertad. Regla: **publica al bus solo lo público**; mantén lo interno, interno.
+
+> [!NOTE]
+> 🌱 **Semilla — y al revés: cuando recibes un evento público de OTRO servicio, no lo manejes directo.** Si tu handler reacciona directamente a un `IPublicEvent` ajeno, acoplas tu dominio a una firma que no controlas. La solución es una **Anti-Corruption Layer**: una capa-frontera que valida el evento externo y lo **traduce a un comando interno** de tu propio lenguaje. Y el contexto (tenant, usuario) de ese mensaje no viaja en el payload, sino en el **Envelope** (el sobre). Lo dominamos en §24 (ACL) y §25 (Envelope).
+
 ## 🪐 Cómo lo hace Cosmos
 
 En `Cosmos.BuildingBlocks` esto está encapsulado:
@@ -108,6 +139,9 @@ En `Cosmos.BuildingBlocks` esto está encapsulado:
 
 > [!NOTE]
 > Tu bug histórico del `TypeLoadException` en `WolverinePublicEventSender` vive justo en esta capa. Entender el Outbox y el modo de durabilidad es el contexto que necesitas para atacarlo.
+
+> [!NOTE]
+> 🌱 **Semilla — ¿y si un mensaje falla una y otra vez?** El relay del Outbox reintenta los envíos fallidos. Pero hay mensajes "venenosos" que **fallan siempre** (un evento corrupto, un consumidor con un bug). Reintentarlos para siempre bloquearía la cola. La solución estándar de la industria es la **Dead Letter Queue (DLQ)**: tras N reintentos, el mensaje se aparta a una "cola de cartas muertas" para inspección manual, sin frenar al resto. Wolverine y Azure Service Bus la traen integrada. Guárdalo: la entrega garantizada del Outbox se complementa con la DLQ para los casos que *nunca* van a pasar.
 
 ---
 

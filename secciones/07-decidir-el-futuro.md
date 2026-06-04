@@ -110,10 +110,104 @@ Acabas de ver el flujo básico para interactuar con el dominio:
 > Aquí vemos una regla de oro: **Los Comandos son los encargados de generar los Eventos** (siempre a través del Aggregate Root).
 
 > [!NOTE]
-> 🌱 **Semilla — Acabas de escribir la función `decide`.** En la Sección 03 viste `evolve` (estado + evento → estado). Aquí `RegistrarMudanza` hace la otra mitad: **`decide`** (estado + comando → eventos). Juntas forman el **patrón Decider**, el modelo funcional del Event Sourcing: `decide` valida y *decide qué pasó*, `evolve` *aplica lo que pasó*. Ambas son puras → se testean sin base de datos. Marten + Wolverine se montan justo sobre este par.
+> 🌱 **Semilla — los tres tipos de mensaje (no los confundas).** Desde ahora vas a manejar tres cosas distintas que es fácil mezclar. Grábate la diferencia:
+>
+> | Tipo | Qué es | Cardinalidad | ¿Se puede rechazar? | Tiempo verbal |
+> |------|--------|--------------|---------------------|---------------|
+> | **Comando** | una *intención* ("haz esto") | **1** destinatario (un handler) | **Sí** (puede fallar una regla) | imperativo: `RegistrarMatrimonio` |
+> | **Evento** | un *hecho* que ya ocurrió | **0..N** interesados | **No** (ya pasó, es irrechazable) | pasado: `PersonaCasada` |
+> | **Query** | una *pregunta* (pedir datos) | 1, devuelve resultado | n/a (no muta nada) | `ObtenerPersona` |
+>
+> El error clásico: tratar un "evento" que en realidad tiene **un solo dueño obligado** → eso era un comando disfrazado. Las **queries** las veremos a fondo en CQRS (§20); por ahora basta saber que **leer ≠ escribir**.
 
 > [!NOTE]
-> 🌱 **Semilla — ¿Y si el mismo comando llega dos veces?** Hoy, en el camino feliz, `RegistrarMatrimonio` siempre emite el evento. Pero en un sistema real un comando puede reintentarse (la red falló, el usuario hizo doble clic). Si no lo controlas, Jhon se "casa" dos veces. A la propiedad de **dar el mismo resultado aunque la operación se repita** se le llama **idempotencia**, y será clave cuando lleguemos a la mensajería (Outbox). Por ahora: que el agregado **valide su estado antes de emitir** ya es tu primera defensa.
+> 🌱 **Semilla — Acabas de escribir la función `decide`.** En la Sección 03 viste `evolve` (estado + evento → estado). Aquí `RegistrarMudanza` hace la otra mitad: **`decide`** (estado + comando → eventos). Juntas forman el **patrón Decider**, el modelo funcional del Event Sourcing: `decide` valida y *decide qué pasó*, `evolve` *aplica lo que pasó*. Ambas son puras → se testean sin base de datos. Marten + Wolverine se montan justo sobre este par.
+
+---
+
+## 🧬 Evolucionemos el código: ¿y si el comando llega dos veces?
+
+Hasta aquí, `RegistrarMatrimonio` está en el "camino feliz": **siempre** emite el evento. Probemos qué pasa en la vida real, donde un comando puede reintentarse (la red falló, el usuario hizo doble clic):
+
+```csharp
+// 🟢 Lo ingenuo (lo que tenemos ahora)
+public PersonaCasada RegistrarMatrimonio(string nombrePareja)
+{
+    return new PersonaCasada(this.Id, nombrePareja);
+}
+```
+
+```csharp
+// 💥 El dolor: el mismo comando llega dos veces
+jhon.RegistrarMatrimonio("María");   // emite PersonaCasada
+jhon.RegistrarMatrimonio("María");   // emite PersonaCasada OTRA VEZ
+// La biografía de Jhon ahora dice que se casó dos veces con María.
+// Al rehidratar, Apply(PersonaCasada) corre dos veces → estado corrupto.
+```
+
+El agregado es el **guardián de las reglas** (lo dijimos arriba). Así que la defensa nace donde debe: dentro de la `Persona`, validando su estado **antes** de emitir.
+
+```csharp
+// 🔧 El refactor: el agregado protege su invariante
+public class Persona : AggregateRoot
+{
+    public bool Casado { get; private set; }          // ← estado que ahora vigilamos
+
+    public PersonaCasada? RegistrarMatrimonio(string nombrePareja)
+    {
+        if (Casado)
+            return null;   // ya está casado: no emitimos un evento duplicado
+
+        return new PersonaCasada(this.Id, nombrePareja);
+    }
+
+    private void Apply(PersonaCasada c) { NombrePareja = c.NombrePareja; Casado = true; }
+}
+```
+
+> [!TIP]
+> 🏷️ **El nombre.** Acabas de hacer la operación **idempotente**: ejecutarla una o cinco veces produce el mismo resultado. Es tu **primera línea** de defensa (la regla en el agregado). Más adelante, en mensajería, veremos la **segunda línea**: la deduplicación por *id de mensaje* (Inbox), porque a veces ni siquiera quieres recargar el agregado para descartar un duplicado. Por ahora, recuerda: **validar el estado antes de emitir** ya te protege de los reintentos.
+
+---
+
+> [!NOTE]
+> 🌱 **Semilla — devolver el evento en vez de publicarlo: "cascading messages".** Fíjate en un detalle de estilo: `RegistrarMatrimonio` **devuelve** el evento; no lo guarda ni lo publica por su cuenta. Eso es deliberado y Wolverine lo eleva a patrón con el nombre **cascading messages**: tu handler **devuelve** los mensajes/eventos que deben ocurrir, y el framework se encarga de publicarlos. ¿Por qué importa? Porque mantiene la lógica **pura** (no inyectas el bus, no escondes envíos en el fondo del call stack) y hace evidente, leyendo el método, *qué efectos* produce. Lo veremos a fondo en el Aggregate Handler (§18).
+
+---
+
+## 🧪 Empieza a testear DESDE YA (no lo dejes para el final)
+
+`RegistrarMatrimonio` es una **función pura**: recibe el estado (eventos pasados) y un comando, y decide un evento. Eso significa que **ya puedes testearla** — sin base de datos, sin mocks, en microsegundos. Adopta el hábito desde esta sección:
+
+```csharp
+[Fact]
+public void Casar_a_un_soltero_emite_PersonaCasada()
+{
+    // Given: la historia previa de Jhon
+    var jhon = new Persona(new object[] { new PersonaNacida("Jhon", new DateTime(1990,5,10), "Bogotá") });
+
+    // When: ejecutamos la decisión
+    var evento = jhon.RegistrarMatrimonio("María");
+
+    // Then: el hecho esperado
+    evento.Should().BeOfType<PersonaCasada>();
+}
+
+[Fact]
+public void Casar_a_alguien_ya_casado_no_emite_nada()  // protege la invariante (idempotencia, arriba)
+{
+    var jhon = new Persona(new object[]
+    {
+        new PersonaNacida("Jhon", new DateTime(1990,5,10), "Bogotá"),
+        new PersonaCasada(idJhon, "María")
+    });
+
+    jhon.RegistrarMatrimonio("Ana").Should().BeNull();
+}
+```
+
+> [!TIP]
+> 🌱 Este patrón **Given → When → Then** (historia previa → ejecutar → verificar el evento) será tu forma de testear todo el workshop. No esperes a una "fase de testing": cada vez que escribas un `decide` o un `evolve`, **escribe su test al lado**. Lo profundizamos en §21 (incluida la base `CommandHandlerTestBase` de Cosmos), pero el hábito empieza aquí.
 
 ---
 

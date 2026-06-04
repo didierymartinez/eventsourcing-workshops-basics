@@ -67,22 +67,22 @@ Escribir eso a mano en 50 handlers es repetitivo y propenso a olvidar la versió
 Wolverine + Marten generan el ritual cargar/guardar por ti. Tú escribes **solo el `decide`**, y devuelves los eventos:
 
 ```csharp
-public record AprobarOrden(Guid OrdenId, string AprobadorId);
+public record RegistrarMatrimonio(Guid PersonaId, string Pareja);
 
-public static class AprobarOrdenHandler
+public static class RegistrarMatrimonioHandler
 {
     // [Aggregate] le dice a Wolverine: carga este agregado con FetchForWriting
     // (captura la versión esperada para concurrencia optimista)
-    public static IEnumerable<object> Handle(AprobarOrden cmd, [Aggregate] Orden orden)
+    public static IEnumerable<object> Handle(RegistrarMatrimonio cmd, [Aggregate] Persona persona)
     {
-        if (orden.Aprobada) yield break;          // regla de negocio (decide)
-        yield return new OrdenAprobada(cmd.OrdenId, cmd.AprobadorId); // evento emitido
+        if (persona.Casado) yield break;                       // regla de negocio (decide)
+        yield return new PersonaCasada(cmd.PersonaId, cmd.Pareja); // evento emitido
     }
 }
 ```
 
 ¿Qué hace Wolverine automáticamente alrededor de esa función pura?
-1. **Carga** la `Orden` con `session.Events.FetchForWriting<Orden>(cmd.OrdenId)` — que reproduce los eventos **y captura la versión esperada**.
+1. **Carga** la `Persona` con `session.Events.FetchForWriting<Persona>(cmd.PersonaId)` — que reproduce los eventos **y captura la versión esperada**.
 2. Ejecuta tu `Handle` (el `decide`).
 3. **Appendea** los eventos que devolviste al stream.
 4. Hace `SaveChangesAsync` en una transacción; si la versión cambió entre tanto → **`ConcurrencyException`** (la concurrencia optimista que sembramos), con reintento configurable.
@@ -94,15 +94,15 @@ public static class AprobarOrdenHandler
 Cuando el agregado aún no existe (primer evento), no usas `[Aggregate]`; devuelves un side-effect que inicia el stream:
 
 ```csharp
-public static (CreationResponse, IStartStream) Handle(CrearOrden cmd)
+public static (CreationResponse, IStartStream) Handle(RegistrarPersona cmd)
 {
-    var creada = new OrdenCreada(cmd.OrdenId, cmd.Proveedor, cmd.Total);
-    var start  = MartenOps.StartStream<Orden>(cmd.OrdenId, creada); // side-effect puro
-    return (new CreationResponse(cmd.OrdenId), start);
+    var nacio = new PersonaNació(cmd.PersonaId, cmd.Nombre, cmd.Ciudad);
+    var start = MartenOps.StartStream<Persona>(cmd.PersonaId, nacio); // side-effect puro
+    return (new CreationResponse(cmd.PersonaId), start);
 }
 ```
 
-Y para responder con el estado ya actualizado (incluyendo los eventos recién emitidos), Marten ofrece `FetchLatest<Orden>(id)`.
+Y para responder con el estado ya actualizado (incluyendo los eventos recién emitidos), Marten ofrece `FetchLatest<Persona>(id)`.
 
 ---
 
@@ -116,6 +116,9 @@ La plantilla de Cosmos (`Cosmos.BuildingBlocks`, Sección 17) expone **ambos** e
 > Regla práctica (alineada a la best-practice de Wolverine): **handler delgado, lógica pura en el agregado**. Si tu handler crece en `if`s e llamadas a servicios, casi siempre la lógica debería estar en el `decide` del agregado, no en el handler.
 
 ---
+
+> [!NOTE]
+> 🌱 **Semilla — ¿y cuando un proceso cruza varios agregados?** El Aggregate Handler asume **un comando → un agregado** (la frontera transaccional, §08/CONCEPTOS-PROFUNDO). Pero algunos procesos de negocio abarcan varios pasos y agregados a lo largo del tiempo: *aprovisionar un tenant* (crear cuenta → aprovisionar infra → notificar) es el caso real de Cosmos. Para coordinar eso **sin** una transacción gigante existe la **saga** (o *process manager*): una máquina de estados que reacciona a eventos, emite los siguientes comandos, y si algo falla aplica **compensaciones** (no *rollback*, sino "deshacer con un nuevo evento"). Wolverine + Marten las soportan nativamente. Guárdalo: cuando un caso de uso "no cabe" en un solo agregado, probablemente es una saga.
 
 ### El Descubrimiento
 El patrón Decider (`decide` + `evolve`) es el modelo mental; el Aggregate Handler Workflow es su forma productiva en el Critter Stack. Ahora cuando escribas `[Aggregate]` y devuelvas eventos, no es un truco: es **el ritual cargar/decidir/guardar que ya construiste a mano**, generado y con concurrencia optimista incluida.

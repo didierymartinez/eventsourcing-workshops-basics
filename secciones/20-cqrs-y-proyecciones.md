@@ -6,7 +6,7 @@
 
 Para saber si Jhon está casado, `AggregateStreamAsync` reproduce su stream completo. Para **un** agregado, perfecto. Pero el negocio pregunta cosas como:
 
-- *"Dame el listado de las 100 órdenes pendientes ordenadas por monto."*
+- *"Dame el listado de las personas casadas este mes, ordenadas por ciudad."*
 - *"¿Cuántos matrimonios hubo por ciudad este año?"*
 
 Responder eso reproduciendo **todos los streams de todas las personas** cada vez sería absurdo. El log de eventos es excelente para **escribir** y para **reconstruir un agregado**, pero pésimo para **consultas arbitrarias**.
@@ -57,23 +57,25 @@ Un proceso aparte —el **Async Daemon** de Marten— va leyendo los eventos nue
 
 ## Single-stream vs Multi-stream
 
-- **Single-stream projection:** la vista resume **un** stream (ej. el estado actual de **una** orden). Suele usarse como **snapshot** del agregado.
+- **Single-stream projection:** la vista resume **un** stream (ej. el estado actual de **una** persona). Suele usarse como **snapshot** del agregado.
 - **Multi-stream projection:** la vista combina eventos de **muchos** streams (ej. "matrimonios por ciudad" cruza miles de personas). Marten las coordina en el daemon.
 
 También existen las **flat-table projections** (proyectar a una tabla relacional plana para reporting con SQL puro).
 
 ```csharp
-// Esbozo conceptual de una proyección de un solo stream (snapshot de la Orden)
-public class OrdenResumen
+// Esbozo conceptual de una proyección de un solo stream (snapshot de la Persona)
+public class PersonaResumen
 {
     public Guid Id { get; set; }
-    public string Estado { get; set; }
-    public decimal Total { get; set; }
+    public string Nombre { get; set; }
+    public string Ciudad { get; set; }
+    public bool Casado { get; set; }
 
-    public void Apply(OrdenCreada e)  { Id = e.OrdenId; Estado = "Creada"; Total = e.Total; }
-    public void Apply(OrdenAprobada e){ Estado = "Aprobada"; }
+    public void Apply(PersonaNació e)   { Id = e.PersonaId; Nombre = e.Nombre; Ciudad = e.Ciudad; }
+    public void Apply(PersonaCasada e)  { Casado = true; }
+    public void Apply(PersonaMudada e)  { Ciudad = e.NuevaCiudad; }
 }
-// Registro: options.Projections.Add<OrdenResumenProjection>(ProjectionLifecycle.Async);
+// Registro: options.Projections.Add<PersonaResumenProjection>(ProjectionLifecycle.Async);
 ```
 
 > [!NOTE]
@@ -87,7 +89,7 @@ En `Cosmos.BuildingBlocks`:
 - `Cosmos.EventSourcing.Abstractions/Queries/IProjectionStore.cs` — contrato del lado lectura.
 - `Cosmos.EventSourcing.CritterStack/Queries/MartenProjectionStore.cs` — implementación.
 - `WolverineQueryRouter` — enruta las queries (espejo del `WolverineCommandRouter`).
-- `Cosmos.EventSourcing.Linq.Extensions/QueryableExtensions.cs` — consultas LINQ sobre los read models (`session.Query<OrdenResumen>().Where(...)`).
+- `Cosmos.EventSourcing.Linq.Extensions/QueryableExtensions.cs` — consultas LINQ sobre los read models (`session.Query<PersonaResumen>().Where(...)`).
 
 ---
 

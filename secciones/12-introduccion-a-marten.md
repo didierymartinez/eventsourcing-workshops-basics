@@ -196,6 +196,32 @@ public class Persona : AggregateRoot
 
 ---
 
+## 🔬 Cómo lo hace Marten por dentro (que no sea una caja negra)
+
+No es magia: es tu `InMemoryEventStore`, pero contra Postgres. Esto es lo que ocurre realmente:
+
+**1. El esquema que crea en Postgres.** Marten genera (entre otras) dos tablas:
+- `mt_events` — **una fila por evento**: el `data` en **JSONB**, más metadatos: `stream_id`, `version` (orden dentro del stream), `seq_id` (orden global), `timestamp` y el **nombre del tipo** del evento. *(Es tu `EventoAlmacenado`, pero en una tabla.)*
+- `mt_streams` — **una fila por stream**: su `id`, su `version` actual y el tipo de agregado. *(Es la "tapa" del cajón que en RAM era la llave del diccionario.)*
+
+**2. Al hacer `StartStream`/`Append`.** Inserta filas en `mt_events` con la `version` incrementada, dentro de una **transacción**. `SaveChangesAsync()` hace el `COMMIT`.
+
+**3. Al rehidratar (`AggregateStreamAsync<Persona>`).**
+```
+SELECT data, type, version FROM mt_events WHERE stream_id = @id ORDER BY version
+   → deserializa cada JSON a su tipo (por el nombre de tipo guardado)
+   → crea una Persona vacía (constructor sin parámetros)
+   → le aplica cada evento llamando tus métodos Apply(...)   ← tu mismo 'evolve'
+```
+La diferencia de rendimiento con tu versión: en vez de `dynamic`, Marten **compila** ese "llamar al `Apply` correcto por tipo" (delegados generados), así que el replay es rápido aun con millones de eventos.
+
+**4. Concurrencia optimista.** Al guardar, compara la `version` esperada del stream con la que hay en `mt_streams`; si otro escribió primero, **`ConcurrencyException`** (lo que tú hacías a mano en §06).
+
+> [!TIP]
+> Esto lo puedes **ver**: conéctate a Postgres y haz `SELECT * FROM mt_events;` — ahí están tus eventos como JSON. Marten no esconde nada; solo te ahorró escribir el SQL, la serialización y el control de versión.
+
+---
+
 ### El Descubrimiento
 
 Con tres cambios quirúrgicos hemos pasado de un diccionario en RAM a una base de datos empresarial lista para producción:
@@ -209,6 +235,34 @@ El resto — serialización JSON, transacciones ACID, control de versiones, tabl
 **¿Pero en un sistema real, cómo le llegan los Comandos a los Handlers? ¿Tiene que existir un endpoint HTTP que instancie al Handler manualmente?**
 
 En sistemas de alta escala, los Comandos se envían a través de un **Bus de Mensajes interno** que enruta cada Comando a su Handler correcto de forma desacoplada. Para eso necesitamos al siguiente actor de nuestro workshop: **Wolverine**.
+
+---
+
+## 📚 Panorama: ¿qué hace Marten (y se puede usar sin Wolverine)?
+
+> Duda natural a esta altura. Respuesta corta: **sí, Marten funciona solo** — es una librería independiente. Esta sección usó Marten "puro" (`IDocumentSession`), sin Wolverine. Wolverine recién entra en §13 y es **otro** paquete (la integración es `WolverineFx.Marten`).
+
+**La identidad (el `Id`).** Marten exige un `Id` por documento/agregado. Soporta `Guid`, `string`, `int`, `long` o `Guid` secuencial (Comb, mejor para índices). El id del **stream** puede ser `Guid` (lo normal) o `string` (*natural keys*, ej. una cédula). Es la clave que agrupa el stream y las proyecciones.
+
+**¿"Descubrimiento"? Ojo, son dos cosas:**
+- El **descubrimiento de *handlers*** (mapear comando→handler escaneando el ensamblado) **es de Wolverine, NO de Marten**.
+- Lo que Marten gestiona es el **esquema** (`AutoCreateSchemaObjects` crea/actualiza `mt_events`, `mt_streams`, tablas de documentos) y necesita que le **registres los tipos de evento** (`AddEventType<…>()`) para deserializar el JSON — no los adivina.
+
+**Qué hace Marten (dos caras):**
+
+| Como base documental | Como event store |
+|---|---|
+| Guardar/cargar por Id | Append y rehidratación de streams |
+| Consultas **LINQ** sobre JSON | **Proyecciones**: inline / live / **async daemon** |
+| **Índices** (computados, GIN), full-text | **Multi-stream** projections |
+| Concurrencia optimista de documentos | **Subscriptions** (reaccionar a eventos) |
+| Soft deletes, **patching**, batch/compiled queries | **Versionado/upcasting** (§19), **archiving** |
+| Multi-tenancy (incl. DB por tenant) | Concurrencia optimista por versión de stream |
+
+*Transversal:* gestión de **esquema y migraciones**, **diagnósticos + OpenTelemetry**, configuración de serialización.
+
+> [!TIP]
+> En una frase: **Marten = PostgreSQL como base documental + event store de producción**, con consultas, índices, proyecciones y multi-tenancy — **sin** Wolverine. Wolverine solo añade la capa de *mensajería/runtime* (enrutar, descubrir handlers, Outbox/Inbox). Puedes tener Marten solo; entonces el enrutamiento y la transacción por handler los cableas tú (como en §08).
 
 ---
 

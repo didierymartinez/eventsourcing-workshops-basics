@@ -33,8 +33,40 @@ public record EventoAlmacenado(
 > [!NOTE]
 > La `Version` es crucial: garantiza que, aunque miles de eventos lleguen al almacén al mismo tiempo, siempre conserven su estricto orden cronológico dentro de su propia biografía. En la industria, a esto se le conoce como **Control de Concurrencia Optimista**.
 
-> [!NOTE]
-> 🌱 **Semilla — ¿Qué pasa si dos procesos editan a Jhon a la vez?** Ambos leen la versión 5, ambos intentan escribir la versión 6 → colisión. El control **optimista** asume que esto es raro: al guardar, verifica que la versión esperada siga vigente; si no, lanza una **`ConcurrencyException`** y tú **recargas y reintentas**. No bloquea (a diferencia del pesimista). Marten implementa esto con `FetchForWriting`, y lo veremos a fondo más adelante. Por ahora: la `Version` no es solo orden, es tu **detector de conflictos**.
+### 🧬 Evolucionemos: ¿y si dos procesos editan a Jhon a la vez?
+
+Nuestro `AppendEvent` actual mete el sobre al cajón sin preguntar nada. Veamos el dolor:
+
+```csharp
+// 💥 Dos procesos concurrentes trabajan sobre el mismo Jhon
+// Proceso A lee a Jhon: última versión = 5
+// Proceso B lee a Jhon: última versión = 5  (al mismo tiempo)
+procesoA.AppendEvent(new EventoAlmacenado(idJhon, Version: 6, ..., new MudanzaRealizada("Madrid")));
+procesoB.AppendEvent(new EventoAlmacenado(idJhon, Version: 6, ..., new MatrimonioRegistrado("Ana")));
+// Ambos creyeron ser la versión 6. Uno pisa al otro: un cambio se PIERDE en silencio (lost update).
+```
+
+La `Version` que añadimos no sirve de nada si nadie la verifica. El arreglo: que el almacén **rechace** un append cuya versión esperada ya no esté vigente.
+
+```csharp
+// 🔧 El almacén valida la versión esperada antes de aceptar
+public void AppendEvent(EventoAlmacenado evento)
+{
+    var cajon = _storage.GetValueOrDefault(evento.AggregateId) ?? new();
+    var versionActual = cajon.LastOrDefault()?.Version ?? 0;
+
+    if (evento.Version != versionActual + 1)
+        throw new ConcurrencyException(
+            $"Se esperaba escribir la versión {versionActual + 1}, pero llegó la {evento.Version}. " +
+            "Alguien más escribió primero: recarga y reintenta.");
+
+    cajon.Add(evento);
+    _storage[evento.AggregateId] = cajon;
+}
+```
+
+> [!TIP]
+> 🏷️ **El nombre.** Esto es **control de concurrencia optimista**: asumimos que los conflictos son raros, no bloqueamos; solo al guardar verificamos la versión y, si chocó, **fallamos y reintentamos** (recargar → reaplicar → reintentar). En producción no lo escribes a mano: Marten lo hace con **`FetchForWriting`** (lo veremos en §18). Pero ahora sabes que la `Version` no es decorativa: es tu **detector de conflictos**.
 
 ---
 

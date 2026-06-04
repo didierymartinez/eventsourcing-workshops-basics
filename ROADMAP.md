@@ -13,10 +13,11 @@
 
 | Estado | Sección | Concepto núcleo |
 |--------|---------|-----------------|
+| ✅ | [**El mapa de contextos (dentro/fuera)**](./secciones/01b-mapa-de-contextos.md) | Bounded Context + 2º BC (Registro Civil) como encuadre temprano |
 | ✅ | Inmutabilidad y Records | shallow vs deep, `readonly record struct` *(ampliar)* |
 | ✅ | Interfaces vs Clases Abstractas | + default interface methods (C# 8), composición > herencia *(ampliar)* |
 | 🧩 | **Genéricos y restricciones (`where T`)** | base de `GetAggregateRootAsync<T>` y discovery |
-| 🧩 | **Delegados, `Func`/`Action` y composición** | semilla del middleware (pipeline = composición) |
+| ✅ | [**Delegados, `Func`/`Action` y composición → Middleware**](./secciones/23-de-codigo-repetido-a-middleware.md) | arco naive→refactor: del código repetido al pipeline |
 | 🧩 | **SOLID en ejemplos reales** | DIP y OCP como columna vertebral |
 | ✅ | Polimorfismo y dispatch | `switch` tipado **primero**, `dynamic` con sus costos *(replantear)* |
 
@@ -42,6 +43,7 @@
 | ✅ | Event Store en memoria | + **concurrencia optimista (`Version`)** *(ampliar)* |
 | ✅ | Emitir eventos / Command Handler | cargar → actuar → guardar |
 | ✅ | Docker + PostgreSQL (JSONB) | persistencia real |
+| ✅ | [**Por qué adoptar herramientas (Critter Stack)**](./secciones/11b-por-que-adoptar-herramientas.md) | necesidad + claridad: qué hacen Marten/Wolverine y cómo (anti-cargo-cult) |
 | ✅ | Introducción a Marten | el bibliotecario experto |
 | ✅ | [Wolverine](./secciones/13-wolverine.md) | bus interno + integración Marten |
 | ✅ | [Outbox transaccional](./secciones/14-outbox.md) | + **Inbox** + **idempotencia** *(ampliar)* |
@@ -55,7 +57,11 @@
 | 💡 | Idempotencia + Dead Letter Queues | reentregas, dedup, fallos repetidos |
 | 💡 | Snapshots (single-stream projections) | optimizar replays largos |
 | 💡 | Subscriptions / Event forwarding | reaccionar a eventos ya guardados |
+| ✅ | [**Anti-Corruption Layer**](./secciones/24-anti-corruption-layer.md) | evento público → comando interno; validar + traducir; público vs privado |
+| ✅ | [**Envelope y contexto** (+ por qué no en memoria)](./secciones/25-envelope-y-contexto.md) | payload vs sobre; tenant/usuario en el envelope; in-memory = sin contexto |
+| ✅ | [**Dos Bounded Contexts hablando**](./secciones/26-dos-bounded-contexts.md) | dentro vs fuera con un 2º BC (Registro Civil); junta integration+ACL+Envelope |
 | 💡 | Sagas / procesos largos | coordinación entre agregados + compensación |
+| 💡 | Multi-tenancy de punta a punta | `InvokeForTenantAsync`, FIFO por tenant, aislamiento (Cosmos) |
 | 💡 | Azure Service Bus a fondo | FIFO por tenant, dead-letter, forwarding |
 | 💡 | Archiving / Compacting / GDPR | operación y cumplimiento del event store |
 | 💡 | Observabilidad (OpenTelemetry) | trazas en EDA |

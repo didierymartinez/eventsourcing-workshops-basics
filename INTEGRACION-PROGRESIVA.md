@@ -48,7 +48,8 @@ Las ediciones concretas de cada sección se registran aquí a medida que se hace
 
 | Sección | Semillas añadidas |
 |---------|-------------------|
-| §01 El diario de Jhon | 🌱 Domain vs Integration events ("¿quién necesita enterarse?") |
+| §01 El diario de Jhon | 🌱 Domain vs Integration events ("¿quién necesita enterarse?") → enlaza a §01b |
+| §01b El mapa de contextos | 🟢 **Encuadre temprano**: Bounded Context + 2º BC (Registro Civil) + dentro/fuera, anticipando §14/§24/§25/§26 |
 | §03 Vivir el pasado | 🌱 Event versioning (eventos eternos) · 🌱 `evolve` como función pura (Decider) |
 | §04 Refactorizando el motor | 🌱 Aggregate Handler Workflow (Marten/Wolverine automatizan este motor) |
 | §06 El almacén en memoria | 🌱 Concurrencia optimista (conflicto → `ConcurrencyException`/reintento) · 🌱 Proyecciones/CQRS (el estado es una vista) |
@@ -67,3 +68,24 @@ Las ediciones concretas de cada sección se registran aquí a medida que se hace
 | §13 Wolverine | 🌱 Middleware = composición de funciones (delegados/closures) + codegen |
 
 **✅ Cobertura completa:** las 14 secciones del workshop principal tienen sembrados los conceptos avanzados desde temprano. Lo que queda es **escribir las secciones 🧩 dedicadas** del [ROADMAP](./ROADMAP.md) donde cada concepto se **domina** (Decider+Aggregate Handler, Event Versioning, CQRS/proyecciones, Testing, Reflexión-vs-codegen, etc.).
+
+---
+
+## 🐺 Espiral de conceptos propios de Wolverine
+
+Conceptos que aparecen en la documentación de Wolverine y que también se siembran desde temprano (no solo al final):
+
+| Concepto Wolverine | 🌱 Semilla | 🌳 Domina |
+|---|---|---|
+| **A-Frame / Vertical Slice** (lógica pura al centro, infra a los bordes, call stacks cortos) | §02 (cómo leer) — filosofía guía | §nueva / best-practices |
+| **Cascading messages** (el handler *devuelve* mensajes; el framework los publica) | §07 (ya devuelves el evento) | §18 Aggregate Handler |
+| **Railway / manejo de errores** (éxito/fallo como flujo, no try/catch ciego) | §08 (al introducir el handler) | §nueva Railway |
+| **Method injection vs constructor injection** (Wolverine prefiere por método) | §10 (DI) | best-practices |
+| **Dead Letter Queue** (mensajes que fallan repetidamente) | §14 (Outbox/mensajería) | §nueva DLQ |
+| **Idempotencia en mensajería** | §07/§14 (ya) | §14 |
+| **Sagas / process managers** (coordinar varios agregados, compensación) | §18 (un comando = un agregado → ¿y si son varios?) | §nueva Sagas |
+| **Multi-tenancy** (`InvokeForTenantAsync`, FIFO por tenant) | §17 (ya) / CONCEPTOS-PROFUNDO | §25 Envelope / §nueva |
+| **Anti-Corruption Layer** (evento público → comando interno) | §14 (semilla) | ✅ §24 |
+| **Envelope / contexto** (payload vs sobre; in-memory sin contexto) | §10 (TenantId DEFAULT) / §14 | ✅ §25 |
+
+**Estado:** semillas de Wolverine plantadas en §02, §07, §08, §10, §14, §18 (esta pasada). Las secciones que las *dominan* (Railway, DLQ, Sagas, Multi-tenancy) entran al ROADMAP como 🧩/💡.

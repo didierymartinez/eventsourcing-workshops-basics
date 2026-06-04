@@ -26,28 +26,27 @@ El agregado no toca infraestructura, así que se testea instanciándolo y verifi
 
 ```csharp
 [Fact]
-public void Aprobar_una_orden_pendiente_emite_OrdenAprobada()
+public void Registrar_matrimonio_de_soltero_emite_PersonaCasada()
 {
-    // Given: la orden ya fue creada
-    var orden = new Orden();
-    orden.Load(new object[] { new OrdenCreada(id, "ACME", 1000m) }); // rehidratar (evolve)
+    // Given: Jhon ya nació
+    var jhon = new Persona();
+    jhon.Load(new object[] { new PersonaNació(id, "Jhon", "Bogotá") }); // rehidratar (evolve)
 
-    // When: la aprobamos
-    var evento = orden.Aprobar("user-1"); // decide
+    // When: lo casamos
+    var evento = jhon.RegistrarMatrimonio("María"); // decide
 
     // Then: el hecho correcto
-    evento.Should().BeOfType<OrdenAprobada>();
+    evento.Should().BeOfType<PersonaCasada>();
 }
 
 [Fact]
-public void Aprobar_una_orden_ya_aprobada_falla()
+public void Registrar_matrimonio_de_ya_casado_no_emite_nada()
 {
-    var orden = new Orden();
-    orden.Load(new object[] { new OrdenCreada(id, "ACME", 1000m), new OrdenAprobada(id, "user-1") });
+    var jhon = new Persona();
+    jhon.Load(new object[] { new PersonaNació(id, "Jhon", "Bogotá"), new PersonaCasada(id, "María") });
 
-    // La invariante se protege: no se puede aprobar dos veces
-    var act = () => orden.Aprobar("user-2");
-    act.Should().Throw<InvalidOperationException>();
+    // La invariante se protege: no se puede casar dos veces (idempotencia, §07)
+    jhon.RegistrarMatrimonio("Ana").Should().BeNull();
 }
 ```
 
@@ -60,23 +59,23 @@ Sin mocks. Sin base de datos. Microsegundos por test.
 El handler sí orquesta (carga/guarda), pero no necesitas Postgres: usas un **event store en memoria de prueba**. La plantilla de Cosmos lo trae listo en `Cosmos.EventSourcing.Testing.Utilities` con la clase base **`CommandHandlerTestBase`**:
 
 ```csharp
-public class AprobarOrdenHandlerTests : CommandHandlerTestBase
+public class RegistrarMatrimonioHandlerTests : CommandHandlerTestBase
 {
     [Fact]
-    public async Task Aprobar_emite_evento_publico()
+    public async Task Casar_a_Jhon_emite_PersonaCasada()
     {
         // Given: historia previa en el TestStore
-        Given(new OrdenCreada(AggregateId, "ACME", 1000m));
+        Given(new PersonaNació(GuidAggregateId, "Jhon", "Bogotá"));
 
         // When: ejecuto el handler real
-        var handler = new AprobarOrdenHandler(EventStore);
-        await handler.HandleAsync(new AprobarOrden(GuidAggregateId, "user-1"), default);
+        var handler = new RegistrarMatrimonioHandler(EventStore);
+        await handler.HandleAsync(new RegistrarMatrimonio(GuidAggregateId, "María"), default);
 
         // Then: el evento esperado fue emitido
-        Then(new OrdenAprobada(AggregateId, "user-1"));
+        Then(new PersonaCasada(GuidAggregateId, "María"));
 
         // And: (opcional) el estado proyectado quedó así
-        And<Orden, bool>(o => o.Aprobada, true);
+        And<Persona, bool>(p => p.Casado, true);
     }
 }
 ```
@@ -102,13 +101,13 @@ Una proyección (§20) también es determinista: dados unos eventos, produce una
 
 ```csharp
 [Fact]
-public void Resumen_refleja_el_estado_tras_aprobar()
+public void Resumen_refleja_el_estado_tras_casarse()
 {
-    var resumen = new OrdenResumen();
-    resumen.Apply(new OrdenCreada(id, "ACME", 1000m));
-    resumen.Apply(new OrdenAprobada(id, "user-1"));
+    var resumen = new PersonaResumen();
+    resumen.Apply(new PersonaNació(id, "Jhon", "Bogotá"));
+    resumen.Apply(new PersonaCasada(id, "María"));
 
-    resumen.Estado.Should().Be("Aprobada");
+    resumen.Casado.Should().BeTrue();
 }
 ```
 

@@ -186,6 +186,9 @@ Acabamos de abstraer la intermediación de acciones únicas. Nuestro **Aggregate
 > [!NOTE]
 > 🌱 **Semilla — Por qué este diseño es un regalo para los tests.** Fíjate en la repartición: el **agregado** (`Persona`) tiene la lógica pura (`decide`/`evolve`, sin I/O) y el **handler** es una capa delgada que orquesta cargar→actuar→guardar. Eso significa que puedes testear toda tu lógica de negocio **sin mocks ni base de datos**: le das eventos pasados (*Given*), ejecutas un comando (*When*), y verificas los eventos emitidos (*Then*). La best-practice oficial de Wolverine lo dice explícitamente: *prefiere funciones puras y evita los mocks*. Más adelante verás que la plantilla de Cosmos trae un `CommandHandlerTestBase` con exactamente este estilo Given-When-Then.
 
+> [!NOTE]
+> 🌱 **Semilla — los errores no van con `try/catch` por todos lados.** Cuando un handler falla (la regla no se cumple, la red cae), tu instinto es llenar el método de `try/catch`. Eso ensucia la lógica y la oculta. Dos enfoques mejores que veremos: (1) **Railway programming** — tratar el resultado como "éxito o fallo" que fluye por el sistema (en vez de excepciones para todo), un estilo que Wolverine soporta de forma ligera; y (2) **políticas de manejo de errores** del framework — Wolverine recomienda *"apoyarte en sus políticas de reintento/error"* en vez de capturar excepciones a mano, lo que te da reintentos, *circuit breakers* y observabilidad gratis. Por ahora: que tu handler **exprese la regla**, no que se ahogue en manejo de errores.
+
 Pero todavía hay una fragilidad enorme de la que tenemos que hacernos cargo: si el servidor se apaga, todo desaparece. En la siguiente sección, enfrentaremos el mundo real: persistencia e I/O.
 
 ---

@@ -2,6 +2,9 @@
 
 > Aquí se junta todo. `Cosmos.BuildingBlocks` es la **plantilla** sobre la que se construyen los productos del ERP (Órdenes de Compra, Obligaciones por Pagar, Contabilidad…). Esta guía tiene dos objetivos: (1) **entender su anatomía** y (2) darte la **receta productiva** para crear un Bounded Context nuevo sin reinventar nada. Filosofía: ya construiste a mano el motor (Secciones 1-16); aquí ves el motor de producción ya ensamblado.
 
+> [!NOTE]
+> 🔀 **Cambio de hilo (a propósito).** Hasta aquí el ejemplo fue **Jhon / Biografías**. A partir de esta sección saltamos a un **producto real de Cosmos** (`OrdenDeCompra`) para que veas el patrón en su hábitat. No es un ejemplo nuevo: es **exactamente lo mismo que ya dominas** con `Persona` —agregado, eventos, comando, handler— aplicado a un dominio del ERP. Si en algún punto te pierdes, traduce mentalmente `OrdenDeCompra` ↔ `Persona`.
+
 ---
 
 ## 🎯 Lo que la plantilla te resuelve (y por qué existe)

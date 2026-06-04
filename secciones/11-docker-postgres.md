@@ -109,4 +109,4 @@ Bienvenido al corazón de Sincosoft Cosmos. ¡Pasa a la siguiente sección para 
 
 [⬅️ Volver a la sección anterior](./10-inyeccion-de-dependencias.md)
 
-[➡️ Siguiente sección: El Bibliotecario Experto (Introducción a Marten)](./12-introduccion-a-marten.md)
+[➡️ Siguiente sección: El momento de adoptar herramientas (Marten + Wolverine)](./11b-por-que-adoptar-herramientas.md)
