@@ -15,6 +15,9 @@ Una semilla **no debe quedarse en una caja de texto** si el concepto se puede **
 
 > El hilo conductor manda: cada concepto nuevo **mueve el mismo ejemplo un paso adelante**, no abre un ejemplo de juguete aparte.
 
+> [!IMPORTANT]
+> 🧭 **Este principio también aplica a paradigmas y tecnologías, no solo a patrones de código.** EDA, Marten, Wolverine, CQRS… **nunca** se introducen como una "tecnología adoptada" en una caja al final de un concepto. Siempre: **revelar la necesidad primero** (el intento ingenuo y su dolor) **y después la nueva implementación**. Ejemplos en el workshop: §11b (por qué adoptar Marten/Wolverine, tras sufrir el motor a mano), §26 (EDA nace del dolor de la llamada síncrona entre contextos). Si un paradigma aparece sin que el lector haya *sentido* por qué lo necesita, está mal ubicado.
+
 ### Estado de conversión (semilla-texto → arco-de-código)
 | Concepto | Antes | Ahora |
 |---|---|---|

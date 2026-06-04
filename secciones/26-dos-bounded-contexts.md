@@ -12,6 +12,43 @@ Decir *"evento privado vs público"* en abstracto confunde. La pregunta correcta
 
 Cuando Jhon se casa, **algo tiene que pasar en los dos**: Biografías actualiza el estado de Jhon, y el Registro Civil debe inscribir el matrimonio. Pero son **equipos, repos y bases de datos distintos**. ¿Cómo se enteran?
 
+### 🟢 El intento ingenuo: que Biografías llame al Registro Civil
+
+Lo primero que se nos ocurre: cuando Jhon se casa, Biografías **llama directamente** a la API del Registro Civil.
+
+```csharp
+// En el handler de Biografías, tras casar a Jhon:
+jhon.RegistrarMatrimonio("María");
+await registroCivilApi.InscribirMatrimonio(jhon.Id, "María", DateOnly.FromDateTime(DateTime.Today)); // 😬
+```
+
+### 💥 El dolor
+
+Esa sola línea acopla los dos contextos de tres formas:
+- **Acoplamiento de conocimiento:** Biografías ahora *conoce* al Registro Civil (su URL, su API, su forma). Justo lo que el Bounded Context quería evitar. ¿Y si mañana Notificaciones y Estadísticas también quieren enterarse? Biografías tendría que llamarlos a **todos**.
+- **Acoplamiento temporal:** si el Registro Civil está caído, **el matrimonio en Biografías falla**. Un problema ajeno tumba tu operación.
+- **Responsabilidad invertida:** Biografías tendría que saber *qué hace* el Registro Civil con el dato. No es asunto suyo.
+
+### 🔧 La vuelta: anunciar un hecho y olvidarse
+
+¿Y si Biografías **no llama a nadie**, solo **anuncia que algo pasó** y sigue con su vida?
+
+```csharp
+// Biografías: "esto ocurrió". Punto. No sé ni me importa quién escucha.
+publicar(new MatrimonioCelebrado(jhon.Id, "María", hoy));
+```
+
+Quien necesite reaccionar (Registro Civil, Notificaciones, quien sea) **se suscribe** a ese hecho y actúa a su ritmo. Biografías no conoce a nadie; si un consumidor está caído, procesará el hecho cuando vuelva, sin afectar a Biografías.
+
+### 🏷️ El nombre: Event-Driven Architecture (EDA)
+
+Eso es **EDA**: en vez de *ordenar* a otros qué hacer (llamadas), **anuncias hechos** (eventos) y dejas que **0..N interesados** reaccionen, **desacoplados en conocimiento y en tiempo**. No la adoptamos por moda — la necesitamos en el instante en que *un hecho cruza la frontera y otros deben reaccionar*, porque la alternativa síncrona acopla todo.
+
+> [!NOTE]
+> 🧭 **Cuándo NO es EDA.** EDA es para **notificar hechos** (push: "ya pasó esto"). Si lo que necesitas es **pedir un dato ahora** (pull: "dame el saldo actual"), eso es una **query síncrona**, no un evento. No todo cruce de frontera es EDA: reaccionar a hechos sí; consultar datos no.
+
+Con EDA en la cabeza, así se ve la comunicación completa (y por fin el bus tiene sentido):
+
 ```mermaid
 graph LR
     subgraph BC_A["BC-A · Biografías"]
@@ -20,7 +57,7 @@ graph LR
         AGG_A -- "evento de INTEGRACIÓN" --> PUB["MatrimonioCelebrado<br/>(IPublicEvent)"]
     end
 
-    PUB == "viaja por la cola<br/>(Outbox + Envelope)" ==> ACL
+    PUB == "se anuncia al bus<br/>(Outbox + Envelope)" ==> ACL
 
     subgraph BC_B["BC-B · Registro Civil"]
         ACL["Anti-Corruption Layer<br/>valida + traduce"] --> CMD_B["Comando interno:<br/>InscribirMatrimonio"]
