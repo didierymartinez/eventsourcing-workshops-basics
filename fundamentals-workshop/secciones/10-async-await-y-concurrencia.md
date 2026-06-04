@@ -59,9 +59,13 @@ La palabra `await` significa *"Haz que este cocinero atienda otras cosas, y pon 
 
 Como en Event Sourcing TODO tu sistema se basa en comunicarse con EventStores en Bases de Datos y lanzar eventos por Bus de Mensajes:
 
-1. Nunca uses `.Result` o `.Wait()` en código asíncrono. ¡Es obligar al cocinero a congelarse esperando que vibre el aparato, matando todo el propósito!
+1. Nunca uses `.Result` o `.Wait()` en código asíncrono. Vuelves a **congelar el hilo** esperando — y bajo carga **agotas el pool de hilos** y la app se cae (*thread starvation*). (En apps de UI o ASP.NET clásico, además, causa un **deadlock** clásico por el contexto de sincronización.) La regla: **async hasta arriba**, sin bloquear.
 2. Todo lo que toque Infraestructura (Base de datos, Red, Archivos) DEBE llevar la firma `async Task`.
-3. Todo lo que sea puramente memoria RAM (como los métodos en tu Agregado `Persona.Casar()`) son sincrónicos, no llevan `async` ni `Task`. ¡El CPU es feliz reventando números en memoria en nanosegundos!
+3. **Propaga el `CancellationToken`.** Toda API async seria lo recibe (`Task GuardarAsync(…, CancellationToken ct)`); pásalo siempre para poder abortar trabajo cuando el cliente se va.
+4. Todo lo que sea puramente memoria RAM (como los métodos en tu Agregado `Persona.Casar()`) son sincrónicos, no llevan `async` ni `Task`. ¡El CPU es feliz reventando números en memoria en nanosegundos!
+
+> [!NOTE]
+> Y desmonta el mito: `async` **no hace tu código más rápido** ni "lo corre en otro hilo". En I/O **no hay ningún hilo esperando**; lo que ganas es **escalabilidad** (atender más peticiones con los mismos hilos).
 
 ---
 [⬅️ Volver a la sección anterior](./09-eventos-de-dominio.md) | [➡️ Siguiente sección: Fundamentos de CQRS](./11-fundamentos-de-cqrs.md)

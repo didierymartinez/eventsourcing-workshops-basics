@@ -18,7 +18,7 @@ Lo primero que se nos ocurre: cuando Jhon se casa, Biografías **llama directame
 
 ```csharp
 // En el handler de Biografías, tras casar a Jhon:
-jhon.RegistrarMatrimonio("María");
+jhon.Casar("María");
 await registroCivilApi.InscribirMatrimonio(jhon.Id, "María", DateOnly.FromDateTime(DateTime.Today)); // 😬
 ```
 

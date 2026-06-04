@@ -1,4 +1,4 @@
-# 03 - La Magia del Enrutamiento: Polimorfismo y Dynamic Dispatching
+# 03 - Despacho de eventos: `switch` tipado vs `dynamic` (y por qué importa)
 
 En la arquitectura basada en eventos, constantemente tenemos listas masivas de objetos "crudos". Por ejemplo, un historial de vida puede contener dentro muchos tipos distintos de eventos:
 
@@ -7,7 +7,7 @@ List<object> historia = new()
 {
     new PersonaNacida("Jhon"),
     new CumpleañosCelebrado(),
-    new MudanzaRegistrada("Bogotá")
+    new PersonaMudada("Bogotá")
 };
 ```
 
@@ -29,7 +29,7 @@ public void Load(IEnumerable<object> eventos)
         { 
             Edad++; 
         }
-        else if (ev is MudanzaRegistrada m) 
+        else if (ev is PersonaMudada m) 
         { 
             Ciudad = m.NuevaCiudad; 
         }
@@ -38,56 +38,70 @@ public void Load(IEnumerable<object> eventos)
 }
 ```
 
-Cada vez que el negocio invente un nuevo evento, tendrás que abrir el motor nuclear (`Load`) y modificar esa cadena interminable. 
+Ese `if/else` (o un `switch` equivalente) **funciona y es seguro** —el compilador verifica cada tipo—, pero es verboso y cada nuevo evento te obliga a tocar el motor. ¿Hay formas más limpias? Sí, dos. Y conviene conocer el **tradeoff** de cada una.
 
-## 🎩 La Magia: Dynamic Dispatching
+## Opción A — `dynamic` dispatch (elegante… pero con costo real)
 
-C# nos ofrece una forma de "engañar" al estricto compilador de tipos para enrutar los métodos automáticamente en **tiempo de ejecución (Runtime)** en lugar de obligarlo a resolverlos en **tiempo de compilación**. 
-
-Hacemos esto rompiendo las reglas limpiamente con la palabra reservada `dynamic`.
+C# te permite **apagar la verificación de tipos** del compilador y resolver el método en **tiempo de ejecución** con la palabra reservada `dynamic`:
 
 ```csharp
-// El motor base limpio que JAMÁS cambia
 public void Load(IEnumerable<object> eventos)
 {
     foreach (var ev in eventos)
+        ((dynamic)this).Apply((dynamic)ev);   // resuelve en runtime cuál Apply llamar
+}
+
+// Y en la clase, un overload de Apply por evento (se ve muy OCP):
+protected void Apply(PersonaNacida n)       => Nombre = n.Nombre;
+protected void Apply(CumpleañosCelebrado e) => Edad++;
+protected void Apply(PersonaMudada m)       => Ciudad = m.NuevaCiudad;
+```
+
+Se ve mágico: agregas un evento nuevo añadiendo un overload `Apply`, **sin tocar `Load`**. Pero esa magia tiene un precio que debes conocer:
+
+> [!WARNING]
+> **El costo de `dynamic` (según la doc oficial de Microsoft):**
+> - *"an object of type `dynamic` **bypasses static type checking**"* — pierdes la red de seguridad del compilador.
+> - *"**Overload resolution occurs at run time**"* — resolver qué `Apply` llamar se hace en cada ejecución, vía el **DLR (Dynamic Language Runtime)** → más lento que una llamada directa.
+> - Si olvidas escribir el `Apply` de un evento, **no hay error de compilación**: revienta en producción con un `RuntimeBinderException`.
+>
+> 📎 Referencia: [Using type dynamic — Microsoft Learn](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/interop/using-type-dynamic).
+
+## Opción B — `switch` con pattern matching (la recomendada para escribir a mano)
+
+Desde C# 8, el `switch` con patrones te da un dispatch **limpio Y con seguridad de compilación** (sin el riesgo de `dynamic`):
+
+```csharp
+public void Load(IEnumerable<object> eventos)
+{
+    foreach (var ev in eventos) Apply(ev);
+}
+
+private void Apply(object ev)
+{
+    switch (ev)
     {
-        ((dynamic)this).Apply((dynamic)ev);
+        case PersonaNacida n:       Nombre = n.Nombre; break;
+        case CumpleañosCelebrado:   Edad++; break;
+        case PersonaMudada m:       Ciudad = m.NuevaCiudad; break;
+        // default: podrías ignorar, loguear o lanzar para eventos desconocidos
     }
 }
 ```
 
-### ¿Cómo funciona bajo el capó?
+Sí, tocas el `switch` al añadir un evento — pero a cambio el **compilador te respalda**, es **más rápido** (sin DLR) y no hay sorpresas en runtime. Para código que escribes a mano, **prefiere esto sobre `dynamic`**.
 
-1. El bucle toma el primer objeto (ej: `PersonaNacida`) que ante los ojos del compilador era un genérico `object`.
-2. Al castearlo a `(dynamic)ev`, le decimos a C#: *"Apaga tus validaciones tipadas en este momento"*.
-3. El programa sigue ejecutándose, examina la memoria real y dice: *"Aha! Este objeto es realmente del tipo Exacto `PersonaNacida`. Voy a buscar si existe, en cualquier parte de LA CLASE ACTUAL (`this`), un método que se llame `Apply` y reciba exactamente un `PersonaNacida`."*
-4. Si lo encuentra, lo llama de forma transparente. ¡Sin condicionales!
+## En producción: ni una ni otra a mano
 
-### El Resultado en tus Clases (Limpio y Aislado)
-
-Ahora cada Agregado (`Persona`) añade nuevos comportamientos de forma aislada e infinita sin alterar para nada el motor base:
-
-```csharp
-public class Persona : AggregateRoot
-{
-    // ... propiedades
-    
-    // ✅ Cumple el principio Abierto/Cerrado (OCP de código Limpio)
-    // C# lo encontrará automáticamente por el tipo de parámetro.
-    protected void Apply(PersonaNacida n) => Nombre = n.Nombre;
-    protected void Apply(CumpleañosCelebrado e) => Edad++;
-    protected void Apply(MudanzaRegistrada m) => Ciudad = m.NuevaCiudad;
-}
-```
+Aquí está el remate: las librerías serias (como **Marten**, que verás en el workshop principal) **no usan `dynamic` en la ruta caliente** —por el costo que vimos— ni te hacen escribir el `switch`. **Descubren** tus métodos `Apply` al arrancar y **generan/compilan** el dispatch (código rápido y verificable). Es el concepto *reflexión vs generación de código* (§22 del principal): la "magia" se cambia por **código generado que sí puedes leer**.
 
 > [!TIP]
-> Mantener estos métodos `Apply` marcados como **`protected`** o **`private`** es una excelente práctica. Evitamos contaminar la "API pública" de la clase ante el mundo exterior. `dynamic` tiene poderes especiales y logrará invocarlos aunque estén ocultos, protegiendo así el encapsulamiento de nuestro dominio.
+> Mantén tus métodos `Apply` como `protected`/`private` para no contaminar la API pública del agregado. (Tanto `dynamic` como los frameworks de codegen logran invocarlos aunque estén ocultos.)
 
 ---
 
 ### Cierre de la Fase 1
-Acabamos de pulir las herramientas fundamentales de C# que requiere un arquitecto de Event Sourcing: Inmutabilidad (Records), Moldes de Herencia (Abstract Classes) y Enrutamiento Eficiente (Dynamic). 
+Acabamos de pulir las herramientas fundamentales de C# que requiere un arquitecto de Event Sourcing: Inmutabilidad (Records), Moldes de Herencia (Abstract Classes) y Enrutamiento de eventos (`switch` tipado vs `dynamic`, y por qué producción genera código). 
 
 Es hora de saltar a cómo estructuramos el sistema en su totalidad.
 

@@ -1,6 +1,6 @@
 # 06 - El Almacén en Memoria: El Event Store
 
-En la sección anterior logramos que el `EventStream<T>` manejara perfectamente el flujo de vida de un solo individuo aislando su `List<IEvent>` física.
+En la sección anterior logramos que el `EventStream<T>` manejara perfectamente el flujo de vida de un solo individuo aislando su `List<EventoAlmacenado>` física.
 
 Pero nos dimos cuenta de un problema logístico masivo: si tenemos 1.000 clientes, tendríamos 1.000 listas flotando en la memoria del programa. Necesitamos un archivero general que agrupe y custodie todos esos flujos individuales.
 
@@ -123,7 +123,7 @@ public class InMemoryEventStore : IEventStore
 
 ## 4. Actualizando el EventStream
 
-Ahora que el EventStore existe, modificamos el `EventStream<T>` de la sección anterior. Ya no guarda una `List<IEvent>` interna; ahora se conecta al `IEventStore` genérico para que él le traiga los eventos o se los guarde.
+Ahora que el EventStore existe, modificamos el `EventStream<T>` de la sección anterior. Ya no guarda una `List<EventoAlmacenado>` interna; ahora se conecta al `IEventStore` genérico para que él le traiga los eventos o se los guarde.
 
 Además, nuestro stream calculará la versión / secuencia del objeto:
 

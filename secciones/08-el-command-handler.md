@@ -28,8 +28,8 @@ Vamos a abstraer el `Program.cs` moviendo este trabajo a una clase nueva. Ademá
 
 ```csharp
 // 1. Definimos los "Formularios de Petición" (Comandos)
-public record MatrimonioSolicitado(Guid PersonaId, string NombrePareja);
-public record MudanzaSolicitada(Guid PersonaId, string NuevaCiudad);
+public record RegistrarMatrimonio(Guid PersonaId, string NombrePareja);
+public record RegistrarMudanza(Guid PersonaId, string NuevaCiudad);
 ```
 
 > [!NOTE]
@@ -53,26 +53,26 @@ public class PersonaCommandHandlers
     }
 
     // Nuestro Biógrafo anota un matrimonio
-    public void TramitarBoda(MatrimonioSolicitado comando)
+    public void TramitarBoda(RegistrarMatrimonio comando)
     {
         // 1. Cargar: Abrimos el cajón de Jhon en el archivero
         var stream = new EventStream<Persona>(_store, comando.PersonaId);
         var jhon = stream.Get();
 
         // 2. Actuar: Le pasamos la intención verificada al Agregado
-        var eventoBoda = jhon.RegistrarMatrimonio(comando.NombrePareja);
+        var eventoBoda = jhon.Casar(comando.NombrePareja);
 
         // 3. Guardar: Almacenar el nuevo hecho en el stream
         stream.Append(eventoBoda);
     }
 
     // Nuestro Biógrafo anota una mudanza
-    public void ProcesarMudanza(MudanzaSolicitada comando)
+    public void ProcesarMudanza(RegistrarMudanza comando)
     {
         var stream = new EventStream<Persona>(_store, comando.PersonaId);
         var jhon = stream.Get();
         
-        var eventoMudanza = jhon.RegistrarMudanza(comando.NuevaCiudad);
+        var eventoMudanza = jhon.Mudarse(comando.NuevaCiudad);
         
         stream.Append(eventoMudanza);
     }
@@ -82,15 +82,16 @@ public class PersonaCommandHandlers
 // ¿Cómo se usa esta clase en nuestro programa principal?
 // ----------------------------------------------------
 
-var biografo = new PersonaCommandHandlers(biografia);
+// 'store' es nuestro IEventStore (el InMemoryEventStore de la §06)
+var biografo = new PersonaCommandHandlers(store);
 
-var comandoBoda = new MatrimonioSolicitado(idPersona, "María");
+var comandoBoda = new RegistrarMatrimonio(idPersona, "María");
 // Llamamos al método por su nombre específico
 biografo.TramitarBoda(comandoBoda); 
 
-// ¡Ahora la _biografia tiene el nuevo evento!
-// Para VER el nuevo estado, rehidratamos a Jhon desde la lista actualizada.
-var jhonActualizado = new Persona(biografia);
+// ¡Ahora el store tiene el nuevo evento!
+// Para VER el nuevo estado, rehidratamos a Jhon desde el almacén (vía su Stream).
+var jhonActualizado = new EventStream<Persona>(store, idPersona).Get();
 Console.WriteLine($"Jhon está casado con: {jhonActualizado.NombrePareja}");
 ```
 
@@ -117,36 +118,36 @@ public interface ICommandHandler<in TCommand>
 }
 
 // 2. Un Biógrafo especializado exclusivamente en matrimonios
-public class MatrimonioSolicitadoHandler : ICommandHandler<MatrimonioSolicitado>
+public class RegistrarMatrimonioHandler : ICommandHandler<RegistrarMatrimonio>
 {
     private readonly IEventStore _store;
 
-    public MatrimonioSolicitadoHandler(IEventStore store) => _store = store;
+    public RegistrarMatrimonioHandler(IEventStore store) => _store = store;
 
-    public void Handle(MatrimonioSolicitado comando)
+    public void Handle(RegistrarMatrimonio comando)
     {
         var stream = new EventStream<Persona>(_store, comando.PersonaId);
         var jhon = stream.Get();
         
-        var eventoBoda = jhon.RegistrarMatrimonio(comando.NombrePareja);
+        var eventoBoda = jhon.Casar(comando.NombrePareja);
         
         stream.Append(eventoBoda);
     }
 }
 
 // 3. Otro Biógrafo especializado exclusivamente en mudanzas
-public class MudanzaSolicitadaHandler : ICommandHandler<MudanzaSolicitada>
+public class RegistrarMudanzaHandler : ICommandHandler<RegistrarMudanza>
 {
     private readonly IEventStore _store;
 
-    public MudanzaSolicitadaHandler(IEventStore store) => _store = store;
+    public RegistrarMudanzaHandler(IEventStore store) => _store = store;
 
-    public void Handle(MudanzaSolicitada comando)
+    public void Handle(RegistrarMudanza comando)
     {
         var stream = new EventStream<Persona>(_store, comando.PersonaId);
         var jhon = stream.Get();
         
-        var eventoMudanza = jhon.RegistrarMudanza(comando.NuevaCiudad);
+        var eventoMudanza = jhon.Mudarse(comando.NuevaCiudad);
         
         stream.Append(eventoMudanza);
     }
@@ -160,13 +161,13 @@ Ahora, el código de "arranque" de nuestra aplicación (ya sea una API REST o un
 
 ```csharp
 // Llenamos el formulario de la primera acción
-var comandoBoda = new MatrimonioSolicitado(idPersona, "María");
-var handlerBoda = new MatrimonioSolicitadoHandler(store); // Inyectamos el EventStore
+var comandoBoda = new RegistrarMatrimonio(idPersona, "María");
+var handlerBoda = new RegistrarMatrimonioHandler(store); // Inyectamos el EventStore
 handlerBoda.Handle(comandoBoda);
 
 // Llenamos otro formulario para una segunda acción
-var comandoMudanza = new MudanzaSolicitada(idPersona, "Madrid");
-var handlerMudanza = new MudanzaSolicitadaHandler(store);
+var comandoMudanza = new RegistrarMudanza(idPersona, "Madrid");
+var handlerMudanza = new RegistrarMudanzaHandler(store);
 handlerMudanza.Handle(comandoMudanza);
 
 // Para probar que los Handlers realmente hicieron su trabajo
@@ -179,7 +180,7 @@ Console.WriteLine($"[VERIFICACIÓN] {jhonFinal.Nombre} ahora está casado con {j
 ---
 
 ### El Descubrimiento
-Acabamos de abstraer la intermediación de acciones únicas. Nuestro **Aggregate Root** (`Persona`) cuida las reglas vitales puras, mientras que el **Command Handler** (`MudanzaSolicitadaHandler`) se ocupa del trabajo sucio de la arquitectura: conseguir las herramientas (`EventStream`), despertar a la persona y guardar sus memorias para ese evento particular.
+Acabamos de abstraer la intermediación de acciones únicas. Nuestro **Aggregate Root** (`Persona`) cuida las reglas vitales puras, mientras que el **Command Handler** (`RegistrarMudanzaHandler`) se ocupa del trabajo sucio de la arquitectura: conseguir las herramientas (`EventStream`), despertar a la persona y guardar sus memorias para ese evento particular.
 
 ¡Felicidades! Acabas de construir desde cero el flujo arquitectónico completo y profesional de Event Sourcing en Memoria.
 

@@ -30,13 +30,13 @@ public class Persona : AggregateRoot
 
     // ... propiedades, constructor y métodos Apply básicos ...
 
-    public PersonaCasada RegistrarMatrimonio(string nombrePareja)
+    public PersonaCasada Casar(string nombrePareja)
     {
         // Generamos un nuevo hito para la biografía
         return new PersonaCasada(this.Id, nombrePareja);
     }
 
-    public PersonaMudada RegistrarMudanza(string nuevaCiudad)
+    public PersonaMudada Mudarse(string nuevaCiudad)
     {
         // En una aplicación real, aquí validaríamos las reglas de negocio usando el estado rehidratado
         return new PersonaMudada(this.Id, nuevaCiudad);
@@ -87,7 +87,7 @@ var jhon = streamJhon.Get();
 Console.WriteLine($"[ANTES] Jhon vive en {jhon.Ciudad}");
 
 // 2. ACTUAMOS: Le pedimos a Jhon que registre un nuevo hito en su vida
-var eventoMudanza = jhon.RegistrarMudanza("Nueva York");
+var eventoMudanza = jhon.Mudarse("Nueva York");
 
 // 3. GUARDAMOS: Enviamos el evento de vuelta al stream para que se guarde
 streamJhon.Append(eventoMudanza);
@@ -106,7 +106,7 @@ Acabas de ver el flujo básico para interactuar con el dominio:
 3. **Actuar**: Le pides al objeto que realice una acción y genere un **nuevo evento**.
 
 > [!TIP]
-> Intuitivamente, cada acción que le pides a Jhon (como llamar a `RegistrarMatrimonio`) es una petición que le haces al sistema. En diseño de software, a esta intención de hacer algo se le llama **Comando**.
+> Intuitivamente, cada acción que le pides a Jhon (ej. pedirle que se case) es una petición que le haces al sistema. A esa intención de hacer algo se le llama **Comando** (lo formalizaremos como `RegistrarMatrimonio` en §08); el método del agregado que la ejecuta es `Casar`.
 > Aquí vemos una regla de oro: **Los Comandos son los encargados de generar los Eventos** (siempre a través del Aggregate Root).
 
 > [!NOTE]
@@ -121,17 +121,17 @@ Acabas de ver el flujo básico para interactuar con el dominio:
 > El error clásico: tratar un "evento" que en realidad tiene **un solo dueño obligado** → eso era un comando disfrazado. Las **queries** las veremos a fondo en CQRS (§20); por ahora basta saber que **leer ≠ escribir**.
 
 > [!NOTE]
-> 🌱 **Semilla — Acabas de escribir la función `decide`.** En la Sección 03 viste `evolve` (estado + evento → estado). Aquí `RegistrarMudanza` hace la otra mitad: **`decide`** (estado + comando → eventos). Juntas forman el **patrón Decider**, el modelo funcional del Event Sourcing: `decide` valida y *decide qué pasó*, `evolve` *aplica lo que pasó*. Ambas son puras → se testean sin base de datos. Marten + Wolverine se montan justo sobre este par.
+> 🌱 **Semilla — Acabas de escribir la función `decide`.** En la Sección 03 viste `evolve` (estado + evento → estado). Aquí `Mudarse` (y `Casar`) hacen la otra mitad: **`decide`** (estado + comando → eventos). Juntas forman el **patrón Decider**, el modelo funcional del Event Sourcing: `decide` valida y *decide qué pasó*, `evolve` *aplica lo que pasó*. Ambas son puras → se testean sin base de datos. Marten + Wolverine se montan justo sobre este par.
 
 ---
 
 ## 🧬 Evolucionemos el código: ¿y si el comando llega dos veces?
 
-Hasta aquí, `RegistrarMatrimonio` está en el "camino feliz": **siempre** emite el evento. Probemos qué pasa en la vida real, donde un comando puede reintentarse (la red falló, el usuario hizo doble clic):
+Hasta aquí, `Casar` está en el "camino feliz": **siempre** emite el evento. Probemos qué pasa en la vida real, donde un comando puede reintentarse (la red falló, el usuario hizo doble clic):
 
 ```csharp
 // 🟢 Lo ingenuo (lo que tenemos ahora)
-public PersonaCasada RegistrarMatrimonio(string nombrePareja)
+public PersonaCasada Casar(string nombrePareja)
 {
     return new PersonaCasada(this.Id, nombrePareja);
 }
@@ -139,8 +139,8 @@ public PersonaCasada RegistrarMatrimonio(string nombrePareja)
 
 ```csharp
 // 💥 El dolor: el mismo comando llega dos veces
-jhon.RegistrarMatrimonio("María");   // emite PersonaCasada
-jhon.RegistrarMatrimonio("María");   // emite PersonaCasada OTRA VEZ
+jhon.Casar("María");   // emite PersonaCasada
+jhon.Casar("María");   // emite PersonaCasada OTRA VEZ
 // La biografía de Jhon ahora dice que se casó dos veces con María.
 // Al rehidratar, Apply(PersonaCasada) corre dos veces → estado corrupto.
 ```
@@ -154,7 +154,7 @@ public class Persona : AggregateRoot
     public bool Casado { get; private set; }          // ← estado que vigilamos
     public int  Edad   { get; private set; }          // ← lo actualiza Apply(CumpleañosCelebrado)
 
-    public PersonaCasada? RegistrarMatrimonio(string nombrePareja)
+    public PersonaCasada? Casar(string nombrePareja)
     {
         // (a) VALIDACIÓN — regla de negocio violada → se RECHAZA (esto sí es un error)
         if (Edad < 18)
@@ -181,7 +181,7 @@ public class Persona : AggregateRoot
 ---
 
 > [!NOTE]
-> 🌱 **Semilla — devolver el evento en vez de publicarlo: "cascading messages".** Fíjate en un detalle de estilo: `RegistrarMatrimonio` **devuelve** el evento; no lo guarda ni lo publica por su cuenta. Eso es deliberado y Wolverine lo eleva a patrón con el nombre **cascading messages**: tu handler **devuelve** los mensajes/eventos que deben ocurrir, y el framework se encarga de publicarlos. ¿Por qué importa? Porque mantiene la lógica **pura** (no inyectas el bus, no escondes envíos en el fondo del call stack) y hace evidente, leyendo el método, *qué efectos* produce. Lo veremos a fondo en el Aggregate Handler (§18).
+> 🌱 **Semilla — devolver el evento en vez de publicarlo: "cascading messages".** Fíjate en un detalle de estilo: `Casar` **devuelve** el evento; no lo guarda ni lo publica por su cuenta. Eso es deliberado y Wolverine lo eleva a patrón con el nombre **cascading messages**: tu handler **devuelve** los mensajes/eventos que deben ocurrir, y el framework se encarga de publicarlos. ¿Por qué importa? Porque mantiene la lógica **pura** (no inyectas el bus, no escondes envíos en el fondo del call stack) y hace evidente, leyendo el método, *qué efectos* produce. Lo veremos a fondo en el Aggregate Handler (§18).
 
 ---
 
@@ -203,7 +203,7 @@ static Persona JhonAdulto(params object[] extra)
 public void Casar_a_un_adulto_soltero_emite_PersonaCasada()
 {
     var jhon = JhonAdulto();                          // Given
-    var evento = jhon.RegistrarMatrimonio("María");   // When (decide)
+    var evento = jhon.Casar("María");   // When (decide)
     evento.Should().BeOfType<PersonaCasada>();        // Then
 }
 
@@ -211,7 +211,7 @@ public void Casar_a_un_adulto_soltero_emite_PersonaCasada()
 public void Casar_a_un_menor_es_RECHAZADO()           // validación: la regla se rechaza
 {
     var jhon = new Persona(new object[] { new PersonaNacida("Jhon", new DateTime(1990,5,10), "Bogotá") }); // Edad 0
-    var act = () => jhon.RegistrarMatrimonio("María");
+    var act = () => jhon.Casar("María");
     act.Should().Throw<ReglaDeNegocioException>();
 }
 
@@ -219,7 +219,7 @@ public void Casar_a_un_menor_es_RECHAZADO()           // validación: la regla s
 public void Casar_a_alguien_ya_casado_no_emite_nada() // idempotencia: no es error, es no-op
 {
     var jhon = JhonAdulto(new PersonaCasada(idJhon, "María"));
-    jhon.RegistrarMatrimonio("Ana").Should().BeNull();
+    jhon.Casar("Ana").Should().BeNull();
 }
 ```
 

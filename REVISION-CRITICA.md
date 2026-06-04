@@ -31,7 +31,8 @@ A continuación, lo concreto.
 - Regla demasiado dogmática: *"todo lo que vaya en un constructor debería ser una interfaz"*. No siempre — a veces inyectas tipos concretos, `Options<T>`, o `record` de configuración.
 - **Falta:** principio **composición sobre herencia** e **ISP** (Interface Segregation). La elección abstract-vs-interface es realmente una decisión de diseño, no una tabla.
 
-### 03 — Polimorfismo y `dynamic` dispatch · 🔴 Crítico
+### 03 — Polimorfismo y `dynamic` dispatch · 🔴 Crítico — ✅ REPLANTEADO (04/06)
+> Reescrita: ahora presenta `switch` con pattern matching como la opción recomendada (segura en compilación), `dynamic` como alternativa **con sus costos citando la doc oficial de Microsoft** (bypass de type-checking, overload resolution en runtime vía DLR, `RuntimeBinderException`), y cierra con "producción genera el dispatch (Marten/codegen, §22)". Título actualizado.
 - **El problema más serio del workshop.** Se promueve `((dynamic)this).Apply((dynamic)ev)` como "la solución limpia" sin **ninguno** de sus costos:
   - `dynamic` usa el **DLR (Dynamic Language Runtime)**: tiene overhead real por call-site, hace boxing y **rompe en runtime** (`RuntimeBinderException`) si no existe un `Apply` para ese tipo — sin error de compilación.
   - Pierdes seguridad de tipos, refactors seguros y análisis estático.

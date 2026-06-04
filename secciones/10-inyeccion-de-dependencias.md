@@ -16,8 +16,8 @@ Hasta ahora, para que nuestro sistema funcione, nosotros (como programadores en 
 IEventStore miAlmacen = new InMemoryEventStore();
 
 // 2. Instanciamos el Handler pasándole el almacén manualmente
-var handlerBoda = new MatrimonioSolicitadoHandler(miAlmacen);
-var handlerMudanza = new MudanzaSolicitadaHandler(miAlmacen);
+var handlerBoda = new RegistrarMatrimonioHandler(miAlmacen);
+var handlerMudanza = new RegistrarMudanzaHandler(miAlmacen);
 
 // 3. Ya podemos usar los handlers...
 ```
@@ -30,7 +30,7 @@ Tendríamos que escribir el infierno de los "new":
 var conexion = new PostgresConnection("Host=localhost;...");
 var json = new MiJsonMaker();
 var almacen = new PostgresEventStore(conexion, json);
-var handlerBoda = new MatrimonioSolicitadoHandler(almacen);
+var handlerBoda = new RegistrarMatrimonioHandler(almacen);
 ```
 
 Si tenemos 50 Handlers, nuestro `Program.cs` será una pesadilla de configuración. El "Jefe" (nuestra app) está perdiendo el tiempo armando los escritorios de los empleados en lugar de atender clientes.
@@ -43,7 +43,7 @@ Para resolver esto, la industria adoptó el patrón de **Inyección de Dependenc
 Imagina que contratamos a un Recepcionista súper eficiente para la Agencia.
 
 1. **El Registro (`IServiceCollection`)**: Al inicio del día, le decimos al Recepcionista cómo se fabrica cada empleado o herramienta. *"Señor Recepcionista, cuando alguien pida un `IEventStore`, entréguele un `InMemoryEventStore`"*.
-2. **El Suministro (`IServiceProvider`)**: El Recepcionista se queda en la puerta. Cuando llega un Comando de Boda, el sistema le dice al Recepcionista: *"Necesito un `MatrimonioSolicitadoHandler`"*. El Recepcionista lee el constructor del Handler, ve que necesita un `IEventStore`, fabrica el Almacén él mismo, se lo inyecta al Handler, y te entrega el Handler listo para usar.
+2. **El Suministro (`IServiceProvider`)**: El Recepcionista se queda en la puerta. Cuando llega un Comando de Boda, el sistema le dice al Recepcionista: *"Necesito un `RegistrarMatrimonioHandler`"*. El Recepcionista lee el constructor del Handler, ve que necesita un `IEventStore`, fabrica el Almacén él mismo, se lo inyecta al Handler, y te entrega el Handler listo para usar.
 
 > [!TIP]
 > A este concepto se le llama **Inversión de Control (IoC)**. El Handler ya no asume el control de crear o buscar su almacén (`new InMemoryEventStore()`). En su lugar, simplemente *exige* un `IEventStore` en su constructor, y confía en que el sistema se lo proveerá (se lo inyectará) por arte de magia.
@@ -67,7 +67,7 @@ var services = new ServiceCollection();
 services.AddSingleton<IEventStore, InMemoryEventStore>();
 
 // "AddTransient" significa: Crea UNO NUEVO cada vez que alguien te lo pida.
-services.AddTransient<MatrimonioSolicitadoHandler>();
+services.AddTransient<RegistrarMatrimonioHandler>();
 
 // 3. Abrimos la oficina (Construir el Proveedor)
 var proveedor = services.BuildServiceProvider();
@@ -81,7 +81,7 @@ Y así se usa en el resto de la aplicación (en tus Controladores Web o APIs):
 // MAGIA: No usamos 'new'. Le pedimos al recepcionista que nos dé el Handler.
 // Él automáticamente lee el constructor, fabrica el EventStore (o usa el que ya tiene), 
 // lo inyecta al Handler, y nos lo entrega listo.
-var handlerBoda = proveedor.GetRequiredService<MatrimonioSolicitadoHandler>();
+var handlerBoda = proveedor.GetRequiredService<RegistrarMatrimonioHandler>();
 
 await handlerBoda.HandleAsync(comandoBoda);
 ```
@@ -150,7 +150,7 @@ var c = new MiniContenedor();
 c.Register<IEventStore, InMemoryEventStore>();
 // Pedimos el Handler: el contenedor lee su constructor, ve que necesita IEventStore,
 // lo fabrica, lo inyecta, y nos devuelve el Handler listo. Sin un solo 'new' nuestro.
-var handler = c.Resolve<MatrimonioSolicitadoHandler>();
+var handler = c.Resolve<RegistrarMatrimonioHandler>();
 ```
 
 > [!TIP]
@@ -158,7 +158,7 @@ var handler = c.Resolve<MatrimonioSolicitadoHandler>();
 
 La Inyección de Dependencias no es solo una comodidad, es el **puente que conecta el dominio con la infraestructura**. 
 
-Nuestros Handlers de la Fase 1 (`MatrimonioSolicitadoHandler`) exigen en su constructor un `IEventStore`. Ellos **no tienen idea** si la persistencia ocurre en RAM, en Postgres o en un archivo de texto. A ellos no les importa; el Recepcionista se encarga del trabajo sucio.
+Nuestros Handlers de la Fase 1 (`RegistrarMatrimonioHandler`) exigen en su constructor un `IEventStore`. Ellos **no tienen idea** si la persistencia ocurre en RAM, en Postgres o en un archivo de texto. A ellos no les importa; el Recepcionista se encarga del trabajo sucio.
 
 ¿Por qué es vital aprender esto ahora? Porque en la siguiente fase (Persistencia Real), descubriremos que la famosa librería **Marten** no es más que una caja llena de instrucciones para nuestro Recepcionista.
 

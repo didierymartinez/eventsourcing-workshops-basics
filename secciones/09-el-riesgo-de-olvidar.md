@@ -116,16 +116,16 @@ public class EventStream<T> where T : AggregateRoot, new()
 Finalmente, el controlador maestro (Handler) también tiene que adaptarse al nuevo paradigma de la agencia:
 
 ```csharp
-public class MatrimonioSolicitadoHandler
+public class RegistrarMatrimonioHandler
 {
     private readonly IEventStore _store;
 
-    public MatrimonioSolicitadoHandler(IEventStore store)
+    public RegistrarMatrimonioHandler(IEventStore store)
     {
         _store = store;
     }
 
-    public async Task HandleAsync(RegistrarMatrimonioCommand comando)
+    public async Task HandleAsync(RegistrarMatrimonio comando)
     {
         var stream = new EventStream<Persona>(_store, comando.PersonaId);
         
@@ -133,7 +133,7 @@ public class MatrimonioSolicitadoHandler
         var persona = await stream.GetAsync();
 
         // 2. ACTUAR (Reglas de CPU instantáneas)
-        var nuevoEvento = persona.RegistrarMatrimonio(comando.NombrePareja);
+        var nuevoEvento = persona.Casar(comando.NombrePareja);
 
         // 3. GUARDAR (Esperar I/O)
         await stream.AppendAsync(nuevoEvento);

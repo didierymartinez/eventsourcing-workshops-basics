@@ -9,7 +9,7 @@ public async Task HandleAsync(RegistrarMatrimonio cmd, CancellationToken ct)
 {
     var stream = new EventStream<Persona>(_store, cmd.PersonaId);
     var persona = await stream.GetAsync();        // 1. cargar (boilerplate)
-    var evento  = persona.RegistrarMatrimonio(cmd.NombrePareja); // 2. la ÚNICA línea que importa
+    var evento  = persona.Casar(cmd.NombrePareja); // 2. la ÚNICA línea que importa
     await stream.AppendAsync(evento);             // 3. guardar (boilerplate)
 }
 ```
@@ -30,7 +30,7 @@ evolve(estado, evento)  -> nuevo estado  // ¿cómo cambia el estado? (= tu mét
 - **`decide`** mira el estado actual y un comando, aplica las reglas de negocio, y **devuelve los eventos** que deben ocurrir (o lanza/rechaza si la regla no se cumple). No toca base de datos ni red.
 - **`evolve`** toma el estado y un evento ya ocurrido, y produce el nuevo estado. Es exactamente el `Apply` que construiste en la Sección 03.
 
-Ambas son **puras**: mismas entradas → mismas salidas, sin efectos secundarios. En nuestra `Persona`, `RegistrarMatrimonio` es el `decide` y `Apply(PersonaCasada)` es el `evolve`:
+Ambas son **puras**: mismas entradas → mismas salidas, sin efectos secundarios. En nuestra `Persona`, `Casar` es el `decide` y `Apply(PersonaCasada)` es el `evolve`:
 
 ```csharp
 public class Persona : AggregateRoot
@@ -39,7 +39,7 @@ public class Persona : AggregateRoot
     public int  Edad   { get; private set; }
 
     // decide: estado + intención -> evento(s)
-    public PersonaCasada? RegistrarMatrimonio(string nombrePareja)
+    public PersonaCasada? Casar(string nombrePareja)
     {
         if (Edad < 18) throw new ReglaDeNegocioException("No se puede casar a un menor de edad."); // validación → rechaza
         if (Casado)    return null;                                                                // idempotencia → no-op
@@ -100,13 +100,40 @@ Cuando el agregado aún no existe (primer evento), no usas `[Aggregate]`; devuel
 ```csharp
 public static (CreationResponse, IStartStream) Handle(RegistrarPersona cmd)
 {
-    var nacio = new PersonaNacida(cmd.PersonaId, cmd.Nombre, cmd.Ciudad);
+    var nacio = new PersonaNacida(cmd.PersonaId, cmd.Nombre, cmd.FechaNacimiento, cmd.Ciudad);
     var start = MartenOps.StartStream<Persona>(cmd.PersonaId, nacio); // side-effect puro
     return (new CreationResponse(cmd.PersonaId), start);
 }
 ```
 
 Y para responder con el estado ya actualizado (incluyendo los eventos recién emitidos), Marten ofrece `FetchLatest<Persona>(id)`.
+
+---
+
+## 🏛️ Esta forma tiene nombre: A-Frame Architecture
+
+Mira lo que acabas de construir, sin habértelo propuesto:
+
+```
+              Handler / Wolverine            ← el VÉRTICE (orquesta)
+             /                    \
+   carga el agregado          tu decide (PURO)
+   (Marten / I/O)             (Casar)
+             \                    /
+        appendea + guarda (Marten / I/O)
+```
+
+Es la letra **A**: dos "patas" que **no se hablan entre sí** —la **infraestructura** (Marten, el bus) por un lado y la **lógica de negocio pura** (`decide`/`evolve`) por el otro— unidas solo arriba por un **orquestador delgado** (el handler, que aquí ni siquiera escribes: lo genera Wolverine). Jeremy Miller (autor de Wolverine/Marten) la llama **A-Frame Architecture**.
+
+> [!NOTE]
+> **¿Por qué "A-Frame"?** Es un término de construcción: una estructura con forma de A —una **casa A-frame**, una **escalera de tijera**, una **carpa**— donde dos miembros se apoyan y solo se tocan en el vértice. "Frame" = armazón. La arquitectura toma prestada esa imagen: **las dos patas (negocio puro / infraestructura) nunca se referencian directamente; solo se conectan en el orquestador de arriba.**
+
+**El contraste con la arquitectura por capas (Onion/Clean):** ahí la lógica de negocio *depende* de abstracciones (`IRepository`) y las **llama en medio de su ejecución** → call stacks profundos (saltas por 6-8 capas) y tests llenos de **mocks**. A-Frame **jala todo el I/O hacia el vértice**: el negocio recibe datos planos y devuelve resultados planos, **sin depender de nada**. Es la idea de *"núcleo funcional, cáscara imperativa"*.
+
+**Lo que te compra** (y por qué Wolverine la promueve):
+- **Tests sin mocks**: la pata pura (`decide`) se prueba con entradas/salidas planas (lo viste en §07 y lo formalizaremos en §21). La infra se prueba aparte.
+- **Call stacks cortos**: cargar → decidir → guardar en un método legible, no enterrado en capas.
+- **Efectos visibles arriba**: el handler **devuelve** lo que debe pasar (los eventos); el I/O ocurre en el borde, no escondido en el fondo.
 
 ---
 

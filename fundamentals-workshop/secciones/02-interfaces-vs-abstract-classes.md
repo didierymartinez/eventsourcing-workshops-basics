@@ -18,6 +18,9 @@ public interface ICommandHandler<in TCommand>
 - **Uso Estructural:** La usamos para lograr **Desacoplamiento (Loose Coupling)**. 
 - **El escenario ideal:** Cuando diferentes clases hacen el mismo trabajo conceptual pero su implementación física es drásticamente distinta. Por ejemplo, `InMemoryEventStore` guarda datos en un diccionario, mientras que `PostgresEventStore` guarda datos haciendo llamados de red a un motor SQL. Comparten el contrato (`IEventStore`), pero no comparten ni una sola línea de código útil entre ellos.
 
+> [!NOTE]
+> **Cuidado con el mito "la interfaz no tiene código".** Desde **C# 8** las interfaces **sí pueden** traer implementación (*default interface methods*). Entonces, ¿cuál es la diferencia *real* con una clase abstracta? Dos cosas: (1) una clase abstracta puede tener **estado** (campos, propiedades con backing field), una interfaz no; (2) solo puedes heredar de **una** clase base, pero implementar **muchas** interfaces. La elección no es "código sí/no", es **estado + herencia única (abstracta)** vs **contrato múltiple (interfaz)**.
+
 ## 🏗️ La Clase Abstracta: El Molde (Reuso de Comportamiento)
 
 Una clase abstracta (`abstract class`) es un **molde a medio terminar**. Dice **QUÉ** hay que hacer, pero también te regala el código de **CÓMO** resolver la mitad de las cosas genéricas.
