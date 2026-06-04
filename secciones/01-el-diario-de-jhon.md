@@ -2,6 +2,9 @@
 
 Bienvenido. En este workshop no vamos a construir una base de datos tradicional. Vamos a construir una **Biografía**.
 
+> [!NOTE]
+> 🌱 **Antes de empezar — cómo leer este workshop (las "semillas").** A lo largo del camino verás cajas marcadas con 🌱 **Semilla**. Son adelantos cortos de conceptos avanzados (concurrencia, versionado de eventos, idempotencia, CQRS, generación de código…) plantados **mucho antes** de su sección dedicada. No tienes que dominarlos al verlos: solo *anclar la idea y el nombre correcto*. Cuando reaparezcan a fondo, ya tendrás dónde colgarlos. Es lo contrario a dejar todo lo difícil para el final. (La primera semilla aparece al terminar esta misma sección.)
+
 ## 🎯 El Objetivo
 Imagina que quieres conocer la vida de una persona. Tienes dos opciones:
 1. Ver su **foto actual** (donde ves si está feliz, qué ropa lleva y su edad).
@@ -32,7 +35,8 @@ Si tenemos la lista de hechos, siempre podemos saber dónde vive hoy, pero adem�
 A esta forma de diseñar sistemas donde la "Fuente de la Verdad" no es una foto del presente, sino la secuencia de todos los hechos del pasado, se le conoce como **Event Sourcing**.
 
 > [!NOTE]
-> 🌱 **Semilla — No todos los hechos le importan a todo el mundo.** Algunos hechos del diario de Jhon solo le conciernen a él (*"celebró un cumpleaños"*); otros, el pueblo entero necesita saberlos (*"se casó"* → el registro civil, la familia). En software esa distinción es real y tiene nombre: **eventos de dominio** (internos) vs **eventos de integración** (públicos). En la **siguiente sección** dibujamos el mapa completo de "dentro vs fuera" para que esto te acompañe desde el inicio.
+> 🌱 **Semilla — No todos los hechos necesitan salir del sistema.** Mira la diferencia con un ejemplo natural: que Jhon **consiga novia** es un hecho **interno** — personal, sin efecto legal; ningún otro sistema necesita hacer nada. Pero que Jhon **se case** *cambia su estado civil* — un hecho **legal** — y por eso el **Registro Civil** (otro sistema) sí debe reaccionar e inscribirlo oficialmente.
+> El criterio **no** es si *socialmente* alguien se entera (a un cumpleaños va la familia, claro) — es si **otro sistema/contexto debe actuar** ante el hecho (típicamente cuando hay un efecto legal/oficial). En software esa distinción tiene nombre: **eventos de dominio** (internos) vs **eventos de integración** (otros sistemas reaccionan). En la **siguiente sección** dibujamos el mapa completo de "dentro vs fuera".
 
 ---
 

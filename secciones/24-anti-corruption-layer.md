@@ -12,7 +12,7 @@ Seguimos con nuestro elenco (§01b). El BC **Registro Civil** escucha una cola. 
 public static async Task Handle(MatrimonioCelebrado evento, IDocumentSession session)
 {
     var acta = await session.Events.FetchForWriting<ActaMatrimonio>(evento.PersonaId);
-    acta.Aggregate.Inscribir(evento.Pareja, evento.Fecha); // uso campos del evento ajeno
+    acta.Aggregate.Inscribir(evento.NombrePareja, evento.Fecha); // uso campos del evento ajeno
     // ...
 }
 ```
@@ -20,7 +20,7 @@ public static async Task Handle(MatrimonioCelebrado evento, IDocumentSession ses
 Funciona hoy. Pero acabas de **acoplar el dominio de Registro Civil a la firma de un evento que no controla** (lo controla Biografías).
 
 ## 💥 El dolor
-El equipo de Biografías —otro equipo, otro repo, otro ciclo de despliegue— decide renombrar `Pareja` a `NombreConyuge`, o partir `MatrimonioCelebrado` en dos eventos. **Registro Civil se rompe** y ni se enteró del cambio. Peor: el evento podría llegar **mal formado** (un `PersonaId` vacío) y tu agregado lo procesa igual, corrompiendo tu estado.
+El equipo de Biografías —otro equipo, otro repo, otro ciclo de despliegue— decide renombrar `NombrePareja` a `NombreConyuge`, o partir `MatrimonioCelebrado` en dos eventos. **Registro Civil se rompe** y ni se enteró del cambio. Peor: el evento podría llegar **mal formado** (un `PersonaId` vacío) y tu agregado lo procesa igual, corrompiendo tu estado.
 
 > El problema de fondo: un **evento público es un contrato de OTRO**. Si tu lógica de negocio depende directamente de su forma, cada cambio de ellos es un riesgo para ti.
 
@@ -38,13 +38,13 @@ public static class BiografiasAcl
     public static async Task Handle(MatrimonioCelebrado externo, IMessageBus bus)
     {
         // a) VALIDA que el evento externo venga bien informado
-        if (externo.PersonaId == Guid.Empty || string.IsNullOrEmpty(externo.Pareja))
+        if (externo.PersonaId == Guid.Empty || string.IsNullOrEmpty(externo.NombrePareja))
             throw new EventoInvalidoException("MatrimonioCelebrado mal formado"); // no contaminamos el dominio
 
         // b) TRADUCE a TU idioma y despacha un comando interno
         await bus.InvokeAsync(new InscribirMatrimonio(
             CiudadanoId: externo.PersonaId,   // "Persona" (Biografías) -> "Ciudadano" (Registro Civil)
-            Conyuge:     externo.Pareja,      // el mapeo vive AQUÍ, aislado
+            Conyuge:     externo.NombrePareja,      // el mapeo vive AQUÍ, aislado
             FechaActa:   externo.Fecha));
     }
 }

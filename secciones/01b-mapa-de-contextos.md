@@ -35,16 +35,20 @@ No comparten base de datos ni código. Son **mundos separados** que, a veces, ne
 
 Esta es la idea que iremos explicando módulo a módulo. Cuando algo le pasa a Jhon, hay **dos posibilidades**:
 
-1. **Se queda adentro.** *"Jhon cumplió años"* solo le importa a Biografías. Es un hecho **interno** (lo llamaremos **evento privado**).
-2. **Cruza la frontera.** *"Jhon se casó"* le importa al Registro Civil (afuera). Es un hecho que se vuelve **público** (un **evento de integración**) y debe viajar al otro contexto.
+1. **Se queda adentro.** *"Jhon consiguió novia"* es un hecho **interno**: personal, sin efecto legal; ningún otro sistema necesita actuar. Es un **evento privado**.
+2. **Cruza la frontera.** *"Jhon se casó"* **cambia su estado civil** — un hecho legal — así que el Registro Civil (otro sistema) **debe reaccionar** e inscribirlo. Es un **evento de integración** y debe viajar al otro contexto.
+
+> [!IMPORTANT]
+> El criterio **no** es si *socialmente* alguien se entera (a un cumpleaños va la familia; tener novia lo sabe medio mundo) — el criterio es si **otro Bounded Context tiene que reaccionar** al hecho, normalmente porque tiene un **efecto oficial/legal**. Conseguir novia no cambia nada en ningún sistema; **casarse cambia tu estado civil**, y eso el Registro Civil sí lo registra.
 
 ```
-        Dentro de Biografías          │   Cruza al Registro Civil
-   ─────────────────────────────────  │  ──────────────────────────
-   PersonaNació        (privado)       │
-   CumpleañosCelebrado (privado)       │
-   PersonaCasada       (privado) ──────┼──▶  MatrimonioCelebrado (público)
-                                       │
+        Dentro de Biografías          │   Otro sistema debe reaccionar
+   ─────────────────────────────────  │  ──────────────────────────────
+   PersonaNacida        (privado)      │
+   NoviazgoIniciado     (privado)      │
+   CumpleañosCelebrado  (privado)      │
+   PersonaCasada        (privado) ─────┼──▶  MatrimonioCelebrado (integración)
+   (cambia estado civil)              │      → el Registro Civil inscribe
 ```
 
 > [!NOTE]
@@ -57,7 +61,7 @@ Para que el ejemplo sea **un solo hilo** de principio a fin, todo el workshop us
 **🟦 BC Biografías** (lo que construimos)
 - Agregado: **`Persona`** (Jhon)
 - Comandos: `RegistrarMatrimonio`, `RegistrarMudanza`
-- Eventos privados: `PersonaNació`, `CumpleañosCelebrado`, `HijoNacido`, `PersonaCasada`, `PersonaMudada`
+- Eventos privados: `PersonaNacida`, `CumpleañosCelebrado`, `NoviazgoIniciado`, `HijoNacido`, `PersonaCasada` *(cambia estado civil)*, `PersonaMudada`
 - Evento de integración (público): **`MatrimonioCelebrado`**
 
 **🟩 BC Registro Civil** (el vecino, aparece desde §24)

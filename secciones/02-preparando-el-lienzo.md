@@ -40,9 +40,6 @@ Abre el archivo `Program.cs` y borra todo su contenido. Queremos un lienzo total
 ---
 
 > [!NOTE]
-> 🌱 **Cómo leer este workshop — las "semillas".** A lo largo del camino verás cajas marcadas con 🌱 **Semilla**. Son adelantos cortos de conceptos avanzados (concurrencia, versionado de eventos, idempotencia, CQRS, generación de código…) plantados **mucho antes** de su sección dedicada. No tienes que dominarlos al verlos: solo *anclar la idea y el nombre correcto*. Cuando reaparezcan a fondo, ya tendrás dónde colgarlos. Es lo contrario a dejar todo lo difícil para el final.
-
-> [!NOTE]
 > 🌱 **Semilla — el norte arquitectónico: lógica pura al centro, infraestructura en los bordes.** Todo el workshop empuja hacia un estilo que el equipo de Wolverine llama **"A-Frame Architecture"**: la *decisión de negocio* vive en funciones puras (el agregado), y lo "sucio" (base de datos, red, bus) se queda en los bordes, lejos de esa lógica. La consecuencia práctica: **call stacks cortos** y código fácil de razonar y testear (sin saltar por 8 capas). Wolverine incluso desaconseja el exceso de capas tipo Onion/Clean. Guárdalo como brújula: cuando dudes dónde poner algo, pregúntate *"¿esto es decisión (centro) o infraestructura (borde)?"*.
 
 ---

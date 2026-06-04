@@ -38,7 +38,7 @@ graph LR
 
 ```csharp
 // BC-A · Biografías  —  evento PRIVADO
-public record PersonaCasada(Guid PersonaId, string Pareja) : IPrivateEvent;
+public record PersonaCasada(Guid PersonaId, string NombrePareja) : IPrivateEvent;
 ```
 
 ### 2. Lo que cruza la frontera: el evento de integración
@@ -46,7 +46,7 @@ Que Jhon se casó **sí** le importa al mundo exterior. Pero **no publicamos `Pe
 
 ```csharp
 // BC-A · Biografías  —  evento de INTEGRACIÓN (contrato público y estable)
-public record MatrimonioCelebrado(Guid PersonaId, string Pareja, DateOnly Fecha) : IPublicEvent;
+public record MatrimonioCelebrado(Guid PersonaId, string NombrePareja, DateOnly Fecha) : IPublicEvent;
 ```
 
 > [!IMPORTANT]
@@ -69,7 +69,7 @@ public static class BiografiasAcl
         // Traducimos al lenguaje de NUESTRO dominio (no al de Biografías)
         return new InscribirMatrimonio(
             CiudadanoId: externo.PersonaId,        // en RC se llama "Ciudadano", no "Persona"
-            Conyuge:     externo.Pareja,
+            Conyuge:     externo.NombrePareja,
             FechaActa:   externo.Fecha);
     }
 }

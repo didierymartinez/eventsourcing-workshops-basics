@@ -71,7 +71,7 @@ public class PersonaResumen
     public string Ciudad { get; set; }
     public bool Casado { get; set; }
 
-    public void Apply(PersonaNació e)   { Id = e.PersonaId; Nombre = e.Nombre; Ciudad = e.Ciudad; }
+    public void Apply(PersonaNacida e)   { Id = e.PersonaId; Nombre = e.Nombre; Ciudad = e.Ciudad; }
     public void Apply(PersonaCasada e)  { Casado = true; }
     public void Apply(PersonaMudada e)  { Ciudad = e.NuevaCiudad; }
 }

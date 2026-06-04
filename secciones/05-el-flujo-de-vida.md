@@ -25,7 +25,7 @@ El **EventStream** es el envoltorio lógico para **una sola línea temporal** (l
 
 Antes de crear el Stream, vamos a solucionar el problema más grave: que cualquiera pueda insertar cualquier cosa, y peor aún, que no sabemos cuándo pasó ni a quién le pertenece.
 
-En lugar de obligar a nuestros hermosos Eventos de Dominio (`PersonaNacida`, `MatrimonioRegistrado`) a heredar de interfaces raras (lo cual contamina el dominio), **vamos a crear un sobre**.
+En lugar de obligar a nuestros hermosos Eventos de Dominio (`PersonaNacida`, `PersonaCasada`) a heredar de interfaces raras (lo cual contamina el dominio), **vamos a crear un sobre**.
 
 Cuando un Evento de Dominio quiere entrar a la historia, lo metemos dentro de un sobre oficial llamado `EventoAlmacenado`:
 

@@ -25,32 +25,45 @@ Then   → espero que se emitan ciertos eventos (y/o que el estado quede así)
 El agregado no toca infraestructura, así que se testea instanciándolo y verificando los eventos que emite:
 
 ```csharp
-[Fact]
-public void Registrar_matrimonio_de_soltero_emite_PersonaCasada()
+// Helper: la edad de Jhon se deriva de sus cumpleaños (§03), así que para "Jhon adulto"
+// montamos su historia con suficientes CumpleañosCelebrado.
+static Persona JhonAdulto(params object[] extra)
 {
-    // Given: Jhon ya nació
+    var historia = new List<object> { new PersonaNacida(id, "Jhon", "Bogotá") };
+    historia.AddRange(Enumerable.Repeat<object>(new CumpleañosCelebrado(), 18)); // → 18 años
+    historia.AddRange(extra);
     var jhon = new Persona();
-    jhon.Load(new object[] { new PersonaNació(id, "Jhon", "Bogotá") }); // rehidratar (evolve)
-
-    // When: lo casamos
-    var evento = jhon.RegistrarMatrimonio("María"); // decide
-
-    // Then: el hecho correcto
-    evento.Should().BeOfType<PersonaCasada>();
+    jhon.Load(historia); // rehidratar (evolve)
+    return jhon;
 }
 
 [Fact]
-public void Registrar_matrimonio_de_ya_casado_no_emite_nada()
+public void Casar_a_un_adulto_soltero_emite_PersonaCasada()
+{
+    var jhon = JhonAdulto();                          // Given: Jhon adulto y soltero
+    var evento = jhon.RegistrarMatrimonio("María");   // When: lo casamos (decide)
+    evento.Should().BeOfType<PersonaCasada>();        // Then: el hecho correcto
+}
+
+[Fact]
+public void Casar_a_un_menor_es_RECHAZADO()           // validación (regla de negocio)
 {
     var jhon = new Persona();
-    jhon.Load(new object[] { new PersonaNació(id, "Jhon", "Bogotá"), new PersonaCasada(id, "María") });
+    jhon.Load(new object[] { new PersonaNacida(id, "Jhon", "Bogotá") }); // Edad = 0
 
-    // La invariante se protege: no se puede casar dos veces (idempotencia, §07)
-    jhon.RegistrarMatrimonio("Ana").Should().BeNull();
+    var act = () => jhon.RegistrarMatrimonio("María");
+    act.Should().Throw<ReglaDeNegocioException>();     // se rechaza, no se traga la regla
+}
+
+[Fact]
+public void Casar_a_alguien_ya_casado_NO_emite_nada() // idempotencia (no es error)
+{
+    var jhon = JhonAdulto(new PersonaCasada(id, "María"));
+    jhon.RegistrarMatrimonio("Ana").Should().BeNull(); // no-op silencioso
 }
 ```
 
-Sin mocks. Sin base de datos. Microsegundos por test.
+Sin mocks. Sin base de datos. Microsegundos por test. Fíjate que los **tres** casos —éxito, validación rechazada, e idempotencia— se prueban igual de fácil porque `decide` es puro.
 
 ---
 
@@ -65,7 +78,7 @@ public class RegistrarMatrimonioHandlerTests : CommandHandlerTestBase
     public async Task Casar_a_Jhon_emite_PersonaCasada()
     {
         // Given: historia previa en el TestStore
-        Given(new PersonaNació(GuidAggregateId, "Jhon", "Bogotá"));
+        Given(new PersonaNacida(GuidAggregateId, "Jhon", "Bogotá"));
 
         // When: ejecuto el handler real
         var handler = new RegistrarMatrimonioHandler(EventStore);
@@ -104,7 +117,7 @@ Una proyección (§20) también es determinista: dados unos eventos, produce una
 public void Resumen_refleja_el_estado_tras_casarse()
 {
     var resumen = new PersonaResumen();
-    resumen.Apply(new PersonaNació(id, "Jhon", "Bogotá"));
+    resumen.Apply(new PersonaNacida(id, "Jhon", "Bogotá"));
     resumen.Apply(new PersonaCasada(id, "María"));
 
     resumen.Casado.Should().BeTrue();

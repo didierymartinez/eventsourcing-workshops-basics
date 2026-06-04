@@ -116,7 +116,7 @@ La distinción es de diseño: hay eventos **de dominio** (internos, dentro de tu
 ```csharp
 // 🔧 Marcamos el alcance de cada evento con interfaces (las de Cosmos)
 public record PersonaCumpleañosCelebrado(...) : IPrivateEvent;   // interno: se queda en casa
-public record PersonaCasada(Guid Id, string Pareja) : IPublicEvent; // integración: otros lo necesitan
+public record PersonaCasada(Guid Id, string NombrePareja) : IPublicEvent; // integración: otros lo necesitan
 
 // El AggregateRoot ya sabe separarlos (API real de Cosmos.BuildingBlocks):
 IPrivateEvent[] internos = persona.GetPrivateEvents();  // se procesan dentro del BC

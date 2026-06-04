@@ -36,12 +36,14 @@ Ambas son **puras**: mismas entradas → mismas salidas, sin efectos secundarios
 public class Persona : AggregateRoot
 {
     public bool Casado { get; private set; }
+    public int  Edad   { get; private set; }
 
-    // decide: estado + intención -> evento(s), validando la regla
-    public PersonaCasada RegistrarMatrimonio(string pareja)
+    // decide: estado + intención -> evento(s)
+    public PersonaCasada? RegistrarMatrimonio(string nombrePareja)
     {
-        if (Casado) throw new InvalidOperationException("Jhon ya está casado."); // invariante
-        return new PersonaCasada(Id, pareja);
+        if (Edad < 18) throw new ReglaDeNegocioException("No se puede casar a un menor de edad."); // validación → rechaza
+        if (Casado)    return null;                                                                // idempotencia → no-op
+        return new PersonaCasada(Id, nombrePareja);
     }
 
     // evolve: estado + hecho -> nuevo estado
@@ -67,7 +69,7 @@ Escribir eso a mano en 50 handlers es repetitivo y propenso a olvidar la versió
 Wolverine + Marten generan el ritual cargar/guardar por ti. Tú escribes **solo el `decide`**, y devuelves los eventos:
 
 ```csharp
-public record RegistrarMatrimonio(Guid PersonaId, string Pareja);
+public record RegistrarMatrimonio(Guid PersonaId, string NombrePareja);
 
 public static class RegistrarMatrimonioHandler
 {
@@ -75,8 +77,10 @@ public static class RegistrarMatrimonioHandler
     // (captura la versión esperada para concurrencia optimista)
     public static IEnumerable<object> Handle(RegistrarMatrimonio cmd, [Aggregate] Persona persona)
     {
-        if (persona.Casado) yield break;                       // regla de negocio (decide)
-        yield return new PersonaCasada(cmd.PersonaId, cmd.Pareja); // evento emitido
+        if (persona.Edad < 18)
+            throw new ReglaDeNegocioException("No se puede casar a un menor de edad."); // validación → rechaza
+        if (persona.Casado) yield break;                              // idempotencia → no-op
+        yield return new PersonaCasada(cmd.PersonaId, cmd.NombrePareja); // evento emitido
     }
 }
 ```
@@ -96,7 +100,7 @@ Cuando el agregado aún no existe (primer evento), no usas `[Aggregate]`; devuel
 ```csharp
 public static (CreationResponse, IStartStream) Handle(RegistrarPersona cmd)
 {
-    var nacio = new PersonaNació(cmd.PersonaId, cmd.Nombre, cmd.Ciudad);
+    var nacio = new PersonaNacida(cmd.PersonaId, cmd.Nombre, cmd.Ciudad);
     var start = MartenOps.StartStream<Persona>(cmd.PersonaId, nacio); // side-effect puro
     return (new CreationResponse(cmd.PersonaId), start);
 }

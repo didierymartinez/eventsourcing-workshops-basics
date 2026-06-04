@@ -41,8 +41,8 @@ Nuestro `AppendEvent` actual mete el sobre al cajón sin preguntar nada. Veamos 
 // 💥 Dos procesos concurrentes trabajan sobre el mismo Jhon
 // Proceso A lee a Jhon: última versión = 5
 // Proceso B lee a Jhon: última versión = 5  (al mismo tiempo)
-procesoA.AppendEvent(new EventoAlmacenado(idJhon, Version: 6, ..., new MudanzaRealizada("Madrid")));
-procesoB.AppendEvent(new EventoAlmacenado(idJhon, Version: 6, ..., new MatrimonioRegistrado("Ana")));
+procesoA.AppendEvent(new EventoAlmacenado(idJhon, Version: 6, ..., new PersonaMudada("Madrid")));
+procesoB.AppendEvent(new EventoAlmacenado(idJhon, Version: 6, ..., new PersonaCasada("Ana")));
 // Ambos creyeron ser la versión 6. Uno pisa al otro: un cambio se PIERDE en silencio (lost update).
 ```
 
@@ -174,7 +174,7 @@ IEventStore store = new InMemoryEventStore();
 // (Pre-llenamos el almacén con historia pasada para simular una base de datos)
 var idJhon = Guid.NewGuid();
 store.AppendEvent(new EventoAlmacenado(idJhon, 1, DateTime.UtcNow, new PersonaNacida("Jhon", new DateTime(1990, 5, 10), "Bogotá")));
-store.AppendEvent(new EventoAlmacenado(idJhon, 2, DateTime.UtcNow, new MatrimonioRegistrado("María")));
+store.AppendEvent(new EventoAlmacenado(idJhon, 2, DateTime.UtcNow, new PersonaCasada("María")));
 
 var idAna = Guid.NewGuid();
 store.AppendEvent(new EventoAlmacenado(idAna, 1, DateTime.UtcNow, new PersonaNacida("Ana", new DateTime(1995, 3, 22), "Medellín")));

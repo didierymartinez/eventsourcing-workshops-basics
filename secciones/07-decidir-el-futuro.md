@@ -148,13 +148,19 @@ jhon.RegistrarMatrimonio("María");   // emite PersonaCasada OTRA VEZ
 El agregado es el **guardián de las reglas** (lo dijimos arriba). Así que la defensa nace donde debe: dentro de la `Persona`, validando su estado **antes** de emitir.
 
 ```csharp
-// 🔧 El refactor: el agregado protege su invariante
+// 🔧 El refactor: el agregado protege sus reglas ANTES de emitir
 public class Persona : AggregateRoot
 {
-    public bool Casado { get; private set; }          // ← estado que ahora vigilamos
+    public bool Casado { get; private set; }          // ← estado que vigilamos
+    public int  Edad   { get; private set; }          // ← lo actualiza Apply(CumpleañosCelebrado)
 
     public PersonaCasada? RegistrarMatrimonio(string nombrePareja)
     {
+        // (a) VALIDACIÓN — regla de negocio violada → se RECHAZA (esto sí es un error)
+        if (Edad < 18)
+            throw new ReglaDeNegocioException("No se puede casar a un menor de edad.");
+
+        // (b) IDEMPOTENCIA — comando repetido sobre un estado ya alcanzado → NO-OP (no es un error)
         if (Casado)
             return null;   // ya está casado: no emitimos un evento duplicado
 
@@ -165,8 +171,12 @@ public class Persona : AggregateRoot
 }
 ```
 
-> [!TIP]
-> 🏷️ **El nombre.** Acabas de hacer la operación **idempotente**: ejecutarla una o cinco veces produce el mismo resultado. Es tu **primera línea** de defensa (la regla en el agregado). Más adelante, en mensajería, veremos la **segunda línea**: la deduplicación por *id de mensaje* (Inbox), porque a veces ni siquiera quieres recargar el agregado para descartar un duplicado. Por ahora, recuerda: **validar el estado antes de emitir** ya te protege de los reintentos.
+> [!IMPORTANT]
+> 🏷️ **Dos motivos distintos para NO emitir un evento — no los confundas:**
+> - **Validación (rechazar):** la operación es **inválida** (un menor no puede casarse). Es un **error**: lanzas una excepción (o devuelves un fallo) para que el llamador se entere. *No* debes "tragarte" una regla violada.
+> - **Idempotencia (no-op):** la operación es **válida pero redundante** (ya estaba casado; el comando llegó dos veces). **No es un error**: simplemente no emites un evento duplicado y sigues.
+>
+> Ambas viven en el agregado (el **guardián de las reglas**), pero se comportan distinto: una grita, la otra calla. Más adelante, en mensajería, veremos la **segunda línea** de la idempotencia: deduplicación por *id de mensaje* (Inbox).
 
 ---
 
@@ -180,28 +190,35 @@ public class Persona : AggregateRoot
 `RegistrarMatrimonio` es una **función pura**: recibe el estado (eventos pasados) y un comando, y decide un evento. Eso significa que **ya puedes testearla** — sin base de datos, sin mocks, en microsegundos. Adopta el hábito desde esta sección:
 
 ```csharp
-[Fact]
-public void Casar_a_un_soltero_emite_PersonaCasada()
+// La edad de Jhon se deriva de sus cumpleaños (§03); para "Jhon adulto" montamos su historia.
+static Persona JhonAdulto(params object[] extra)
 {
-    // Given: la historia previa de Jhon
-    var jhon = new Persona(new object[] { new PersonaNacida("Jhon", new DateTime(1990,5,10), "Bogotá") });
-
-    // When: ejecutamos la decisión
-    var evento = jhon.RegistrarMatrimonio("María");
-
-    // Then: el hecho esperado
-    evento.Should().BeOfType<PersonaCasada>();
+    var historia = new List<object> { new PersonaNacida("Jhon", new DateTime(1990,5,10), "Bogotá") };
+    historia.AddRange(Enumerable.Repeat<object>(new CumpleañosCelebrado(), 18)); // → 18 años
+    historia.AddRange(extra);
+    return new Persona(historia);
 }
 
 [Fact]
-public void Casar_a_alguien_ya_casado_no_emite_nada()  // protege la invariante (idempotencia, arriba)
+public void Casar_a_un_adulto_soltero_emite_PersonaCasada()
 {
-    var jhon = new Persona(new object[]
-    {
-        new PersonaNacida("Jhon", new DateTime(1990,5,10), "Bogotá"),
-        new PersonaCasada(idJhon, "María")
-    });
+    var jhon = JhonAdulto();                          // Given
+    var evento = jhon.RegistrarMatrimonio("María");   // When (decide)
+    evento.Should().BeOfType<PersonaCasada>();        // Then
+}
 
+[Fact]
+public void Casar_a_un_menor_es_RECHAZADO()           // validación: la regla se rechaza
+{
+    var jhon = new Persona(new object[] { new PersonaNacida("Jhon", new DateTime(1990,5,10), "Bogotá") }); // Edad 0
+    var act = () => jhon.RegistrarMatrimonio("María");
+    act.Should().Throw<ReglaDeNegocioException>();
+}
+
+[Fact]
+public void Casar_a_alguien_ya_casado_no_emite_nada() // idempotencia: no es error, es no-op
+{
+    var jhon = JhonAdulto(new PersonaCasada(idJhon, "María"));
     jhon.RegistrarMatrimonio("Ana").Should().BeNull();
 }
 ```

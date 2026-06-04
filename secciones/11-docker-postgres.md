@@ -12,8 +12,8 @@ Históricamente, los desarrolladores en C# han guardado datos usando tablas estr
 
 Pero en Event Sourcing, nosotros no guardamos a "Jhon el hombre". **Nosotros guardamos sus eventos**, que tienen esquemas (propiedades) completamente diferentes entre sí:
 *   `PersonaNacida` tiene: Nombre, Fecha, Ciudad.
-*   `MatrimonioRegistrado` tiene: NombrePareja.
-*   `MudanzaRealizada` tiene: NuevaCiudad.
+*   `PersonaCasada` tiene: NombrePareja.
+*   `PersonaMudada` tiene: NuevaCiudad.
 
 Si intentáramos guardar esto en SQL tradicional, tendríamos que crear decenas de tablas diferentes o una tabla gigante llena de columnas vacías (`NombrePareja = null` cuando nace). ¡Una pesadilla de mantenimiento!
 
