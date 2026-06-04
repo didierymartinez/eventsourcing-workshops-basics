@@ -143,7 +143,15 @@ public class MatrimonioSolicitadoHandler
 
 ### El Descubrimiento Crítico
 
-La arquitectura real *nunca* asume que la base de datos es instantánea. En .NET, la persistencia se separa lógicamente del procesamiento usando `.Wait()`, `Task` o `async`.
+La arquitectura real *nunca* asume que la base de datos es instantánea. En .NET, la persistencia se modela con `Task` + `async`/`await`, propagando la asincronía de punta a punta.
+
+> [!WARNING]
+> 🌱 **Semilla — Tres reglas de producción que aún no aplicamos (y que importan).**
+> 1. **Nunca `.Result` ni `.Wait()`** sobre un `Task`. En ASP.NET Core / Azure Functions (como Cosmos) esto no causa el "deadlock" clásico, pero **bloquea un hilo del pool**; bajo carga agotas los hilos y la app se cae (*thread starvation*). La regla: *async hasta arriba*.
+> 2. **Propaga `CancellationToken`.** Toda firma async real lo lleva (`HandleAsync(cmd, CancellationToken ct)`); todas las APIs de Marten/Wolverine lo reciben. Permite abortar trabajo cuando el cliente se va.
+> 3. **`async` no es "más rápido" ni "otro hilo".** En I/O no hay hilo esperando; lo que ganas es **escalabilidad** (más peticiones con los mismos hilos).
+>
+> Lo veremos a fondo, pero adóptalo desde ya: cuando escribas un `HandleAsync`, dale su `CancellationToken`.
 
 Ahora nuestro motor está preparado para el mundo real. Las interfaces ya no nos mienten. Pero, ¿quién implementará ese `Task<IEnumerable<EventoAlmacenado>> GetEventsAsync`? Para eso, en la sección 11 dejaremos atrás la tabla de madera y construiremos una **Bóveda Incombustible** impulsada por tecnología real. 
 

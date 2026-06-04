@@ -78,6 +78,9 @@ builder.Services.AddMarten(options =>
 });
 ```
 
+> [!NOTE]
+> 🌱 **Semilla — recoge la semilla de la Sección 03: el versionado de eventos.** Marten guarda cada evento como **JSON** en PostgreSQL. Eso hace concreto el problema que sembramos al inicio: el día que `PersonaNacida` necesite un campo nuevo (`País`), el JSON viejo en la base **no lo tiene**. ¿Marten explota al deserializar? No — para eso existe el **upcasting** (transformar la versión vieja del evento a la nueva al leerla). Marten documenta esto en *Event Versioning*. Por ahora: que registres los tipos aquí es también el punto donde, más adelante, registrarás sus *upcasters*.
+
 > [!TIP]
 > `AutoCreate.All` es equivalente a que Marten ejecute automáticamente `CREATE TABLE IF NOT EXISTS` al arrancar la app. En producción se recomienda usar `AutoCreate.None` y correr las migraciones de forma controlada.
 
@@ -158,6 +161,12 @@ public class ConsultarPersonaHandler
 > 2. Mantener sus métodos `Apply(TipoDeEvento)` que definimos en la Sección 04.
 >
 > Marten usa exactamente el mismo mecanismo de `Apply` con `dynamic dispatch` que diseñamos a mano. ¡No fue en vano!
+
+> [!NOTE]
+> 🌱 **Semilla — Marten NO usa `dynamic` en la ruta caliente (matiz de rendimiento).** Conceptualmente es el mismo despacho por tipo que hicimos a mano, pero Marten **descubre** tus métodos `Apply` al configurar y **genera/compila** el código que los llama — no paga el costo de `dynamic` en cada evento. Esto es un anticipo del concepto **reflexión vs generación de código** (lo mismo que hace Wolverine): el framework prefiere *generar código inspeccionable* antes que resolver por reflexión en cada llamada.
+
+> [!NOTE]
+> 🌱 **Semilla — recoge la concurrencia optimista de la Sección 06.** `AggregateStreamAsync` es para **leer**. Cuando quieras **escribir** protegiéndote de ediciones simultáneas, Marten ofrece **`FetchForWriting<Persona>(id)`**: carga el agregado capturando su **versión esperada**, y al guardar falla con `ConcurrencyException` si alguien escribió primero. Ese es el cimiento del **Aggregate Handler Workflow** de Wolverine (devuelves eventos y él guarda con la versión correcta), que veremos más adelante.
 
 ---
 

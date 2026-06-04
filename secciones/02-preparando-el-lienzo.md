@@ -39,6 +39,11 @@ Abre el archivo `Program.cs` y borra todo su contenido. Queremos un lienzo total
 
 ---
 
+> [!NOTE]
+> 🌱 **Cómo leer este workshop — las "semillas".** A lo largo del camino verás cajas marcadas con 🌱 **Semilla**. Son adelantos cortos de conceptos avanzados (concurrencia, versionado de eventos, idempotencia, CQRS, generación de código…) plantados **mucho antes** de su sección dedicada. No tienes que dominarlos al verlos: solo *anclar la idea y el nombre correcto*. Cuando reaparezcan a fondo, ya tendrás dónde colgarlos. Es lo contrario a dejar todo lo difícil para el final.
+
+---
+
 [⬅️ Volver a la sección anterior](./01-el-diario-de-jhon.md)
 
 [➡️ Siguiente sección: Vivir el pasado](./03-vivir-el-pasado.md)

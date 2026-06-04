@@ -147,6 +147,41 @@ app.MapPost("/personas", async (RegistrarPersona comando, IMessageBus bus) =>
 
 ---
 
+## 🪐 Cómo lo hace Cosmos
+
+En producción, Cosmos no expone `IMessageBus` directamente: lo envuelve en un `ICommandRouter` para añadir **multi-tenancy**. En `Cosmos.BuildingBlocks/Cosmos.EventSourcing.CritterStack`:
+
+```csharp
+// WolverineCommandRouter.cs — el bus, pero consciente del tenant
+public class WolverineCommandRouter(IMessageBus messageBus, ITenantResolver tenantResolver) : ICommandRouter
+{
+    public Task InvokeAsync<TCommand>(TCommand command, CancellationToken ct) where TCommand : class
+        => messageBus.InvokeForTenantAsync(tenantResolver.TenantId, command, ct);
+}
+```
+
+Y la configuración (`WolverineExtensions.cs`) registra el descubrimiento de handlers, el middleware de Unit of Work y las transacciones automáticas:
+
+```csharp
+serviceCollection.AddWolverine(ExtensionDiscovery.ManualOnly, options =>
+{
+    options.Discovery.IncludeAssembly(dominioAssembly);          // descubre los Handlers del dominio
+    options.Services.AgregarConfiguracionMartenComandos(...)     // Marten
+        .IntegrateWithWolverine();                               // comparten transacción + Outbox
+    options.Policies.AddMiddleware<UnitOfWorkMiddleware>();      // Unit of Work
+    options.Policies.AutoApplyTransactions();                    // por eso no llamas SaveChangesAsync
+    options.Durability.Mode = DurabilityMode.Solo;               // serverless (Azure Functions)
+});
+```
+
+> [!NOTE]
+> Cosmos usa `AddWolverine(ExtensionDiscovery.ManualOnly, …)` en vez de `UseWolverine()` porque corre en **Azure Functions (.NET isolated)**: el auto-descubrimiento de extensiones `[WolverineModule]` intentaba cargar DLLs que no existen en el host serverless (rompía con `Microsoft.Azure.WebJobs`). Es exactamente el tipo de detalle de producción que cubre el Nivel 5 de tu [ruta de experto](../WOLVERINE-RUTA-EXPERTO.md).
+
+> [!NOTE]
+> 🌱 **Semilla — el middleware no es magia: es composición de funciones.** `AddMiddleware<UnitOfWorkMiddleware>()` "envuelve" tu handler. ¿Cómo? Cada middleware recibe un delegado `next` (= "lo que sigue en la cadena") y decide qué hacer antes y después de llamarlo. Encadenar middlewares es literalmente componer funciones: `mw1(mw2(mw3(handler)))`. Si entiendes **delegados** (`Func`/`Action`) y **closures**, podrías escribir tu propio middleware. Y recuerda: Wolverine **genera el código** que arma esta cadena — no la resuelve por reflexión en cada llamada. Lo dominaremos en las secciones de *delegados/composición* y *reflexión-vs-codegen*.
+
+---
+
 ### El Descubrimiento
 
 Con Wolverine hemos eliminado el acoplamiento directo entre el **que pide** (el endpoint HTTP) y el **que ejecuta** (el Handler):

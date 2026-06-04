@@ -31,6 +31,9 @@ Si tenemos la lista de hechos, siempre podemos saber dónde vive hoy, pero adem�
 ### El Descubrimiento
 A esta forma de diseñar sistemas donde la "Fuente de la Verdad" no es una foto del presente, sino la secuencia de todos los hechos del pasado, se le conoce como **Event Sourcing**.
 
+> [!NOTE]
+> 🌱 **Semilla — No todos los hechos le importan a todo el mundo.** Algunos hechos del diario de Jhon solo le conciernen a él (*"celebró un cumpleaños"*); otros, el pueblo entero necesita saberlos (*"se casó"* → el registro civil, la familia). En software esa distinción es real y tiene nombre: **eventos de dominio** (internos, dentro de tu propio módulo) vs **eventos de integración** (públicos, que otros sistemas necesitan). Guárdala: definirá, más adelante, qué eventos se quedan en casa y cuáles se publican al resto del sistema (en Cosmos: `IPrivateEvent` vs `IPublicEvent`).
+
 ---
 
 [➡️ Siguiente sección: Preparando el lienzo](./02-preparando-el-lienzo.md)

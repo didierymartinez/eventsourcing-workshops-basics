@@ -90,6 +90,17 @@ await handlerBoda.HandleAsync(comandoBoda);
 
 ### El Descubrimiento Crítico
 
+> [!NOTE]
+> 🌱 **Semilla — Desarmemos la "magia" (4 conceptos que no son lo mismo).** Aquí dijimos "magia" y "por arte de magia", pero no hay magia:
+> - **DIP** (principio): depender de `IEventStore`, no de `InMemoryEventStore`. Es diseño.
+> - **IoC** (patrón): que algo externo controle la creación/flujo.
+> - **DI** (técnica): pasar la dependencia por el constructor. **Funciona sin framework** — los `new` manuales del inicio de esta sección *ya eran* DI ("pure DI").
+> - **Contenedor** (`ServiceCollection`): la herramienta que automatiza el ensamblaje. Por dentro es **un diccionario (interfaz→cómo crear) + reflexión del constructor + recursión**. Nada mágico.
+>
+> Dos trampas de nivel para tener en el radar: (1) **captive dependency** — registrar un `Scoped` dentro de un `Singleton` lo "congela" con la primera instancia; (2) usar `GetRequiredService` por todo el código (*service locator*) es anti-patrón: solo en el arranque (*composition root*).
+>
+> Y un adelanto clave: **Wolverine intenta NO usar el contenedor en runtime** — *genera código* que hace la inyección de forma explícita (más rápido y, sobre todo, **inspeccionable**). Lo veremos en la sección de reflexión-vs-codegen. Ahí la "magia" desaparece del todo: lees el código generado.
+
 La Inyección de Dependencias no es solo una comodidad, es el **puente que conecta el dominio con la infraestructura**. 
 
 Nuestros Handlers de la Fase 1 (`MatrimonioSolicitadoHandler`) exigen en su constructor un `IEventStore`. Ellos **no tienen idea** si la persistencia ocurre en RAM, en Postgres o en un archivo de texto. A ellos no les importa; el Recepcionista se encarga del trabajo sucio.

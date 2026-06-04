@@ -20,6 +20,9 @@ public record CumpleañosCelebrado();
 public record HijoNacido(string NombreHijo);
 ```
 
+> [!NOTE]
+> 🌱 **Semilla — Los eventos son eternos.** `PersonaNacida` quedará escrito para siempre en el diario. ¿Qué pasa el día que el negocio quiera añadirle un campo `País`? No puedes editar el pasado. Ese problema tiene nombre y solución —*versionado de eventos / upcasting*— y lo veremos a fondo más adelante. Por ahora quédate con la idea: **un evento es un contrato inmutable con el futuro**, así que nómbralo y modélalo con cuidado.
+
 ### El orden preciso de su vida
 Listo, ya tenemos los hitos, pero ahora nos enfrentamos a un problema: el tiempo. Un nacimiento después de un cumpleaños no tendría sentido. Necesitamos que las páginas del diario estén pegadas en el orden exacto en que ocurrieron:
 
@@ -61,6 +64,9 @@ Console.WriteLine($"Persona: {nombre} tiene {edad} años, nació en {ciudad} y t
 ```
 
 Este proceso de lectura se llama **Replay**. Has "vuelto a vivir" el pasado para rehidratar el presente.
+
+> [!NOTE]
+> 🌱 **Semilla — Esto es una función pura llamada `evolve`.** Fíjate en lo que hiciste: tomaste un *estado* y un *evento*, y produjiste un *nuevo estado* — sin tocar base de datos, red ni nada externo. Esa función `(estado, evento) → nuevo estado` tiene un nombre en Event Sourcing: **`evolve`** (la otra mitad se llama **`decide`**, que veremos al emitir eventos). Que sea **pura** es oro: se testea sin mocks ni infraestructura. Cuando lleguemos a Marten y Wolverine, verás que el framework reusa *exactamente* este `evolve` que escribiste a mano.
 
 ¿Notaste cómo tuvimos que usar variables sueltas (`nombre`, `edad`, `hijos`) para capturar la información? **Saltar de este código imperativo a un código de objetos significa conceptualizar estas variables como propiedades de un objeto llamado `Persona`.**
 

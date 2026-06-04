@@ -109,6 +109,12 @@ Acabas de ver el flujo básico para interactuar con el dominio:
 > Intuitivamente, cada acción que le pides a Jhon (como llamar a `RegistrarMatrimonio`) es una petición que le haces al sistema. En diseño de software, a esta intención de hacer algo se le llama **Comando**.
 > Aquí vemos una regla de oro: **Los Comandos son los encargados de generar los Eventos** (siempre a través del Aggregate Root).
 
+> [!NOTE]
+> 🌱 **Semilla — Acabas de escribir la función `decide`.** En la Sección 03 viste `evolve` (estado + evento → estado). Aquí `RegistrarMudanza` hace la otra mitad: **`decide`** (estado + comando → eventos). Juntas forman el **patrón Decider**, el modelo funcional del Event Sourcing: `decide` valida y *decide qué pasó*, `evolve` *aplica lo que pasó*. Ambas son puras → se testean sin base de datos. Marten + Wolverine se montan justo sobre este par.
+
+> [!NOTE]
+> 🌱 **Semilla — ¿Y si el mismo comando llega dos veces?** Hoy, en el camino feliz, `RegistrarMatrimonio` siempre emite el evento. Pero en un sistema real un comando puede reintentarse (la red falló, el usuario hizo doble clic). Si no lo controlas, Jhon se "casa" dos veces. A la propiedad de **dar el mismo resultado aunque la operación se repita** se le llama **idempotencia**, y será clave cuando lleguemos a la mensajería (Outbox). Por ahora: que el agregado **valide su estado antes de emitir** ya es tu primera defensa.
+
 ---
 
 [⬅️ Volver a la sección anterior](./06-el-almacen-en-memoria.md)

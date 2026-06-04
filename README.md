@@ -35,17 +35,29 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 12. [12 - 🗄️ El Bibliotecario Experto (Introducción a Marten)](./secciones/12-introduccion-a-marten.md)
 
 **Fase 4: Desacoplamiento (Wolverine)**
-13. [13 - 📨 El Correo Interno: Wolverine (Próximamente)](./secciones/13-wolverine.md)
-14. [14 - 🤝 El Compromiso Inquebrantable: Outbox (Próximamente)](./secciones/14-outbox.md)
+13. [13 - 📨 El Correo Interno: Wolverine](./secciones/13-wolverine.md) ✅
+14. [14 - 🤝 El Compromiso Inquebrantable: Outbox](./secciones/14-outbox.md) ✅
 
 **Fase 5: Consultas (CQRS)**
 15. [15 - 📊 El Censo: Límites del Event Store (Próximamente)](./secciones/15-limites-busqueda.md)
 16. [16 - 👁️ Vistas Inteligentes: CQRS y Proyecciones (Próximamente)](./secciones/16-proyecciones.md)
 
 **Fase 6: Cierre Magistral**
-17. [17 - 🚀 Plantilla Sincosoft Cosmos (Próximamente)](./secciones/17-plantilla-cosmos.md)
+17. [17 - 🚀 La Plantilla Cosmos.BuildingBlocks](./secciones/17-plantilla-cosmos.md) ✅
+
+> ⚠️ Este listado numérico es **histórico**. El workshop es **evolutivo**: el orden de aprendizaje real y las secciones que vienen están en el [**ROADMAP.md**](./ROADMAP.md).
 
 ---
 
-Sigue el orden de las secciones para avanzar paso a paso en el workshop.
+## 🧭 Documentos de madurez y dominio
+- [**ROADMAP.md**](./ROADMAP.md) — 🗺️ currículo vivo por niveles (básico→avanzado); crece con el tiempo.
+- [**MAPA-CONCEPTUAL.md**](./MAPA-CONCEPTUAL.md) — vista de pájaro: cada concepto → su lugar en el código real de Cosmos.
+- [**WOLVERINE-RUTA-EXPERTO.md**](./WOLVERINE-RUTA-EXPERTO.md) — ruta por niveles para dominar WolverineFx, anclada a Cosmos.
+- [**CONCEPTOS-PROFUNDO.md**](./CONCEPTOS-PROFUNDO.md) — 🧠 auditoría conceptual profunda: cada concepto con su mecanismo bajo el capó, malentendidos y tradeoffs.
+- [**REVISION-CRITICA.md**](./REVISION-CRITICA.md) — revisión crítica y replanteamiento (huecos y mejoras pendientes).
+- [**INSPIRACION-MARTEN-WOLVERINE.md**](./INSPIRACION-MARTEN-WOLVERINE.md) — 📚 qué enseñan Marten y Wolverine que deberíamos introducir.
+
+---
+
+El workshop avanza por el [ROADMAP](./ROADMAP.md), no por el número de archivo.
 

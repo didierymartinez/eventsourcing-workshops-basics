@@ -51,6 +51,9 @@ Ahora construimos la clase envoltorio genérica. Observa cómo "esconde" la list
 > El `<T>` (de *Type*) le permite a esta clase trabajar con cualquier Agregado. 
 > La restricción `where T : AggregateRoot, new()` garantiza que el tipo que metamos aquí sí o sí tenga el método `Load` y pueda instanciarse vacío (`new()`).
 
+> [!NOTE]
+> 🌱 **Semilla — Por qué los genéricos no son solo "ahorro de código".** Sin `<T>` tendrías que devolver `object` y hacer *casts* por todos lados (con riesgo de error en runtime). Con `EventStream<Persona>`, el compilador **sabe** que `Get()` devuelve una `Persona` — seguridad de tipos, autocompletado, y cero *boxing*. La **restricción** `where T : AggregateRoot` es lo que te deja llamar `.Load()` sin castear: le das al compilador la garantía de que `T` *es* un agregado. Esta misma firma genérica con restricción es la que verás en la plantilla de Cosmos: `GetAggregateRootAsync<TAggregateRoot> where TAggregateRoot : AggregateRoot`. **Una sola firma sirve para todos los agregados, con total seguridad de tipos.**
+
 ```csharp
 // Recordatorio: Nuestra clase base ahora tiene una propiedad Id para la identidad
 public abstract class AggregateRoot 

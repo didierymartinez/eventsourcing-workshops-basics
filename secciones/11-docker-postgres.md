@@ -35,6 +35,11 @@ Esta característica le permite a PostgreSQL guardar y buscar dentro de document
 
 PostgreSQL con `JSONB` se ha convertido en la herramienta suprema para Event Sourcing en el ecosistema .NET.
 
+> [!NOTE]
+> 🌱 **Semilla — dos superpoderes de PostgreSQL que usaremos después.**
+> 1. **ACID** (la seguridad transaccional "todo o nada") es lo que hará posible el **Transactional Outbox** (Sección 14): guardar el evento *y* el mensaje a publicar en **una sola transacción**, para que nunca quede uno sin el otro. Sin ACID, no hay Outbox confiable.
+> 2. **`JSONB` es indexable y consultable**: puedes buscar *dentro* del JSON con índices. Eso es lo que permite construir **proyecciones / read models** eficientes (CQRS) sobre los mismos eventos. Guárdalo: el evento crudo y la vista de lectura conviven en el mismo Postgres.
+
 ---
 
 ## 🛠️ Levantando nuestra Bóveda de Concreto (Docker)

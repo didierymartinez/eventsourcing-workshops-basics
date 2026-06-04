@@ -33,6 +33,9 @@ public record EventoAlmacenado(
 > [!NOTE]
 > La `Version` es crucial: garantiza que, aunque miles de eventos lleguen al almacén al mismo tiempo, siempre conserven su estricto orden cronológico dentro de su propia biografía. En la industria, a esto se le conoce como **Control de Concurrencia Optimista**.
 
+> [!NOTE]
+> 🌱 **Semilla — ¿Qué pasa si dos procesos editan a Jhon a la vez?** Ambos leen la versión 5, ambos intentan escribir la versión 6 → colisión. El control **optimista** asume que esto es raro: al guardar, verifica que la versión esperada siga vigente; si no, lanza una **`ConcurrencyException`** y tú **recargas y reintentas**. No bloquea (a diferencia del pesimista). Marten implementa esto con `FetchForWriting`, y lo veremos a fondo más adelante. Por ahora: la `Version` no es solo orden, es tu **detector de conflictos**.
+
 ---
 
 ## 2. El Contrato: El IEventStore
@@ -182,6 +185,9 @@ IEventStore  (Storage centralizado que agrupa a todos)
 > **La herencia estricta** dicta que para mantener el "código limpio", un arquitecto te obligaría a escribir docenas de clases Repositorio (una por cada Agregado en tu app) cuyo único propósito fuera inyectar el `IEventStore`, extraer sobres genéricos y transformarlos a Dominio. Esto genera muchísimo código "puente" repetitivo.
 >
 > **Alerta de spoiler:** A medida que avancemos hacia frameworks de producción en este workshop, descubrirás que las herramientas más potentes del ecosistema .NET desafían abiertamente esta tradición. En lugar de obligarte a escribir clases Repositorio intermedias, te entregarán **súper-interfaces unificadas** que actúan al mismo tiempo como Store Físico (manejan la transacción a BD) y como Repositorio Lógico (te devuelven el Agregado hidratado). Para algunos puristas esto es un *"pecado"* arquitectónico, pero en la vida real, es una de las mayores bendiciones para la productividad y el rendimiento.
+
+> [!NOTE]
+> 🌱 **Semilla — Lo que acabas de hacer es una proyección de lectura.** `Get()` reconstruye el objeto `Persona` recorriendo sus eventos. Pero ese no es el único "lente" posible: de los mismos eventos podrías construir un *ranking de ciudades más pobladas*, un *reporte de matrimonios por año*, etc. A cada vista de lectura derivada de los eventos se le llama **proyección**, y a separar el modelo de escritura (eventos) del de lectura (proyecciones) se le llama **CQRS**. Lo veremos a fondo; por ahora: **el estado actual es solo una de muchas vistas que puedes derivar del diario**.
 
 Pero todavía hay una fragilidad enorme de la que tenemos que hacernos cargo: si el servidor se reinicia, el `InMemoryEventStore` pierde todo su glorioso diccionario. 
 

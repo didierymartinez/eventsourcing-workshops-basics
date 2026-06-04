@@ -183,6 +183,9 @@ Acabamos de abstraer la intermediación de acciones únicas. Nuestro **Aggregate
 
 ¡Felicidades! Acabas de construir desde cero el flujo arquitectónico completo y profesional de Event Sourcing en Memoria.
 
+> [!NOTE]
+> 🌱 **Semilla — Por qué este diseño es un regalo para los tests.** Fíjate en la repartición: el **agregado** (`Persona`) tiene la lógica pura (`decide`/`evolve`, sin I/O) y el **handler** es una capa delgada que orquesta cargar→actuar→guardar. Eso significa que puedes testear toda tu lógica de negocio **sin mocks ni base de datos**: le das eventos pasados (*Given*), ejecutas un comando (*When*), y verificas los eventos emitidos (*Then*). La best-practice oficial de Wolverine lo dice explícitamente: *prefiere funciones puras y evita los mocks*. Más adelante verás que la plantilla de Cosmos trae un `CommandHandlerTestBase` con exactamente este estilo Given-When-Then.
+
 Pero todavía hay una fragilidad enorme de la que tenemos que hacernos cargo: si el servidor se apaga, todo desaparece. En la siguiente sección, enfrentaremos el mundo real: persistencia e I/O.
 
 ---
