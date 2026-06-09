@@ -72,7 +72,7 @@ Hay 3 Scopes dorados en .NET Core:
 ### Cierre de la Fase 2
 Has masterizado la separación estructural pura. Repositorio = Escudo contra DBs. Comandos = Sobres Inmutables de intención. DI = Nuestro Robot automático de Ensamblaje. 
 
-En la siguiente etapa, soltaremos la estructura técnica para sumergirnos profundamente en el mindset del analista de negocios. Entramos a la sala de Domain Driven Design.
+Pero antes de soltar la estructura técnica, vale la pena **ponerle nombre** a lo que acabas de hacer: el patrón Comando, el Repositorio y la DI no fueron decisiones sueltas — eran **SOLID** en acción. Lo consolidamos en la siguiente sección y, ya con eso firme, entramos a Domain Driven Design.
 
 ---
-[⬅️ Volver a la sección anterior](./05-el-patron-repositorio.md) | [➡️ Siguiente Fase: Lenguaje Ubicuo (DDD)](./07-lenguaje-ubicuo.md)
+[⬅️ Volver a la sección anterior](./05-el-patron-repositorio.md) | [➡️ Siguiente sección: SOLID en ejemplos reales](./06b-solid-en-ejemplos-reales.md)

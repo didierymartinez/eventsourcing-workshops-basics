@@ -19,6 +19,7 @@ A lo largo de este recorrido, no guardaremos nada en archivos de texto exóticos
 Entender las piezas finas que C# nos da para esquivar los problemas de Orientación a Objetos tradicional.
 1. [Inmutabilidad y Records](./secciones/01-records-e-inmutabilidad.md) — 🎯 *para modelar **comandos y eventos** que viajan sin que nadie los altere.*
 2. [Interfaces vs Clases Abstractas](./secciones/02-interfaces-vs-abstract-classes.md) — 🎯 *para definir el `IEventStore` (contrato) y el `AggregateRoot` (motor base con estado).*
+   - 2b. [Genéricos y restricciones (`where T`)](./secciones/02b-genericos-y-restricciones.md) — 🎯 *para un solo `EventStream<T>` y `GetAggregateRootAsync<T>` que sirven para cualquier agregado.*
 3. [Polimorfismo y despacho (`switch`/`dynamic`)](./secciones/03-polimorfismo-y-dynamic-dispatching.md) — 🎯 *para el motor `Apply`/`evolve` que reconstruye un agregado desde sus eventos.*
 
 ### Fase 2: Patrones Estructurales 
@@ -26,6 +27,7 @@ El arte de desacoplar el negocio de la tecnología.
 4. [El Patrón Comando (Command Pattern)](./secciones/04-el-patron-comando.md) — 🎯 *para los **Command Handlers**: recibir una intención y ejecutarla sin ensuciar la UI.*
 5. [El Patrón Repositorio](./secciones/05-el-patron-repositorio.md) — 🎯 *para entender por qué Marten es a la vez repositorio y store (y cuándo NO abstraer).*
 6. [Inversión de Control (Inyección de Dependencias)](./secciones/06-inyeccion-de-dependencias.md) — 🎯 *para ensamblar handlers + store, y entender cómo Wolverine resuelve/genera todo.*
+   - 6b. [SOLID en ejemplos reales](./secciones/06b-solid-en-ejemplos-reales.md) — 🎯 *para ponerle nombre a las decisiones de §04-§06 (SRP, OCP, LSP, ISP, DIP) y defender un diseño.*
 
 ### Fase 3: Introducción a DDD
 Pensar junto a negocio.

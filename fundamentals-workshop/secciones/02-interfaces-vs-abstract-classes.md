@@ -64,4 +64,4 @@ Por eso, `abstract class` es una herramienta de uso muy calculada. Resérvala so
 
 ---
 
-[⬅️ Volver a la sección anterior](./01-records-e-inmutabilidad.md) | [➡️ Siguiente sección: La Magia del Enrutamiento](./03-polimorfismo-y-dynamic-dispatching.md)
+[⬅️ Volver a la sección anterior](./01-records-e-inmutabilidad.md) | [➡️ Siguiente sección: Genéricos y restricciones (`where T`)](./02b-genericos-y-restricciones.md)
