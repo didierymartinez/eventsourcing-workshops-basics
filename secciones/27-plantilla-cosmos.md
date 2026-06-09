@@ -1,6 +1,8 @@
-# 17 - La Plantilla Cosmos: Construir un Producto sobre `Cosmos.BuildingBlocks`
+# 27 - 🏛️ Capstone: La Plantilla Cosmos — Construir un Producto sobre `Cosmos.BuildingBlocks`
 
-> Aquí se junta todo. `Cosmos.BuildingBlocks` es la **plantilla** sobre la que se construyen los productos del ERP (Órdenes de Compra, Obligaciones por Pagar, Contabilidad…). Esta guía tiene dos objetivos: (1) **entender su anatomía** y (2) darte la **receta productiva** para crear un Bounded Context nuevo sin reinventar nada. Filosofía: ya construiste a mano el motor (Secciones 1-16); aquí ves el motor de producción ya ensamblado.
+> 🎯 **Hacia dónde va:** cerramos el viaje viendo el motor de producción ya ensamblado en `Cosmos.BuildingBlocks` y la receta para crear un Bounded Context nuevo del ERP, aplicando todo lo aprendido a un producto real.
+
+> **Cierre del workshop.** `Cosmos.BuildingBlocks` es la **plantilla** sobre la que se construyen los productos del ERP (Órdenes de Compra, Obligaciones por Pagar, Contabilidad…). Esta guía tiene dos objetivos: (1) **entender su anatomía** y (2) darte la **receta productiva** para crear un Bounded Context nuevo sin reinventar nada. Filosofía: ya construiste a mano el motor (§01-§16) y dominaste los patrones de producción (§18-§26); aquí ves todo el motor de producción ya ensamblado.
 
 > [!NOTE]
 > 🔀 **Cambio de hilo (a propósito).** Hasta aquí el ejemplo fue **Jhon / Biografías**. A partir de esta sección saltamos a un **producto real de Cosmos** (`OrdenDeCompra`) para que veas el patrón en su hábitat. No es un ejemplo nuevo: es **exactamente lo mismo que ya dominas** con `Persona` —agregado, eventos, comando, handler— aplicado a un dominio del ERP. Si en algún punto te pierdes, traduce mentalmente `OrdenDeCompra` ↔ `Persona`.

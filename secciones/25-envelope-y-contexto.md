@@ -1,6 +1,8 @@
 # 25 - El Envelope: cómo viaja el contexto (tenant, usuario) y por qué no se procesa en memoria
 
-> 🌳 **Sección donde se domina** la semilla de multi-tenancy (§17) y conecta con el bug del `TenantId = DEFAULT` que vimos en §10. Resuelve: *cuando despacho un comando/evento por la cola, ¿cómo viajan el tenant y el usuario?*
+> 🎯 **Hacia dónde va:** resolvemos cómo viajan el tenant y el usuario cuando un mensaje cruza la cola usando el Envelope, en vez de mezclar el contexto dentro del payload —pieza clave del multi-tenancy.
+
+> 🌳 **Sección donde se domina** la semilla de multi-tenancy (§27) y conecta con el bug del `TenantId = DEFAULT` que vimos en §10. Resuelve: *cuando despacho un comando/evento por la cola, ¿cómo viajan el tenant y el usuario?*
 
 ## El escenario
 En una petición HTTP tienes un **contexto** completo: el request trae el tenant, el usuario, sus permisos, todo. Pero cuando publicas un mensaje a una cola (Outbox → Service Bus), ese mensaje viaja **solo** hasta otro proceso, quizá minutos después. ¿Cómo sabe el handler del otro lado *de qué tenant* es el mensaje?

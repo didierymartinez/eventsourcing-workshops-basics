@@ -1,4 +1,6 @@
 # 12 - El Mensajero Seguro: El Patrón Transaccional Outbox
+> 🎯 **Hacia dónde va:** El Outbox garantiza que guardar tus eventos y publicarlos al exterior sea atómico; es el pilar que hace tu arquitectura de Event Sourcing indestructible y que verás nativo en Marten + Wolverine en el workshop principal.
+> 📦 **Ejemplo de esta sección:** Orden de compra (OrdenConfirmada).
 
 Supongamos que en la sección anterior aplicamos el CQRS junto al sistema de eventos.
 
@@ -60,6 +62,11 @@ El Cartero agarra este mensaje de BD, y lo envía por red a RabbitMQ/AWS de form
 Construir manualmente la Base de Datos de Outbox, el Hilo en Background, las re-intentativas infinitas y el evitar envíos duplicados, puede tomar semanas de desarrollo para tu equipo. 
 
 En el EventSourcing Workshop, verás que la mágica combinación de **Marten (Base de Datos) + Wolverine (Bus)** trae el Outbox nativo e invisible. Literalmente en config escribes `.AddMartenOutbox()` y todos tus eventos jamás se perderán garantizado a nivel banco.
+
+> [!IMPORTANT]
+> **El Outbox garantiza entrega "al menos una vez" (at-least-once), no "exactamente una vez".** Un reintento del relay puede **entregar el mismo mensaje dos veces**. Por eso el consumidor debe ser **idempotente**: procesar el mismo mensaje N veces produce el mismo resultado (dedup por id de mensaje, o una operación naturalmente idempotente). El *"exactly-once delivery"* es un **mito** en sistemas distribuidos; lo alcanzable es *at-least-once + idempotencia* = efecto exactly-once en el **procesamiento**.
+>
+> **Patrón hermano: el Inbox.** Así como el Outbox protege el **envío**, el **Inbox** protege la **recepción**: registra los mensajes ya procesados para **descartar duplicados** de forma durable. Wolverine también lo trae. Outbox (salida) + Inbox (entrada) = mensajería confiable de punta a punta.
 
 ¡Con este pilar, tu arquitectura es virtualmente Indestructible y Escalable! Ya estás listo para el Workshop Principal de **EventSourcing**.
 

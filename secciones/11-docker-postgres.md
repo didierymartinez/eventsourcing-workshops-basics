@@ -1,5 +1,7 @@
 # 11 - El Archivero Incombustible: Docker y PostgreSQL
 
+> 🎯 **Hacia dónde va:** levantamos PostgreSQL en Docker para reemplazar la RAM volátil por una bóveda persistente, la base de datos real donde guardaremos los eventos de aquí en adelante.
+
 Hasta la Fase 2, nuestra **Agencia de Biografías** dependía de un delicado escritorio de cristal (la Memoria RAM). Era rápido e inmediato, pero bastaba con un corte de luz (detener la aplicación) para que todos los recuerdos de nuestros clientes desaparecieran para siempre.
 
 Con la Inyección de Dependencias (El Recepcionista) ya configurada, estamos listos para reemplazar ese escritorio de cristal por una **bóveda incombustible**.

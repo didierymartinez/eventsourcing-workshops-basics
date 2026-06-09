@@ -1,4 +1,5 @@
 # 05 - Abstraer el Archivero: El Patrón Repositorio (Repository)
+> 🎯 **Hacia dónde va:** El Repositorio aísla tu dominio de la persistencia; en Event Sourcing es lo que tu handler usa para rehidratar un agregado desde sus eventos y volver a guardarlo, sin saber que detrás hay un EventStore como Marten.
 
 En la sección anterior, vimos al `RegistrarMatrimonioHandler` ir a un cajón llamado `IPersonaRepository` para sacar a Jhon y luego para guardarlo. 
 
@@ -60,7 +61,7 @@ public class SqlPersonaRepository : IPersonaRepository
 ```
 
 > [!TIP]
-> Si mañana el cliente decide cambiar SQL Server por MongoDB, los desarrolladores solo tienen que crear una clase `MongoPersonaRepository : IPersonaRepository`. ¡No tendremos que reescribir ni una coma de nuestros Handlers ni Controladores! A esto se le conoce como **Dipendency Inversion Principle (La "D" de SOLID)**.
+> Si mañana el cliente decide cambiar SQL Server por MongoDB, los desarrolladores solo tienen que crear una clase `MongoPersonaRepository : IPersonaRepository`. ¡No tendremos que reescribir ni una coma de nuestros Handlers ni Controladores! A esto se le conoce como **Dependency Inversion Principle (La "D" de SOLID)**.
 
 ### Event Sourcing rompe el paradigma
 Es vital que entiendas el Repositorio Clásico porque en el universo moderno de Event Sourcing en .NET, vas a presenciar una **herejía productiva**.
@@ -68,6 +69,12 @@ Es vital que entiendas el Repositorio Clásico porque en el universo moderno de 
 Veremos librerías como `Marten` en el workshop principal que te otorgan una superinterfaz (como `IDocumentSession`) que es al mismo tiempo repositorio lógico ("dame este agregado") y motor de persistencia ("yo me ocupo de generar el SQL nativo contra PostgreSQL subyacente"). 
 
 Muchos puristas detestan inyectar clases de frameworks directamente en los Handlers porque viola el DDD clásico. Pero la agilidad para rehidratar agregados a partir de eventos que entregan herramientas como Marten o EventStoreDB suele justificar eliminar las clases intermedias en muchos escenarios de industria.
+
+> [!WARNING]
+> **El "cuándo NO": el Repository sobre un ORM suele ser un anti-patrón.** Si tu persistencia es Entity Framework Core, EF **ya es** un Repository + Unit of Work. Envolverlo en otro `IRepository<T>` genérico a menudo solo **oculta sus capacidades** (consultas, tracking, transacciones) y agrega una capa sin valor. El Repository brilla cuando de verdad **abstraes tecnologías muy distintas** (o para testear); no como ceremonia automática sobre cualquier ORM.
+
+> [!NOTE]
+> **Concepto hermano que falta nombrar: Unit of Work.** El Repository te da "dame/guarda un agregado", pero ¿quién decide **cuándo se confirma todo junto** (la transacción)? Ese es el **Unit of Work**: agrupa varios cambios y hace un solo `commit`. En el workshop principal lo verás como `SaveChangesAsync()` (Marten) y, en Cosmos, automatizado por el `UnitOfWorkMiddleware` de Wolverine.
 
 ---
 [⬅️ Volver a la sección anterior](./04-el-patron-comando.md) | [➡️ Siguiente sección: Inyección de Dependencias](./06-inyeccion-de-dependencias.md)

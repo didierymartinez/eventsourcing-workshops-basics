@@ -1,5 +1,7 @@
 # 26 - Dos Bounded Contexts hablando: qué vive dentro y qué cruza la frontera
 
+> 🎯 **Hacia dónde va:** hacemos tangible la distinción privado vs público creando un segundo Bounded Context y comunicándolo con el primero, para ver en código qué evento se queda dentro y cuál cruza la frontera.
+
 > 🌳 Aquí se vuelve **tangible** la distinción privado vs público. Hasta ahora todo pasaba dentro de un solo contexto (la **Agencia de Biografías**). Vamos a crear un **segundo** Bounded Context y hacer que se comuniquen — así se ve, en código, qué evento es "de adentro" y cuál "cruza la frontera".
 
 ## El problema de claridad
@@ -121,6 +123,9 @@ public class ActaMatrimonio : AggregateRoot
 }
 ```
 
+> [!NOTE]
+> 🆕 **¿Por qué `RaiseEvent(...)` y ya no `return new ...`?** Hasta aquí, nuestros métodos de agregado **devolvían** el evento (`return new PersonaCasada(...)`) y el handler lo guardaba — el patrón *cascading messages* de §07. `RaiseEvent` es la otra forma, la que usa la plantilla Cosmos: el agregado **aplica el evento a sí mismo y lo encola** en una lista interna de "eventos sin confirmar", y el framework los persiste al final. En una línea: `RaiseEvent(e)` ≡ `Apply(e)` + `_uncommittedEvents.Add(e)`. Lo formalizamos en §27; aquí solo reconoce que es **equivalente**, no un mecanismo nuevo.
+
 Fíjate en el detalle del **lenguaje ubicuo** (§07 fundamentals): en Biografías es `Persona`; en Registro Civil es `Ciudadano`. La misma realidad, **dos lenguajes** — y eso está bien, porque son **dos Bounded Contexts**. La ACL es justamente el traductor entre esos dos idiomas.
 
 ---
@@ -150,4 +155,4 @@ Así se hablan los BCs reales: **ObligacionesPorPagar**, **Contabilidad**, **Imp
 
 ---
 
-[⬅️ Volver a Envelope y contexto](./25-envelope-y-contexto.md) · [🗺️ Roadmap](../ROADMAP.md) · [🏛️ La Plantilla Cosmos](./17-plantilla-cosmos.md)
+[⬅️ Volver a Envelope y contexto](./25-envelope-y-contexto.md) · [🗺️ Roadmap](../ROADMAP.md) · [🏛️ La Plantilla Cosmos](./27-plantilla-cosmos.md)

@@ -1,5 +1,7 @@
 # 05 - El flujo de vida: El EventStream
 
+> 🎯 **Hacia dónde va:** encapsulamos la lista cruda de eventos en un `EventStream<T>` que protege el flujo de vida de cada individuo, paso previo a centralizar el almacenamiento.
+
 En la sección anterior, logramos construir un **motor de rehidratación** elegante dentro de la clase base `AggregateRoot`. 
 
 Sin embargo, para "despertar" a Jhon, todavía dependemos de pasarle una lista cruda desde nuestro programa principal:
@@ -53,6 +55,9 @@ Ahora construimos la clase envoltorio genérica. Observa cómo "esconde" la list
 
 > [!NOTE]
 > 🌱 **Semilla — Por qué los genéricos no son solo "ahorro de código".** Sin `<T>` tendrías que devolver `object` y hacer *casts* por todos lados (con riesgo de error en runtime). Con `EventStream<Persona>`, el compilador **sabe** que `Get()` devuelve una `Persona` — seguridad de tipos, autocompletado, y cero *boxing*. La **restricción** `where T : AggregateRoot` es lo que te deja llamar `.Load()` sin castear: le das al compilador la garantía de que `T` *es* un agregado. Esta misma firma genérica con restricción es la que verás en la plantilla de Cosmos: `GetAggregateRootAsync<TAggregateRoot> where TAggregateRoot : AggregateRoot`. **Una sola firma sirve para todos los agregados, con total seguridad de tipos.**
+
+> [!IMPORTANT]
+> **Cambio respecto a la Sección 03 (para que no te confunda).** Antes creábamos a Jhon pasándole los eventos al constructor: `new Persona(eventos)`. **A partir de aquí ya no.** El `EventStream` crea la entidad **vacía** (`new T()`) y la rehidrata llamando `Load(eventos)` por separado. Por eso la restricción pide `new()` (constructor sin parámetros). Es el mismo patrón que usará Marten más adelante: instanciar vacío → aplicar los eventos. Si ves `new Persona()` sin argumentos, es esto — no un error.
 
 ```csharp
 // Recordatorio: Nuestra clase base ahora tiene una propiedad Id para la identidad

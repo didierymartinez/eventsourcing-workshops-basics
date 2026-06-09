@@ -1,4 +1,5 @@
 # 02 - El Contrato vs El Molde: Interfaces vs Clases Abstractas
+> 🎯 **Hacia dónde va:** Saber cuándo usar `interface` (contrato para desacoplar Handlers y EventStores) o `abstract class` (motor reutilizable del `AggregateRoot`) es lo que te permitirá estructurar el polimorfismo de tu sistema de Event Sourcing.
 
 En C#, tenemos dos herramientas principales para estandarizar objetos: las **Interfaces** (`interface`) y las **Clases Abstractas** (`abstract class`).
 
@@ -14,6 +15,8 @@ public interface ICommandHandler<in TCommand>
     void Handle(TCommand command);
 }
 ```
+
+El modificador `in` de `TCommand` indica **contravarianza**: permite usar un handler de un tipo de comando base donde se espera uno de un tipo derivado (la flexibilidad fluye "hacia adentro", de lo general a lo específico).
 
 - **Uso Estructural:** La usamos para lograr **Desacoplamiento (Loose Coupling)**. 
 - **El escenario ideal:** Cuando diferentes clases hacen el mismo trabajo conceptual pero su implementación física es drásticamente distinta. Por ejemplo, `InMemoryEventStore` guarda datos en un diccionario, mientras que `PostgresEventStore` guarda datos haciendo llamados de red a un motor SQL. Comparten el contrato (`IEventStore`), pero no comparten ni una sola línea de código útil entre ellos.

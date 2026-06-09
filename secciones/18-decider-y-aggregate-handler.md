@@ -1,5 +1,7 @@
 # 18 - El Decider y el Aggregate Handler Workflow
 
+> 🎯 **Hacia dónde va:** eliminamos el boilerplate repetido de cada handler adoptando el patrón Decider y el Aggregate Handler Workflow del Critter Stack, el patrón real de producción que reúne todo lo construido.
+
 > 🌳 **Sección donde se dominan las semillas** de §03 (`evolve`), §07 (`decide`), §04 (el motor automatizado), §06 y §12 (`FetchForWriting`/concurrencia). Aquí juntamos todo en el patrón real de producción del Critter Stack.
 
 En la Sección 08 escribiste el Command Handler completo: cargar → actuar → guardar. Funciona, pero si te fijas, **cada handler repite el mismo ritual**:
@@ -108,6 +110,12 @@ public static (CreationResponse, IStartStream) Handle(RegistrarPersona cmd)
 
 Y para responder con el estado ya actualizado (incluyendo los eventos recién emitidos), Marten ofrece `FetchLatest<Persona>(id)`.
 
+> [!NOTE]
+> **Glosario rápido de lo nuevo (que no sea jerga):**
+> - **`yield return` / `IEnumerable<object>`:** el handler **devuelve** los eventos en vez de guardarlos él mismo (recuerda *cascading messages*, §07). Devolver una secuencia permite emitir **cero, uno o varios** eventos; Wolverine recorre lo devuelto y lo appendea. `yield break` = "no emito nada" (caso idempotente).
+> - **`MartenOps.StartStream<Persona>(id, evento)`:** un **side-effect** que le dice a Marten "inicia un stream nuevo para este id con este evento". Lo **devuelves** (no inyectas la sesión), manteniendo el handler puro.
+> - **`IStartStream` / `CreationResponse`:** `IStartStream` es el *tipo* de ese side-effect que Wolverine sabe ejecutar; `CreationResponse` es simplemente **tu DTO de respuesta** (lo que le contestas al llamador, p. ej. el id creado) — no es de Marten, lo defines tú.
+
 ---
 
 ## 🏛️ Esta forma tiene nombre: A-Frame Architecture
@@ -139,7 +147,7 @@ Es la letra **A**: dos "patas" que **no se hablan entre sí** —la **infraestru
 
 ## 4. ¿Cuándo el workflow y cuándo el `IEventStore` manual?
 
-La plantilla de Cosmos (`Cosmos.BuildingBlocks`, Sección 17) expone **ambos** estilos:
+La plantilla de Cosmos (`Cosmos.BuildingBlocks`, Sección 27) expone **ambos** estilos:
 - **`IEventStore` explícito** (`GetAggregateRootAsync` → método del agregado → `Save` → `SaveChangesAsync`): más verboso, pero control total del flujo. Útil cuando un handler coordina algo más que un solo agregado.
 - **Aggregate Handler Workflow** (`[Aggregate]` + `FetchForWriting`): mínima ceremonia, ideal para el caso común "un comando muta un agregado". Es el patrón que más verás.
 
@@ -158,4 +166,4 @@ El patrón Decider (`decide` + `evolve`) es el modelo mental; el Aggregate Handl
 
 ---
 
-[⬅️ Volver a Outbox](./14-outbox.md) · [🗺️ Roadmap](../ROADMAP.md) · [🏛️ La Plantilla Cosmos](./17-plantilla-cosmos.md)
+[⬅️ Volver a Outbox](./14-outbox.md) · [🗺️ Roadmap](../ROADMAP.md) · [🏛️ La Plantilla Cosmos](./27-plantilla-cosmos.md)

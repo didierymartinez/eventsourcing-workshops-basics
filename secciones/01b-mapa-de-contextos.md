@@ -1,6 +1,11 @@
 # 01b - El mapa: tu Bounded Context y el mundo de afuera
 
+> 🎯 **Hacia dónde va:** fijamos el mapa del Bounded Context y de los eventos que cruzan la frontera, el encuadre que dará sentido más adelante a eventos privados/públicos, traducción y dos contextos comunicándose.
+
 > 📍 **Encuadre temprano.** Antes de escribir una sola línea, fijemos el mapa del mundo que vamos a construir. Este mapa hace que todo lo que viene después —eventos privados/públicos, traducción de mensajes, contexto— tenga un lugar claro desde el principio, en vez de aparecer "de la nada" al final.
+
+> [!TIP]
+> 🧠 **Lo único que debes llevarte de esta sección** (el resto es un mapa para *ojear*, no para memorizar): **(1)** construyes *dentro* de una frontera llamada **Bounded Context**; **(2)** algunos hechos se quedan adentro y otros **cruzan** a otro sistema. Nada más. Los nombres que verás abajo (ACL, Envelope, integración…) son solo "etiquetas en el mapa" — cada uno tendrá su sección propia; aquí no hay que entenderlos, solo saber que existen.
 
 ## La frontera que lo organiza todo: el Bounded Context
 
@@ -42,13 +47,13 @@ Esta es la idea que iremos explicando módulo a módulo. Cuando algo le pasa a J
 > El criterio **no** es si *socialmente* alguien se entera (a un cumpleaños va la familia; tener novia lo sabe medio mundo) — el criterio es si **otro Bounded Context tiene que reaccionar** al hecho, normalmente porque tiene un **efecto oficial/legal**. Conseguir novia no cambia nada en ningún sistema; **casarse cambia tu estado civil**, y eso el Registro Civil sí lo registra.
 
 ```
-        Dentro de Biografías          │   Otro sistema debe reaccionar
-   ─────────────────────────────────  │  ──────────────────────────────
+        Dentro de Biografías           │   Otro sistema debe reaccionar
+   ─────────────────────────────────   │  ──────────────────────────────
    PersonaNacida        (privado)      │
    NoviazgoIniciado     (privado)      │
    CumpleañosCelebrado  (privado)      │
    PersonaCasada        (privado) ─────┼──▶  MatrimonioCelebrado (integración)
-   (cambia estado civil)              │      → el Registro Civil inscribe
+   (cambia estado civil)               │      → el Registro Civil inscribe
 ```
 
 > [!NOTE]

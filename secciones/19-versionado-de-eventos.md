@@ -1,5 +1,7 @@
 # 19 - Versionado de Eventos: cómo cambiar lo que es inmutable
 
+> 🎯 **Hacia dónde va:** resolvemos el problema que rompe sistemas en producción —cómo evolucionar eventos ya guardados como JSON sin editar el pasado— con versionado y upcasting.
+
 > 🌳 **Sección donde se domina** la semilla de §03 ("los eventos son eternos") y §12 ("Marten los guarda como JSON"). Este es el problema que rompe sistemas en producción y que casi nadie enseña.
 
 ## El problema que tarde o temprano vas a tener

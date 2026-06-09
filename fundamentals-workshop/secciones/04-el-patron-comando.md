@@ -1,4 +1,5 @@
 # 04 - Separar la Intención de la Ejecución: El Patrón Comando
+> 🎯 **Hacia dónde va:** El Comando es el cimiento de Event Sourcing y CQRS: toda operación de escritura entra como un comando que el handler procesa para, al final, emitir los eventos que registran lo sucedido.
 
 Si alguna vez has escrito código dentro del "botón Guardar" (`OnClick`) de un formulario de escritorio, o has puesto consultas a base de datos del tipo `dbContext.Users.Add(...)` directamente dentro de un Controlador HTTP en una web, has violado el principio más sagrado de la arquitectura limpia: responsabilidades mezcladas.
 
@@ -75,5 +76,10 @@ En una aplicación clásica (CRUD), a veces los Programadores saltan este paso p
 
 Pero en **Event Sourcing y CQRS**, el patrón Comando no es opcional, es el cimiento absoluto. Toda tu aplicación se tratará de enviar comandos, que generarán validaciones, que a su vez emitirán Eventos para registrar lo sucedido. Dominar esta mensajería es el primer paso.
 
----
-[⬅️ Volver a la Fase anterior](./03-polimorfismo-y-dynamic-dispatching.md) | [➡️ Siguiente sección: El Patrón Repositorio](./05-el-patron-repositorio.md)
+> [!NOTE]
+> **Dos cosas que se llaman "Command" — no las confundas:**
+> - El **Command Pattern de GoF**: un *objeto que encapsula una acción* con un método `Execute()` (para deshacer/rehacer, colas de undo, etc.).
+> - El **comando de mensajería/CQRS** (lo de esta sección): un *DTO de intención* (`record`) que un handler procesa. **No tiene `Execute()`**; es solo datos.
+> Son ideas distintas con el mismo nombre. Aquí siempre hablamos del segundo.
+>
+> **¿Dónde va la validación?** Distingue: la **validación estructural** ("el campo no viene vacío", "el monto es > 0") puede ir antes, en un middleware/borde. Pero las **reglas de negocio** ("no se puede casar a un menor", "no hay stock") **viven en el Agregado** —el guardián de las reglas— nunca en el `record` del comando (que es solo un sobre de datos).

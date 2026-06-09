@@ -1,4 +1,6 @@
 # 07 - Hablar con el Negocio: Lenguaje Ubicuo (Ubiquitous Language)
+> 🎯 **Hacia dónde va:** El Lenguaje Ubicuo es lo que hará que tus comandos, métodos y eventos se llamen como el negocio realmente habla; en Event Sourcing es vital porque los nombres de tus eventos son el registro histórico que leerán los expertos del dominio.
+> 📦 **Ejemplo de esta sección:** Hospital / Paciente (ingreso crítico por urgencias).
 
 Domain-Driven Design (DDD) es una filosofía creada por Eric Evans. Su premisa número uno es simple pero revolucionaria: **El código no debe reflejar la estructura de una base de datos, debe reflejar el lenguaje exacto que hablan los expertos del negocio.**
 
@@ -66,6 +68,9 @@ Debe llamarse `PacienteCriticoIngresado`.
 3. **Eventos (El Pasado Perfecto):** Verbo en pasado participio. Describe que algo sucedió irremediablemente. Ej: `PacienteCriticoIngresado`. Jamás uses `PatientRecordChanged`.
 
 Si al leer en voz alta tus clases y métodos frente al Gerente de Operaciones de la empresa éste te entiende a la perfección, ¡Felicidades! Has logrado usar Lenguaje Ubicuo.
+
+> [!NOTE]
+> **El Lenguaje Ubicuo es *por Bounded Context*.** La misma palabra puede significar cosas distintas en módulos distintos: para Recursos Humanos una persona es un *Empleado* (con cargo y vacaciones); para Contabilidad es un *Tercero* (con cuenta por pagar). Mismo humano, **dos lenguajes**, porque son **dos Bounded Contexts** (la frontera donde un modelo y su lenguaje son coherentes). No existe "el lenguaje ubicuo de la empresa" — existe *uno por contexto*. En el workshop principal verás esto en acción cuando `Persona` (Biografías) se traduce a `Ciudadano` (Registro Civil) en la frontera.
 
 ---
 [⬅️ Volver a la Fase anterior](./06-inyeccion-de-dependencias.md) | [➡️ Siguiente sección: El Agregado y su Raíz](./08-aggregate-y-aggregate-root.md)

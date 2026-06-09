@@ -17,7 +17,7 @@
 | ✅ | Inmutabilidad y Records | shallow vs deep, `readonly record struct` *(ampliar)* |
 | ✅ | Interfaces vs Clases Abstractas | + default interface methods (C# 8), composición > herencia *(ampliar)* |
 | 🧩 | **Genéricos y restricciones (`where T`)** | base de `GetAggregateRootAsync<T>` y discovery |
-| ✅ | [**Delegados, `Func`/`Action` y composición → Middleware**](./secciones/23-de-codigo-repetido-a-middleware.md) | arco naive→refactor: del código repetido al pipeline |
+| ✅ | [**Delegados, `Func`/`Action` y composición → Middleware**](./secciones/23-de-codigo-repetido-a-middleware.md) | arco naive→refactor: del código repetido al pipeline. **Se lee aquí (temprano)**, aunque su archivo sea el 23: DI (§10) y Wolverine (§13) dan por sabido este concepto |
 | 🧩 | **SOLID en ejemplos reales** | DIP y OCP como columna vertebral |
 | ✅ | Polimorfismo y dispatch | `switch` tipado **primero**, `dynamic` con sus costos *(replantear)* |
 
@@ -69,7 +69,7 @@
 ## 🏛️ Capstone — La Plantilla
 | Estado | Sección | Concepto núcleo |
 |--------|---------|-----------------|
-| ✅ | [Plantilla Cosmos.BuildingBlocks](./secciones/17-plantilla-cosmos.md) | construir un BC real sobre la plantilla |
+| ✅ | [Plantilla Cosmos.BuildingBlocks](./secciones/27-plantilla-cosmos.md) | construir un BC real sobre la plantilla |
 | 💡 | Reconstruir un BC real de Cosmos | OxP.Radicación de punta a punta |
 
 ---

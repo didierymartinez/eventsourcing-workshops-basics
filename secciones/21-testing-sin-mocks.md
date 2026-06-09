@@ -1,5 +1,7 @@
 # 21 - Testing sin mocks: el superpoder oculto del Event Sourcing
 
+> 🎯 **Hacia dónde va:** aprovechamos las funciones puras del patrón Decider para escribir tests Given-When-Then sin mocks, mostrando que el Event Sourcing bien hecho es de lo más testeable que existe.
+
 > 🌳 **Sección donde se domina** la semilla de §08 ("este diseño es un regalo para los tests"). El Event Sourcing, bien hecho, es de lo más testeable que existe — y casi **sin mocks**.
 
 ## Por qué el Event Sourcing es tan testeable

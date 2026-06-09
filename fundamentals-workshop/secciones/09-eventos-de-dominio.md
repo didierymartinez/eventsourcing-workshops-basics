@@ -1,4 +1,6 @@
 # 09 - Hechos Históricos Inmutables: Eventos de Dominio
+> 🎯 **Hacia dónde va:** Los Eventos de Dominio son la sangre de Event Sourcing: el hecho histórico e inmutable que el agregado emite y que el EventStore graba como única fuente de verdad de tu lado de escritura.
+> 📦 **Ejemplo de esta sección:** Carrito de compras (ProductoAgregadoAlCarrito).
 
 ¿Qué es un **Evento de Dominio (Domain Event)**?
 
@@ -47,7 +49,7 @@ Recuerda tus lecciones:
 
 1. **[Llega El Comando]** `AgregarProductoAlCarrito` (Un intento del usuario).
 2. **[El Comando es Atendido]** El API Web recibe el DTO, y se lo pasa a un Command Handler desacoplado `AgregarProductoHandler`.
-3. **[Recuperamos El Objeto del Dominio]** El *Handler* inyectó el Receptorio Lógico y rehidrata (o consulta de SQL) al Aggregate Root (Caja fuerte) cargando a nuestro Agregado: el `CarritoCompras`.
+3. **[Recuperamos El Objeto del Dominio]** El *Handler* inyectó el Repositorio lógico y rehidrata (o consulta de SQL) al Aggregate Root (Caja fuerte) cargando a nuestro Agregado: el `CarritoCompras`.
 4. **[El Agregado Ejecuta su lógica]** El Handler invoca `carrito.AnexarArticulo(comando.ArticuloId, comando.Precio)`. El Aggregate Root encapsulado revisa sí ese carrito puede pagarse. Como puede, ejecuta sus matemáticas internas protegiendo que nada se rompa.
 5. **[El Nacimiento del Hecho]** Como el Agregado finalizó el procedimiento sin lanzar excepciones que anulen la vida, decide que acaba de ocurrir una fotografía histórica: 
    Genera e insta un nuevo `record`:
@@ -55,6 +57,12 @@ Recuerda tus lecciones:
 6. **[Infraestructura]** El Handler toma este recién nacido `record`, llama al *Event Store* y graba ese hecho irrefutable en PostgreSQL en tu bóveda histórica inexpugnable. 
 
 En Event Sourcing puro, ese guardado es la ÚNICA Base de Datos que mantendrás en tu arquitectura de Escritura. ¡Y acabas de dominar al 100% sus requerimientos arquitectónicos!
+
+> [!IMPORTANT]
+> **No todos los eventos tienen el mismo alcance: domain vs integration.** Esta distinción es crítica y la profundizarás en el workshop principal (§14, §26):
+> - **Evento de dominio (interno):** ocurre y se procesa **dentro** de tu propio módulo/Bounded Context (ej. `ProductoAgregadoAlCarrito` para actualizar el carrito). Es libre de cambiar.
+> - **Evento de integración (público):** un hecho que **otros sistemas/contextos** necesitan conocer (ej. `PedidoConfirmado` para que Facturación e Inventario reaccionen). Es un **contrato público** que viaja por un bus y debes **versionar con cuidado**.
+> Regla: **no publiques tu evento de dominio interno tal cual al exterior** — acoplarías a otros a tus detalles. Cuando un hecho deba cruzar la frontera, define un evento de integración **dedicado y estable**.
 
 ---
 [⬅️ Volver a la sección anterior](./08-aggregate-y-aggregate-root.md) | [➡️ Siguiente Fase: Async / Await en el Mundo Real](./10-async-await-y-concurrencia.md)

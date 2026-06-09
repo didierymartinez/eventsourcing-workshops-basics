@@ -1,5 +1,7 @@
 # 07 - Decidir el futuro: Emitir eventos
 
+> 🎯 **Hacia dónde va:** damos el salto de solo leer el pasado a decidir el futuro, aprendiendo a emitir nuevos eventos desde el agregado para agregar capítulos a la historia de Jhon.
+
 Jhon ya tiene una biografía y sabe quién es. Pero la vida sigue, y queremos agregar nuevos capítulos a su historia. Hasta ahora solo hemos visto cómo rehidratar el pasado, pero ¿cómo agregamos nuevos hitos en el presente?
 
 ## 🎯 El Objetivo
@@ -188,6 +190,9 @@ public class Persona : AggregateRoot
 ## 🧪 Empieza a testear DESDE YA (no lo dejes para el final)
 
 `RegistrarMatrimonio` es una **función pura**: recibe el estado (eventos pasados) y un comando, y decide un evento. Eso significa que **ya puedes testearla** — sin base de datos, sin mocks, en microsegundos. Adopta el hábito desde esta sección:
+
+> [!NOTE]
+> 🔤 **¿Sintaxis nueva en los tests?** `[Fact]` marca un método como test (xUnit) y `resultado.Should()...` son aserciones fluidas (AwesomeAssertions). Si alguno de estos símbolos te frena —`[Fact]`, `.Should()`, lambdas `() => ...`, `params`— están en el [GLOSARIO](../GLOSARIO.md). Lo profundizamos en §21; aquí solo léelos como "monto la historia → ejecuto → verifico".
 
 ```csharp
 // La edad de Jhon se deriva de sus cumpleaños (§03); para "Jhon adulto" montamos su historia.

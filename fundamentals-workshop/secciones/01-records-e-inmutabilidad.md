@@ -1,4 +1,5 @@
 # 01 - El Peligro del Transporte: Records e Inmutabilidad
+> 🎯 **Hacia dónde va:** Los `record` inmutables son el material con el que construirás Comandos y Eventos de Dominio en Event Sourcing, donde un hecho histórico jamás puede ser alterado en tránsito.
 
 Si has programado en C# clásico o en arquitecturas de tres capas, estás acostumbrado a usar **Clases** (`class`) para todo: para conectarte a la base de datos, para representar un Botón, y también para transportar datos entre métodos (los famosos DTOs).
 
@@ -93,6 +94,9 @@ A partir de este momento, adopta la siguiente heurística estructural estricta:
 
 1. **Usa `class`** para entidades que tienen comportamiento, ciclo de vida continuo y cambian con el tiempo (Ej. Tu Repositorio, tu `AggregateRoot`, tu Gestor de Conexiones).
 2. **Usa `record`** para simples "sobres de datos" inmutables que viajan por el sistema (Comandos, Eventos de Dominio, DTOs de Entrada/Salida).
+
+> [!WARNING]
+> **La inmutabilidad de un `record` es superficial (shallow), no profunda.** Un `record Orden(List<Item> Items)` te impide reasignar `Items`, pero **no** impide `orden.Items.Add(...)` — la lista interna sigue siendo mutable. Si quieres inmutabilidad real, usa colecciones inmutables dentro (`IReadOnlyList<T>`, `ImmutableArray<T>`). Y ojo: `record` (class) sigue siendo **tipo de referencia** con igualdad por valor; si necesitas un *value object* verdaderamente inmutable y por valor, existe `readonly record struct` (C# 10).
 
 ---
 

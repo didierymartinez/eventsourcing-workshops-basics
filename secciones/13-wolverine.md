@@ -1,5 +1,7 @@
 # 13 - El Correo Interno: Wolverine y el Bus de Mensajes
 
+> 🎯 **Hacia dónde va:** introducimos Wolverine como bus de mensajes que descubre y despacha los handlers automáticamente, eliminando el cableado manual y abriendo la puerta a transacciones y outbox.
+
 En la Sección 12 conectamos Marten y logramos que los eventos de Jhon se persistan realmente en PostgreSQL. 
 
 Pero si observas el `Command Handler` que escribimos, hay un detalle que se vuelve problemático a escala:
@@ -176,9 +178,11 @@ serviceCollection.AddWolverine(ExtensionDiscovery.ManualOnly, options =>
 
 > [!NOTE]
 > Cosmos usa `AddWolverine(ExtensionDiscovery.ManualOnly, …)` en vez de `UseWolverine()` porque corre en **Azure Functions (.NET isolated)**: el auto-descubrimiento de extensiones `[WolverineModule]` intentaba cargar DLLs que no existen en el host serverless (rompía con `Microsoft.Azure.WebJobs`). Es exactamente el tipo de detalle de producción que cubre el Nivel 5 de tu [ruta de experto](../WOLVERINE-RUTA-EXPERTO.md).
+>
+> *(¿Términos de Azure nuevos —Service Bus, Functions isolated, sesiones FIFO—? Están en el [GLOSARIO](../GLOSARIO.md).)*
 
 > [!NOTE]
-> 🌱 **Semilla — el middleware no es magia: es composición de funciones.** `AddMiddleware<UnitOfWorkMiddleware>()` "envuelve" tu handler. ¿Cómo? Cada middleware recibe un delegado `next` (= "lo que sigue en la cadena") y decide qué hacer antes y después de llamarlo. Encadenar middlewares es literalmente componer funciones: `mw1(mw2(mw3(handler)))`. Si entiendes **delegados** (`Func`/`Action`) y **closures**, podrías escribir tu propio middleware. Y recuerda: Wolverine **genera el código** que arma esta cadena — no la resuelve por reflexión en cada llamada. Lo dominaremos en las secciones de *delegados/composición* y *reflexión-vs-codegen*.
+> 🌱 **Semilla — el middleware no es magia: es composición de funciones.** `AddMiddleware<UnitOfWorkMiddleware>()` "envuelve" tu handler. ¿Cómo? Cada middleware recibe un delegado `next` (= "lo que sigue en la cadena") y decide qué hacer antes y después de llamarlo. Encadenar middlewares es literalmente componer funciones: `mw1(mw2(mw3(handler)))`. Esto **ya lo construiste a mano en §23** (delegados `Func`/`Action` y closures), así que aquí no es magia: es el mismo patrón que tú armaste. Y recuerda: Wolverine **genera el código** que arma esta cadena — no la resuelve por reflexión en cada llamada (lo desarmamos en §22, *reflexión vs codegen*).
 
 ---
 

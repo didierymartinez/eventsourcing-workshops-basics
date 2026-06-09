@@ -1,4 +1,5 @@
 # 03 - Despacho de eventos: `switch` tipado vs `dynamic` (y por qué importa)
+> 🎯 **Hacia dónde va:** Reconstruir un agregado exige recorrer su historial de eventos y aplicar cada uno; aquí aprendes cómo se enruta cada evento a su método `Apply` y por qué en producción ese despacho se genera como código (no `dynamic` a mano).
 
 En la arquitectura basada en eventos, constantemente tenemos listas masivas de objetos "crudos". Por ejemplo, un historial de vida puede contener dentro muchos tipos distintos de eventos:
 

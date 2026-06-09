@@ -8,7 +8,7 @@
 
 ## 🟥 Lo más valioso: patrones productivos que cambian cómo escribimos handlers
 
-Nuestro workshop (y la plantilla en Sección 17) enseña el flujo **manual**: `GetAggregateRootAsync` → método del agregado → `Save` → `SaveChangesAsync`. El tutorial oficial **Event Sourcing & CQRS with Marten** de Wolverine enseña un nivel por encima que deberíamos introducir:
+Nuestro workshop (y la plantilla en Sección 27) enseña el flujo **manual**: `GetAggregateRootAsync` → método del agregado → `Save` → `SaveChangesAsync`. El tutorial oficial **Event Sourcing & CQRS with Marten** de Wolverine enseña un nivel por encima que deberíamos introducir:
 
 ### 1. Aggregate Handler Workflow (`[Aggregate]` + `FetchForWriting`) 🔴
 Wolverine + Marten **eliminan el código repetitivo** de cargar/guardar el agregado. Tú escribes solo la decisión:

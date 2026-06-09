@@ -1,5 +1,7 @@
 # 02 - Preparando nuestro lienzo
 
+> 🎯 **Hacia dónde va:** montamos el proyecto .NET mínimo —un lienzo en blanco— donde empezaremos a registrar los primeros hechos de la biografía de Jhon.
+
 Para empezar a trabajar con hechos e historia, primero necesitamos un lugar muy sencillo donde experimentar. **Solo necesitamos .NET**. No instalaremos herramientas externas todavía.
 
 ## 🚀 Paso 1: Crear el proyecto

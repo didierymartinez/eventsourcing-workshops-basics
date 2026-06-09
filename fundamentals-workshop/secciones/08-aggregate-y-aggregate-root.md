@@ -1,4 +1,6 @@
 # 08 - Fronteras de Consistencia: El Agregado y su Raíz (Aggregate Root)
+> 🎯 **Hacia dónde va:** El Aggregate Root es el guardián de las reglas de negocio y la frontera de consistencia donde, en Event Sourcing, se validan los comandos y se emiten los eventos que reconstruyen su estado.
+> 📦 **Ejemplo de esta sección:** Carrito de compras (con factura e ítems).
 
 Si abres casi cualquier proyecto de software web genérico hoy en día, verás que todas las propiedades de las clases tienen getters y setters públicos (`public string Estado { get; set; }`). Cualquier parte mínima del programa puede modificar en silencio la fecha límite de un pedido, alterar el estado de un carrito de compras o cancelar una transacción, todo directamente tocando la fila de la base de datos a través de sentencias ORM sueltas.
 
@@ -79,6 +81,11 @@ Así el desarrollador no interactúa con variables, sino con un experto que sabe
 ### Event Sourcing: Dependiente de un Aggregate Root
 
 Todo lo que enseñamos durante este manual cobra sentido en **Event Sourcing**, donde ni siquiera almacenaremos el "Estado Físico Actual" del Agregado en una tabla plana. Como la única forma de que un Agregado recupere su memoria (`TotalDolares` y los iteradores) y pueda aplicar reglas es sabiendo qué le había pasado antes, guardaremos todos los `ProductoAgregadoAlCarrito` en su propio Archivero Histórico Exclusivo y los recargaremos en orden antes de intentar validar si podemos o no agregar otro producto.
+
+> [!IMPORTANT]
+> **Dos reglas de oro del Agregado que casi nunca se enseñan:**
+> 1. **Una transacción = un agregado.** Cada operación modifica **un solo** agregado de forma atómica. Si una acción "necesita" cambiar dos agregados a la vez, casi siempre el diseño está mal: divídela en dos comandos y coordínalos con eventos/consistencia eventual (o una *saga*).
+> 2. **Dimensiona el agregado por sus invariantes, no por sus datos.** Hazlo **pequeño**: solo lo que debe mantenerse consistente *junto* en la misma transacción. El error clásico es el "God aggregate" (un Carrito con 10.000 ítems) que serializa toda la concurrencia y se vuelve lento. Si dos partes no comparten una regla, probablemente son **dos** agregados.
 
 ---
 [⬅️ Volver a la sección anterior](./07-lenguaje-ubicuo.md) | [➡️ Siguiente sección: Eventos de Dominio](./09-eventos-de-dominio.md)

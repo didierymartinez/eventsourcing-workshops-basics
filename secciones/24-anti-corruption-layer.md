@@ -1,5 +1,7 @@
 # 24 - Anti-Corruption Layer: traducir el evento de otro a tu propio idioma
 
+> 🎯 **Hacia dónde va:** resolvemos una decisión clave de producción en Cosmos —cuando llega el evento de otro servicio, ¿manejarlo directo o traducirlo?— construyendo un Anti-Corruption Layer que protege tu propio idioma.
+
 > 🌳 **Sección donde se domina** la semilla de §01/§14 (domain vs integration). Aquí resolvemos la pregunta real de producción: *cuando llega un evento de OTRO servicio, ¿lo manejo directo o lo traduzco?* Es una de las decisiones de diseño más importantes de Cosmos.
 
 ## El escenario
@@ -82,4 +84,4 @@ La ACL responde la pregunta detonante: *no manejes directamente el evento de otr
 
 ---
 
-[⬅️ Volver a Outbox](./14-outbox.md) · [🗺️ Roadmap](../ROADMAP.md) · [🏛️ La Plantilla Cosmos](./17-plantilla-cosmos.md)
+[⬅️ Volver a Outbox](./14-outbox.md) · [🗺️ Roadmap](../ROADMAP.md) · [🏛️ La Plantilla Cosmos](./27-plantilla-cosmos.md)

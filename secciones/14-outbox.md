@@ -1,5 +1,7 @@
 # 14 - El Compromiso Inquebrantable: El Transactional Outbox
 
+> 🎯 **Hacia dónde va:** resolvemos el problema del "mensajero muerto" con el Transactional Outbox, garantizando que guardar el evento y avisar a otros sistemas ocurran de forma atómica aun cuando la red falla.
+
 En la Sección 13, Wolverine y Marten ya comparten una transacción: cuando el Handler de `RegistrarPersona` termina, el evento `PersonaNacida` se guarda en PostgreSQL de forma atómica. 
 
 Pero falta una pieza. En un sistema real, guardar el evento no es suficiente: hay que **avisar a otros**. Cuando Jhon nace, quizá Contabilidad necesita crear su ficha, Notificaciones debe mandarle un correo, y otro Bounded Context resta un cupo. Ese aviso viaja por la red (Azure Service Bus). Y la red **falla**.
@@ -154,4 +156,4 @@ Con el Outbox, tu sistema pasa de "ojalá llegue el mensaje" a **"el mensaje lle
 
 [⬅️ Volver a la sección anterior](./13-wolverine.md)
 
-[➡️ Siguiente sección: El Censo — Límites del Event Store y CQRS](./15-limites-busqueda.md)
+[➡️ Siguiente sección: CQRS y Proyecciones](./20-cqrs-y-proyecciones.md)

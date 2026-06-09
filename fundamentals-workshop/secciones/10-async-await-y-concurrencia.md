@@ -1,4 +1,6 @@
 # 10 - El Bloqueo Mortal: Async / Await en el Mundo Real
+> 🎯 **Hacia dónde va:** Async/await te da la escalabilidad indispensable en Event Sourcing, donde casi todo toca infraestructura (EventStores, buses de mensajes); aprendes a no bloquear hilos al guardar o publicar eventos.
+> 📦 **Ejemplo de esta sección:** Hospital / Paciente (guardado del registro).
 
 Hasta ahora en tus tutoriales básicos, cuando quieres guardar datos en la base de datos escribes algo como:
 

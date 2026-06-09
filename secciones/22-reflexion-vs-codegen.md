@@ -1,5 +1,7 @@
 # 22 - Reflexión vs Generación de Código: la magia, desarmada
 
+> 🎯 **Hacia dónde va:** desarmamos la "magia" del framework comparando reflexión contra generación de código, para entender cómo Wolverine y Marten llaman a tu código y por qué eso los hace rápidos.
+
 > 🌳 **Sección donde se domina** la semilla repetida en §04, §10, §12 y §13: *"el framework no es magia, genera código que puedes leer"*. Esta es la pieza que separa al que usa Wolverine/Marten "porque funciona" del que entiende **qué hace y por qué es rápido**.
 
 ## Dos formas de que un framework "llame a tu código"
@@ -85,4 +87,4 @@ La sensación de "magia" de Wolverine/Marten viene de no ver el puente entre tu 
 
 ---
 
-[⬅️ Volver a Testing sin mocks](./21-testing-sin-mocks.md) · [🗺️ Roadmap](../ROADMAP.md) · [🏛️ La Plantilla Cosmos](./17-plantilla-cosmos.md)
+[⬅️ Volver a Testing sin mocks](./21-testing-sin-mocks.md) · [🗺️ Roadmap](../ROADMAP.md) · [🏛️ La Plantilla Cosmos](./27-plantilla-cosmos.md)

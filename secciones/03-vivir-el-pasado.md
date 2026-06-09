@@ -1,5 +1,7 @@
 # 03 - Vivir el pasado: El motor Apply
 
+> 🎯 **Hacia dónde va:** modelamos los eventos como records inmutables y construimos el motor que recalcula el estado de Jhon reproduciendo su diario, el corazón del replay que usaremos todo el workshop.
+
 En la sección anterior preparamos nuestro lienzo. Ahora, vamos a empezar a escribir los primeros "párrafos" de la vida de Jhon usando C#.
 
 ## 🎯 El Objetivo

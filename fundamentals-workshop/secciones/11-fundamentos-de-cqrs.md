@@ -1,4 +1,6 @@
 # 11 - Divorciando Escritura y Lectura: Fundamentos de CQRS
+> 🎯 **Hacia dónde va:** CQRS separa el universo de escritura (comandos, agregados, EventStore) del de lectura (proyecciones); es el marco en el que Event Sourcing graba eventos y luego los proyecta hacia modelos de lectura por consistencia eventual.
+> 📦 **Ejemplo de esta sección:** Factura (reportes de finanzas).
 
 Cualquier curso de programación clásica te enseña a hacer un sistema monolítico tradicional (El CRUD). Usas una tabla en la base de datos (Ej. `Facturas`), y la modelas con una clase `Factura` en C# para que sirva absolutamente para TODO.
 
@@ -30,7 +32,7 @@ El único objetivo del lado izquierdo del sistema es **Mostrar datos en una pant
 En este lado:
 - NO existen objetos de la vida real como "Agregados". Existen "Proyecciones" o "Modelos de Pantalla" (Ej. `FilaReporteFinanzasGerencia`).
 - No hay CommandHandlers. Hay **Queries** (Ej. `ObtenerReporteGerencia`).
-- **Los datos ya están pre-cacullados y aplanados (Denormalizados).** Si la pantalla pide cruzar clientes con pagos, la base de datos no calcula ningún JOIN. Carga una tabla chata tipo Excel especialmente construida para ESA vista y la escupe íntegra de golpe hacia el usuario. Consultas simples y ultrarrápidas `SELECT * FROM VistaFinanzasPagos`.
+- **Los datos ya están pre-calculados y aplanados (Denormalizados).** Si la pantalla pide cruzar clientes con pagos, la base de datos no calcula ningún JOIN. Carga una tabla chata tipo Excel especialmente construida para ESA vista y la escupe íntegra de golpe hacia el usuario. Consultas simples y ultrarrápidas `SELECT * FROM VistaFinanzasPagos`.
 
 ## 🔄 El Puente: "Consistencia Final"
 
@@ -44,6 +46,9 @@ Milésimas de segundo DESPUÉS, en el fondo, corren procesos subscritos "escucha
 *"Consistencia Final"* significa que, por una fracción minúscula de tiempo, la pantalla de "Listar reportes" quizás aún no muestre la venta que acabas de hacer (está desactualizada por milisegundos). Pero está garantizado que *al final del segundo* lo estará. 
 
 Este divorcio total es lo que permite que gigantes como Amazon o Netflix no se caigan en un Black Friday. La cola de escritura absorbe los millones de compras brutamente, y las bases de datos de lectura se van actualizando a su ritmo para la gente navegando.
+
+> [!WARNING]
+> **El "cuándo NO" (igual de importante que el cómo).** CQRS **no es gratis**: añade read models, sincronización y **consistencia eventual** (el usuario puede no ver su dato al instante). La **mayoría de los CRUDs simples NO lo necesitan** y se complicarían sin beneficio. Justifícalo cuando: las lecturas y escrituras tienen formas/escala muy distintas, necesitas **varios** modelos de lectura, o el reporting pesa sobre la base transaccional. Si tu duda es *"¿lo aplico?"*, probablemente todavía no. Además, **CQRS y Event Sourcing son ortogonales**: puedes hacer CQRS sin ES (y viceversa); no asumas que uno obliga al otro.
 
 ---
 [⬅️ Volver a la sección anterior](./10-async-await-y-concurrencia.md) | [➡️ Siguiente sección: El Patrón Outbox](./12-el-patron-outbox.md)

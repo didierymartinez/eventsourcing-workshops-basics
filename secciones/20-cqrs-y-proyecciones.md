@@ -1,5 +1,7 @@
 # 20 - CQRS y Proyecciones: el lado de lectura
 
+> 🎯 **Hacia dónde va:** pasamos del lado de escritura al de lectura con CQRS y proyecciones, construyendo vistas consultables eficientes en lugar de reproducir todos los streams en cada consulta.
+
 > 🌳 **Sección donde se domina** la semilla de §06 ("el estado es solo una de muchas vistas"). Pasamos del lado de escritura (eventos) al lado de lectura (proyecciones), con sus tres sabores y sus tradeoffs reales.
 
 ## El dolor: leer reproduciendo eventos no escala

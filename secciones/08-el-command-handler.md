@@ -1,5 +1,7 @@
 # 08 - El Command Handler
 
+> 🎯 **Hacia dónde va:** sacamos el flujo cargar → actuar → guardar del `Program.cs` y lo formalizamos en el Command Handler, el orquestador que será la base del patrón de producción y del testing sin mocks.
+
 En la sección anterior vimos que podíamos instanciar a Jhon, pedirle que ejecute acciones y guardar esos eventos en nuestra lista. 
 
 Todo este "flujo de trabajo" (Cargar -> Actuar -> Guardar) sucedía en un solo cajón desordenado: nuestro `Program.cs`.
@@ -95,8 +97,17 @@ var jhonActualizado = new EventStream<Persona>(store, idPersona).Get();
 Console.WriteLine($"Jhon está casado con: {jhonActualizado.NombrePareja}");
 ```
 
+> [!WARNING]
+> 🧩 **Un cabo suelto a propósito: el `null`.** En §07 `Casar` evolucionó a devolver `PersonaCasada?` — puede dar `null` cuando casar es un **no-op** (Jhon ya estaba casado: idempotencia). Aquí, para que el flujo *cargar → actuar → guardar* se lea limpio, llamamos `stream.Append(eventoBoda)` **sin** chequear ese `null`. En código real harías:
+> ```csharp
+> var eventoBoda = jhon.Casar(comando.NombrePareja);
+> if (eventoBoda is null) return;   // no pasó nada: no guardamos
+> stream.Append(eventoBoda);
+> ```
+> No lo metimos en cada ejemplo para no repetir ruido, pero tenlo presente: **cuando un `decide` puede devolver `null`, el handler decide si guardar.** En §18 esto desaparece: el Aggregate Handler Workflow se encarga de "si no hay evento, no escribas".
+
 > [!NOTE]
-> **El Aismlamiento Perfecto**
+> **El Aislamiento Perfecto**
 > Al pasarle el `IEventStore` al `CommandHandler`, hemos logrado desacoplar completamente las reglas de negocio de la infraestructura de almacenamiento.
 > A la clase `PersonaCommandHandlers` no le importa si el `IEventStore` guarda los datos en RAM, en un disco duro, o en una red distribuida. Simplemente le pide el Stream, actúa y guarda.
 

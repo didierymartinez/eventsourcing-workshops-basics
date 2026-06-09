@@ -1,5 +1,7 @@
 # 04 - Refactorizando el motor: El AggregateRoot
 
+> 🎯 **Hacia dónde va:** extraemos el motor de rehidratación a una clase base `AggregateRoot` reutilizable, sentando la arquitectura limpia sobre la que vivirán todos los agregados.
+
 En la sección anterior logramos rehidratar la vida de Jhon leyendo su diario directamente en el constructor. Sin embargo, a medida que Jhon viva más hitos (bodas, mudanzas, trabajos), ese constructor se llenará de un `if` interminable.
 
 Vamos a limpiar nuestra arquitectura siguiendo el principio de **"Separación de Responsabilidades"**.
@@ -41,6 +43,8 @@ Aunque la lista siga siendo de tipo `object` (un problema de tipado que resolver
 
 > [!NOTE]
 > 🌱 **Semilla — Este motor que escribes a mano, luego lo automatiza el framework.** El bucle "cargar historia → aplicar evento por evento → guardar lo nuevo" es tan universal que **Marten + Wolverine lo generan por ti** (el *Aggregate Handler Workflow*: tú solo escribes la decisión y devuelves los eventos; ellos cargan, aplican y guardan con concurrencia optimista). Lo construyes a mano ahora para que ese atajo, más adelante, **no sea magia**: sabrás exactamente qué hace por debajo.
+
+## 🛠️ Refactor 2: Un motor compartido (la Clase Base Abstracta)
 
 Vamos a crear una **Clase Base Abstracta** que comparta esta "mecánica" (el motor) con todos:
 

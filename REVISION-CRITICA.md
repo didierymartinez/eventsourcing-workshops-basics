@@ -18,6 +18,8 @@ A continuación, lo concreto.
 
 ---
 
+> **✅ Estado (04/06): las mejoras por sección de fundamentals fueron APLICADAS.** §01 inmutabilidad superficial · §02 default interface methods · §03 dynamic→switch+codegen (con ref. Microsoft) · §04 GoF vs CQRS-command + dónde validar · §05 Repository anti-patrón sobre ORM + Unit of Work · §06 captive dependency + service locator · §07 lenguaje ubicuo por Bounded Context · §08 una transacción = un agregado + dimensionamiento · §09 domain vs integration events · §10 starvation/CancellationToken/mito async · §11 cuándo NO CQRS + ortogonalidad · §12 at-least-once + idempotencia + Inbox. Los *conceptos vitales* (genéricos, delegados, SOLID, reflexión-vs-codegen, testing, etc.) ya viven en el workshop principal (§05, §10, §18-§23) y su ROADMAP.
+
 ## B. Hallazgos por sección (con severidad)
 
 ### 01 — Records e Inmutabilidad · 🟡 Medio

@@ -1,5 +1,7 @@
 # 10 - El Recepcionista: Inyección de Dependencias
 
+> 🎯 **Hacia dónde va:** reemplazamos el ensamblaje manual de piezas por Inyección de Dependencias, el cableado que nos permitirá conectar el sistema a infraestructura real sin acoplamiento.
+
 Con nuestro motor Event Sourcing preparado para el mundo asíncrono, estamos a un paso de conectar todo a una base de datos real.
 
 Pero si abrimos nuestro punto de entrada (el lugar donde arranca la aplicación, como `Program.cs`), encontraremos un problema de diseño que hará colapsar la Agencia de Biografías si crece un poco más.

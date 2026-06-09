@@ -1,5 +1,7 @@
 # 06 - El Almacén en Memoria: El Event Store
 
+> 🎯 **Hacia dónde va:** definimos el contrato del Event Store y su implementación en memoria, el archivero central que custodia todos los streams y que luego reemplazaremos por una base de datos real.
+
 En la sección anterior logramos que el `EventStream<T>` manejara perfectamente el flujo de vida de un solo individuo aislando su `List<EventoAlmacenado>` física.
 
 Pero nos dimos cuenta de un problema logístico masivo: si tenemos 1.000 clientes, tendríamos 1.000 listas flotando en la memoria del programa. Necesitamos un archivero general que agrupe y custodie todos esos flujos individuales.
@@ -48,6 +50,9 @@ procesoB.AppendEvent(new EventoAlmacenado(idJhon, Version: 6, ..., new PersonaCa
 
 La `Version` que añadimos no sirve de nada si nadie la verifica. El arreglo: que el almacén **rechace** un append cuya versión esperada ya no esté vigente.
 
+> [!NOTE]
+> 🔤 En el código de abajo verás `?.` y `??` (`cajon.LastOrDefault()?.Version ?? 0`): `?.` devuelve `null` sin reventar si lo de la izquierda es `null`, y `??` pone un valor por defecto cuando hay `null`. Si esta o cualquier otra sintaxis de C# te frena, está en el [GLOSARIO](../GLOSARIO.md).
+
 ```csharp
 // 🔧 El almacén valida la versión esperada antes de aceptar
 public void AppendEvent(EventoAlmacenado evento)
@@ -67,6 +72,16 @@ public void AppendEvent(EventoAlmacenado evento)
 
 > [!TIP]
 > 🏷️ **El nombre.** Esto es **control de concurrencia optimista**: asumimos que los conflictos son raros, no bloqueamos; solo al guardar verificamos la versión y, si chocó, **fallamos y reintentamos** (recargar → reaplicar → reintentar). En producción no lo escribes a mano: Marten lo hace con **`FetchForWriting`** (lo veremos en §18). Pero ahora sabes que la `Version` no es decorativa: es tu **detector de conflictos**.
+
+> [!NOTE]
+> 🧱 **Sobre las excepciones de dominio.** A lo largo del workshop verás lanzar excepciones propias como `ConcurrencyException`, `ReglaDeNegocioException` o `EventoInvalidoException`. No vienen de ninguna librería: son **clases tuyas**, de una línea cada una, que solo heredan de `Exception` para darle un nombre claro al fallo:
+> ```csharp
+> public class ConcurrencyException : Exception
+> {
+>     public ConcurrencyException(string mensaje) : base(mensaje) { }
+> }
+> ```
+> Las demás (`ReglaDeNegocioException`, `EventoInvalidoException`) son idénticas: solo cambia el nombre. Asume que están definidas así en el proyecto; no las repetiremos cada vez.
 
 ---
 

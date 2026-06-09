@@ -1,5 +1,7 @@
 # 11b - El momento de adoptar herramientas: Marten + Wolverine, sin magia
 
+> 🎯 **Hacia dónde va:** hacemos el recuento honesto del motor que construiste a mano y justificamos por qué y qué adoptar de Marten y Wolverine, el puente hacia las herramientas de producción sin tratarlas como magia.
+
 > 🧭 **Punto de inflexión del workshop.** Hasta aquí construiste **todo el motor a mano**. Antes de adoptar librerías, paramos a responder dos preguntas honestas: *¿por qué adoptarlas (necesidad real)?* y *¿qué hace cada una y cómo (claridad)?* — para que **no sean "una librería que alguien recomendó y no sé cómo funciona"**, sino herramientas cuyo trabajo ya hiciste tú.
 
 ## 1. Lo que ya construiste a mano (recuento honesto)

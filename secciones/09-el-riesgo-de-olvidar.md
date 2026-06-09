@@ -1,5 +1,7 @@
 # 09 - El Tiempo de Espera: I/O, `async/await` y el riesgo de olvidar
 
+> 🎯 **Hacia dónde va:** preparamos el motor para el mundo asíncrono con `async/await`, el requisito imprescindible antes de dejar la RAM volátil y persistir los eventos en una base de datos real.
+
 ## ⏱️ Fase 2: Transición a la Infraestructura .NET
 
 Hasta este punto de la historia, nuestra Agencia de Biógrafos es un milagro de eficiencia. El Biógrafo (`CommandHandler`) toma los apuntes, va corriendo al `EventStream`, pide los archivos a nuestro `InMemoryEventStore`, y escribe los nuevos eventos en milisegundos.
@@ -79,13 +81,13 @@ public class EventStream<T> where T : AggregateRoot, new()
 
     public EventStream(IEventStore store, Guid aggregateId) { ... }
 
-    // Ya no es 'Get()', ahora devuelve un Task<T>
-    public async Task<T> GetAsync()
+    // Ya no es 'Get()', ahora devuelve un Task<T> (y recibe el CancellationToken)
+    public async Task<T> GetAsync(CancellationToken ct = default)
     {
         var entidad = new T();
         
         // El 'await' libera la CPU mientras el disco responde
-        var eventos = await _store.GetEventsAsync(_aggregateId);
+        var eventos = await _store.GetEventsAsync(_aggregateId, ct);
 
         foreach (var ev in eventos)
         {
@@ -95,7 +97,7 @@ public class EventStream<T> where T : AggregateRoot, new()
         return entidad; // (Rehidratación Asíncrona)
     }
 
-    public async Task AppendAsync(object nuevoEvento)
+    public async Task AppendAsync(object nuevoEvento, CancellationToken ct = default)
     {
         _version++;
         var eventoAlmacenado = new EventoAlmacenado(
@@ -106,7 +108,7 @@ public class EventStream<T> where T : AggregateRoot, new()
         );
 
         // De nuevo, esperamos sin bloquear el hilo
-        await _store.AppendEventAsync(eventoAlmacenado); 
+        await _store.AppendEventAsync(eventoAlmacenado, ct); 
     }
 }
 ```
@@ -125,18 +127,19 @@ public class RegistrarMatrimonioHandler
         _store = store;
     }
 
-    public async Task HandleAsync(RegistrarMatrimonio comando)
+    // El CancellationToken viaja por toda la cadena async (ver la regla de abajo)
+    public async Task HandleAsync(RegistrarMatrimonio comando, CancellationToken ct)
     {
         var stream = new EventStream<Persona>(_store, comando.PersonaId);
         
-        // 1. CARGAR (Esperar I/O)
-        var persona = await stream.GetAsync();
+        // 1. CARGAR (Esperar I/O) — pasamos el ct
+        var persona = await stream.GetAsync(ct);
 
-        // 2. ACTUAR (Reglas de CPU instantáneas)
+        // 2. ACTUAR (Reglas de CPU instantáneas) — síncrono, sin ct
         var nuevoEvento = persona.Casar(comando.NombrePareja);
 
-        // 3. GUARDAR (Esperar I/O)
-        await stream.AppendAsync(nuevoEvento);
+        // 3. GUARDAR (Esperar I/O) — pasamos el ct
+        await stream.AppendAsync(nuevoEvento, ct);
     }
 }
 ```

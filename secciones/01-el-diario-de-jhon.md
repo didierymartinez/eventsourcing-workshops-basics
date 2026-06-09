@@ -1,5 +1,7 @@
 # 01 - 🧠 El rastro de lo que sucede
 
+> 🎯 **Hacia dónde va:** sembramos la idea central de todo el workshop —guardar los hechos del pasado en vez de la foto del presente— que es la base sobre la que construiremos el motor de Event Sourcing.
+
 Bienvenido. En este workshop no vamos a construir una base de datos tradicional. Vamos a construir una **Biografía**.
 
 ## 🎯 El Objetivo

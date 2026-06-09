@@ -84,7 +84,7 @@ Conceptos que aparecen en la documentación de Wolverine y que también se siemb
 | **Dead Letter Queue** (mensajes que fallan repetidamente) | §14 (Outbox/mensajería) | §nueva DLQ |
 | **Idempotencia en mensajería** | §07/§14 (ya) | §14 |
 | **Sagas / process managers** (coordinar varios agregados, compensación) | §18 (un comando = un agregado → ¿y si son varios?) | §nueva Sagas |
-| **Multi-tenancy** (`InvokeForTenantAsync`, FIFO por tenant) | §17 (ya) / CONCEPTOS-PROFUNDO | §25 Envelope / §nueva |
+| **Multi-tenancy** (`InvokeForTenantAsync`, FIFO por tenant) | §27 (ya) / CONCEPTOS-PROFUNDO | §25 Envelope / §nueva |
 | **Anti-Corruption Layer** (evento público → comando interno) | §14 (semilla) | ✅ §24 |
 | **Envelope / contexto** (payload vs sobre; in-memory sin contexto) | §10 (TenantId DEFAULT) / §14 | ✅ §25 |
 

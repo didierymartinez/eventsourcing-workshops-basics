@@ -1,5 +1,7 @@
 # 12 - El Bibliotecario Experto: Introducción a Marten
 
+> 🎯 **Hacia dónde va:** adoptamos Marten para que haga contra PostgreSQL todo el trabajo sucio que ya construiste a mano (sobres, versiones, serialización, transacciones), jubilando el `InMemoryEventStore`.
+
 En la Sección 11 encendimos nuestra bóveda de concreto (PostgreSQL en Docker) y dejamos al `InMemoryEventStore` listo para ser jubilado.
 
 Y si recordamos el dolor de las Secciones 05 y 06, construimos a mano: el sobre (`EventoAlmacenado`), el gestor de versiones, el diccionario en RAM (`InMemoryEventStore`) y el envoltorio lógico (`EventStream<T>`).

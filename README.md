@@ -43,13 +43,14 @@ Este workshop no es una lista de instrucciones, es un viaje donde descubrirás:
 
 **Fase 5: Consultas (CQRS)** → cubierto por [§20 - CQRS y Proyecciones](./secciones/20-cqrs-y-proyecciones.md) ✅
 
-**Fase 6: Profundización y Plantilla** → §18-§26 (Decider, Versionado, Testing, Codegen, ACL, Envelope, dos BCs) y [§17 - La Plantilla Cosmos.BuildingBlocks](./secciones/17-plantilla-cosmos.md) ✅
+**Fase 6: Profundización y Plantilla** → §18-§26 (Decider, Versionado, Testing, Codegen, ACL, Envelope, dos BCs) y [§27 - La Plantilla Cosmos.BuildingBlocks](./secciones/27-plantilla-cosmos.md) ✅
 
 > ⚠️ Este listado numérico es **histórico**. El workshop es **evolutivo**: el **orden de aprendizaje real** y las secciones que vienen están en el [**ROADMAP.md**](./ROADMAP.md) — síguelo a él, no a los números de archivo.
 
 ---
 
 ## 🧭 Documentos de madurez y dominio
+- [**GLOSARIO.md**](./GLOSARIO.md) — 📖 referencia rápida de términos (C#, Azure, arquitectura) para no asumir nada.
 - [**ROADMAP.md**](./ROADMAP.md) — 🗺️ currículo vivo por niveles (básico→avanzado); crece con el tiempo.
 - [**MAPA-CONCEPTUAL.md**](./MAPA-CONCEPTUAL.md) — vista de pájaro: cada concepto → su lugar en el código real de Cosmos.
 - [**WOLVERINE-RUTA-EXPERTO.md**](./WOLVERINE-RUTA-EXPERTO.md) — ruta por niveles para dominar WolverineFx, anclada a Cosmos.
