@@ -118,6 +118,9 @@ public class OrdenDeCompra : AggregateRoot
 ```
 *(`RaiseEvent` = `Apply(e)` + `_uncommittedEvents.Add(e)`, como en el patrón de la plantilla.)*
 
+> [!NOTE]
+> 🔄 **¿Por qué aquí `Apply` es `private` y en §04 tenía que ser `public`?** Porque cambió **quién** los invoca. En §04 el despacho era a mano con `((dynamic)this).Apply(...)` desde la clase base, y `dynamic` respeta la accesibilidad → tenían que ser `public`. Aquí los reaplica **Marten**, que usa **reflexión** y sí puede llamar métodos no públicos. Por eso lo idiomático con Marten es `private`: encapsulas el `Apply` y dejas que el framework lo encuentre.
+
 **3. Implementa el Command Handler** (orquesta: cargar → actuar → guardar):
 ```csharp
 public record AprobarOrdenDeCompra(string OrdenId, string AprobadorId);

@@ -45,8 +45,9 @@ public class Persona : AggregateRoot
     }
 
     // El motor actualiza el estado cuando ESTOS eventos ocurren en el pasado
-    private void Apply(PersonaCasada c) => NombrePareja = c.NombrePareja;
-    private void Apply(PersonaMudada m) => Ciudad = m.NuevaCiudad;
+    // public (no private): los invoca el motor dinámico de AggregateRoot — ver la trampa de §04
+    public void Apply(PersonaCasada c) => NombrePareja = c.NombrePareja;
+    public void Apply(PersonaMudada m) => Ciudad = m.NuevaCiudad;
 }
 ```
 
@@ -169,7 +170,7 @@ public class Persona : AggregateRoot
         return new PersonaCasada(this.Id, nombrePareja);
     }
 
-    private void Apply(PersonaCasada c) { NombrePareja = c.NombrePareja; Casado = true; }
+    public void Apply(PersonaCasada c) { NombrePareja = c.NombrePareja; Casado = true; }
 }
 ```
 

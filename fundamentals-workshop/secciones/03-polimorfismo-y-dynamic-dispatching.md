@@ -53,12 +53,15 @@ public void Load(IEnumerable<object> eventos)
 }
 
 // Y en la clase, un overload de Apply por evento (se ve muy OCP):
-protected void Apply(PersonaNacida n)       => Nombre = n.Nombre;
-protected void Apply(CumpleañosCelebrado e) => Edad++;
-protected void Apply(PersonaMudada m)       => Ciudad = m.NuevaCiudad;
+public void Apply(PersonaNacida n)       => Nombre = n.Nombre;
+public void Apply(CumpleañosCelebrado e) => Edad++;
+public void Apply(PersonaMudada m)       => Ciudad = m.NuevaCiudad;
 ```
 
 Se ve mágico: agregas un evento nuevo añadiendo un overload `Apply`, **sin tocar `Load`**. Pero esa magia tiene un precio que debes conocer:
+
+> [!WARNING]
+> 🪤 **Ojo con `public`.** Esos `Apply` están en `public` a propósito. Si `Load` vive en una **clase base** (`AggregateRoot`) y declaras los `Apply` como `protected`/`private` en la clase hija, en runtime obtendrás `RuntimeBinderException: ... is inaccessible due to its protection level`. La razón: `dynamic` respeta la accesibilidad **desde donde está escrita la llamada** (la clase base), y `protected` solo es visible para la clase declarante y sus **subclases** — no para su superclase. Regla: lo que despacha el motor de la base debe ser `public` (o `internal` en el mismo proyecto). *(Con frameworks como Marten es distinto: usan reflexión y sí acceden a métodos no públicos.)*
 
 > [!WARNING]
 > **El costo de `dynamic` (según la doc oficial de Microsoft):**

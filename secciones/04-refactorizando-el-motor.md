@@ -137,11 +137,20 @@ public class Persona : AggregateRoot
     public Persona(IEnumerable<object> eventos) => Load(eventos);
 
     // Ya no hay `if`. Solo hay sobrecargas limpias.
-    protected void Apply(PersonaNacida n) { Nombre = n.Nombre; Ciudad = n.Ciudad; }
-    protected void Apply(CumpleañosCelebrado e) { Edad++; }
-    protected void Apply(HijoNacido h) { Hijos.Add(h.NombreHijo); }
+    // ⚠️ public (no protected/private): el motor que las invoca vive en la clase base — ver la nota de abajo.
+    public void Apply(PersonaNacida n) { Nombre = n.Nombre; Ciudad = n.Ciudad; }
+    public void Apply(CumpleañosCelebrado e) { Edad++; }
+    public void Apply(HijoNacido h) { Hijos.Add(h.NombreHijo); }
 }
 ```
+
+> [!WARNING]
+> 🪤 **Trampa real de `dynamic` y la accesibilidad (te vas a topar con esto).** Si declaras los `Apply` como `protected` o `private`, en tiempo de ejecución verás:
+> ```
+> RuntimeBinderException: 'Persona.Apply(HijoNacido)' is inaccessible due to its protection level
+> ```
+> ¿Por qué? Porque `dynamic` **sí respeta** las reglas de accesibilidad, evaluadas desde **el lugar donde está escrita la llamada dinámica**. Y `((dynamic)this).Apply(...)` vive en `AggregateRoot.Load`, o sea, en la **clase base**. Un miembro `protected` es accesible desde la clase que lo declara y desde sus **subclases**; pero `AggregateRoot` es la **superclase** de `Persona`, no una subclase, así que **no puede ver** los `Apply` protegidos de `Persona`.
+> La regla, en una frase: **el método al que despacha el motor de la base tiene que ser visible desde la base.** Eso lo garantiza `public` (o `internal`, si todo está en el mismo proyecto). Si quieres mantenerlos ocultos, el motor tendría que usar reflexión con `BindingFlags.NonPublic` — más adelante (§22) verás por qué eso es justo lo que evitamos.
 
 > [!NOTE]
 > **¿Cómo funciona la magia de `dynamic`? (Dynamic Dispatching)**
@@ -153,7 +162,7 @@ public class Persona : AggregateRoot
 > Así es como en tiempo de ejecución (Runtime), el código enruta automáticamente cada evento a su método `Apply(TipoDeEvento)` adecuado sin necesidad de escribir un enorme bloque `if / else`.
 
 > [!TIP]
-> Al separar cada evento en su propio método `Apply(TipoDeEvento)`, hemos eliminado la "complejidad cognitiva" del gran `if`. Si la vida de Jhon crece con 50 eventos nuevos, simplemente añades 50 métodos privados `Apply` aislados y tu clase `Persona` seguirá siendo hermosamente fácil de leer.
+> Al separar cada evento en su propio método `Apply(TipoDeEvento)`, hemos eliminado la "complejidad cognitiva" del gran `if`. Si la vida de Jhon crece con 50 eventos nuevos, simplemente añades 50 métodos `Apply` aislados (públicos, por lo que vimos arriba) y tu clase `Persona` seguirá siendo hermosamente fácil de leer.
 
 ---
 
